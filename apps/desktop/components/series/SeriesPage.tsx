@@ -12,6 +12,7 @@ import { modelLabel, seriesApi } from "./api";
 import { DnaPanel } from "./DnaPanel";
 import { EpisodePanel } from "./EpisodePanel";
 import { LibraryAdd } from "./Library";
+import { ModelChoices } from "./ModelChoices";
 import { field, type Act } from "./shared";
 import type { Character, Readiness, SeriesSnapshot } from "./types";
 
@@ -59,8 +60,8 @@ export function SeriesPage({ id }: { id: string }) {
   const { act, err, pending } = useAct(id);
 
   if (q.isError) return <main className="p-8"><Link href="/animations/series" className="text-sm hover:underline">← Series</Link><p className="mt-4 text-muted-foreground">{(q.error as Error).message}</p></main>;
-  if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse rounded-xl bg-muted/40" /><div className="h-64 animate-pulse rounded-2xl bg-muted/40" /></main>;
-  const { series: s, episodes, ready } = q.data;
+  if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse rounded-xl bg-muted/40" /><div className="h-64 animate-pulse rounded-xl bg-muted/40" /></main>;
+  const { series: s, episodes } = q.data;
   const approved = s.characters.filter((c) => c.status === "approved").length;
   const openEp = episodes.find((e) => e.status !== "done");
 
@@ -70,16 +71,16 @@ export function SeriesPage({ id }: { id: string }) {
         <Link href="/animations/series" className="text-xs text-muted-foreground hover:underline">← Series</Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{q.data.language.name}</span>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">parts: {s.partPlan.join(" → ")} min</span>
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{q.data.language.name}</span>
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">parts: {s.partPlan.join(" → ")} min</span>
         </div>
         {(s.logline || s.premise) && <p className="mt-2 max-w-4xl text-muted-foreground">{s.logline || s.premise}</p>}
       </div>
 
       <WorkBar snap={q.data} onStop={() => act("stop", () => seriesApi.cancel(id))} />
       {err && <p className="rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300" data-testid="series-action-error">{err}</p>}
-      <ReadyPanel ready={ready} />
+      <ModelChoices sid={id} act={act} />
       <DnaPanel sid={id} dna={s.dna} act={act} />
 
       <section>
@@ -124,7 +125,7 @@ export function SeriesPage({ id }: { id: string }) {
       </section>
 
       {s.story.episodes.length > 0 && (
-        <section className="rounded-2xl border border-border bg-card/30 p-5">
+        <section className="rounded-xl border border-border bg-card/30 p-5">
           <h3 className="mb-2 font-semibold text-foreground">The story so far</h3>
           <ul className="space-y-1 text-sm text-muted-foreground">{s.story.episodes.map((e) => <li key={e.episode}><b className="text-foreground">Episode {e.episode}:</b> {e.summary}</li>)}</ul>
           {s.story.facts.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Remembered: {s.story.facts.join(" · ")}</p>}
@@ -139,7 +140,7 @@ export function WorkBar({ snap, onStop }: { snap: SeriesSnapshot; onStop: () => 
   if (!snap.busy && w.state !== "error" && w.state !== "stopped") return null;
   const pct = w.total ? Math.round((100 * (w.done || 0)) / w.total) : null;
   return (
-    <div className={`rounded-2xl border p-4 ${w.state === "error" ? "border-red-500/40 bg-red-500/5" : "border-amber-500/40 bg-amber-500/5"}`} data-testid="work-bar">
+    <div className={`rounded-xl border p-4 ${w.state === "error" ? "border-red-500/40 bg-red-500/5" : "border-amber-500/40 bg-amber-500/5"}`} data-testid="work-bar">
       <div className="flex flex-wrap items-center gap-3">
         {snap.busy ? <Loader2 className="h-4 w-4 animate-spin text-amber-500" /> : <AlertTriangle className="h-4 w-4 text-red-500" />}
         <b className="text-sm text-foreground">{snap.busy ? w.label : w.state === "error" ? "Something failed" : "Stopped"}</b>
@@ -168,7 +169,7 @@ export function ReadyPanel({ ready }: { ready: Readiness }) {
   const missing = STEPS.filter(([k]) => !ready[k]);
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-2xl border border-border bg-card/30" data-testid="ready-panel">
+    <div className="rounded-xl border border-border bg-card/30" data-testid="ready-panel">
       <button className="flex w-full items-center gap-2 p-4 text-left" onClick={() => setOpen(!open)}>
         <Cpu className="h-4 w-4 text-amber-500" />
         <b className="text-sm text-foreground">Models</b>
@@ -201,7 +202,7 @@ const STATUS_CHIP: Record<string, [string, string]> = {
 };
 export const Chip = ({ s }: { s: string }) => {
   const [t, c] = STATUS_CHIP[s] ?? [s, "bg-muted text-muted-foreground"];
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${c}`} data-testid="status-chip">{t}</span>;
+  return <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${c}`} data-testid="status-chip">{t}</span>;
 };
 
 export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Character; act: Act; pending: string | null }) {
@@ -218,7 +219,7 @@ export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Charac
     void act(`upload-${c.id}`, () => seriesApi.uploadCharacter(sid, c.id, fd));
   };
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card/40 p-4" data-testid={`character-${c.id}`}>
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card/40 p-4" data-testid={`character-${c.id}`}>
       <div className="flex items-center gap-2">
         <b className="text-lg text-foreground">{c.name}</b>
         <span className="text-xs text-muted-foreground">{[c.role, c.age, c.gender !== "other" ? c.gender : ""].filter(Boolean).join(" · ")}</span>
@@ -239,8 +240,8 @@ export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Charac
       )}
       {c.voice?.sampleText && <p className="text-xs italic text-muted-foreground">“{c.voice.sampleText}”</p>}
       <div className="flex flex-wrap gap-1 text-[11px]">
-        {c.sheetInfo && <span className={`rounded-full px-2 py-0.5 ${c.sheetInfo.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`} title={c.sheetInfo.note}>look: {modelLabel(c.sheetInfo.model)}</span>}
-        {c.voice?.model && <span className={`rounded-full px-2 py-0.5 ${c.voice.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>voice: {modelLabel(c.voice.model)}</span>}
+        {c.sheetInfo && <span className={`rounded-lg px-2 py-0.5 ${c.sheetInfo.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`} title={c.sheetInfo.note}>look: {modelLabel(c.sheetInfo.model)}</span>}
+        {c.voice?.model && <span className={`rounded-lg px-2 py-0.5 ${c.voice.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>voice: {modelLabel(c.voice.model)}</span>}
       </div>
       {!edit ? (
         <div className="space-y-1 text-sm">
@@ -291,12 +292,12 @@ export function AddCharacter({ sid, act }: { sid: string; act: Act }) {
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ name: "", look: "", outfit: "", personality: "", voice: "", age: "", gender: "other" });
   if (!open) return (
-    <button className="flex min-h-40 items-center justify-center gap-2 rounded-2xl border border-dashed border-border text-sm text-muted-foreground hover:border-amber-500" onClick={() => setOpen(true)} data-testid="add-character">
+    <button className="flex min-h-40 items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:border-amber-500" onClick={() => setOpen(true)} data-testid="add-character">
       <Plus className="h-4 w-4" />Add a character
     </button>
   );
   return (
-    <div className="space-y-2 rounded-2xl border border-border bg-card/40 p-4">
+    <div className="space-y-2 rounded-xl border border-border bg-card/40 p-4">
       <input className={field} placeholder="Name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} data-testid="new-char-name" />
       <div className="grid grid-cols-2 gap-2">
         <input className={field} placeholder="Age" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} />
@@ -321,7 +322,7 @@ function NewEpisode({ sid, act, canStart, number }: { sid: string; act: Act; can
   const [script, setScript] = useState("");
   const [title, setTitle] = useState("");
   return (
-    <div className="space-y-4 rounded-2xl border border-border bg-card/40 p-5" data-testid="new-episode">
+    <div className="space-y-4 rounded-xl border border-border bg-card/40 p-5" data-testid="new-episode">
       <div className="flex flex-wrap items-center gap-3">
         <b className="text-foreground">Episode {number}</b>
         <div className="inline-flex rounded-xl border border-border p-0.5 text-sm">

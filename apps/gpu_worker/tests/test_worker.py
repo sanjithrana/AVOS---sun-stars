@@ -194,8 +194,16 @@ def test_avos_can_push_a_workflow(monkeypatch, tmp_path):
     with client() as c:
         assert c.put("/workflows/wan-2.2", json={"nodes": [], "links": []}).status_code == 400
         assert c.put("/workflows/..%2Fx", json=wf).status_code in (400, 404)
-        assert c.put("/workflows/wan-2.2", json=wf).json() == {"ok": True, "model": "wan-2.2"}
+        assert c.put("/workflows/wan-2.2", json=wf).json() == {"ok": True, "model": "wan-2.2", "autowired": None}
+        # a plain ComfyUI export (no placeholders) is wired on the way in
+        plain = {"3": {"class_type": "CLIPTextEncode", "inputs": {"text": "a fox", "clip": ["9", 0]}},
+                 "4": {"class_type": "KSampler", "inputs": {"positive": ["3", 0], "seed": 7, "steps": 20}},
+                 "5": {"class_type": "LoadImage", "inputs": {"image": "x.png"}}}
+        r = c.put("/workflows/ltx-2.3", json=plain).json()
+        assert "{{PROMPT}} → 3 CLIPTextEncode.text" in r["autowired"] and "{{IMAGE}}" in r["autowired"]
     assert json.loads((tmp_path / "wf" / "wan-2.2.json").read_text()) == wf
+    saved = json.loads((tmp_path / "wf" / "ltx-2.3.json").read_text())
+    assert saved["3"]["inputs"]["text"] == "{{PROMPT}}" and saved["4"]["inputs"]["seed"] == "{{SEED}}"
 
 
 def test_urgent_jobs_jump_the_queue():
@@ -206,3 +214,26 @@ def test_urgent_jobs_jump_the_queue():
         assert q.position(jobs[3]) == 0 and q.position(jobs[2]) == 3
         assert JobSpec.from_body({**job(), "priority": 99}, {}).priority == 9
     asyncio.run(go())
+
+
+def test_cpu_mode_reports_ram_plus_page_file_and_draws_small(monkeypatch):
+    """An Intel PC without an NVIDIA card: the worker is a CPU worker whose memory is RAM + page file (weights beyond
+    RAM page from the SSD), with bf16 / fp8 (kept fp8, cast per layer by ComfyUI), and jobs are drawn small and short."""
+    from worker.adapters.comfyui import cpu_size
+
+    monkeypatch.setattr(config, "DEVICE", "cpu")
+    monkeypatch.setattr(config, "RAM_GB", 16.0)
+    monkeypatch.setattr(config, "SWAP_GB", 48.0)
+    monkeypatch.setattr(config, "FAKE_GPU", "")
+    gpu._cache.update(t=0.0, gpu=None, cpu="Intel Core i7-1255U")
+    g = gpu.info(max_age=0)
+    assert g["device"] == "cpu" and g["name"] == "Intel Core i7-1255U (CPU)" and g["vram_gb"] == 64.0 and g["ram_gb"] == 16.0
+    sup = gpu.supports(g)
+    assert sup["cpu"] and sup["fp8"] and sup["bf16"] and not sup["fp4"] and not sup["cuda"] and gpu.is_cpu(g)
+    job = JobSpec(model="ltx-2.3", adapter="comfyui", task="video", width=1280, height=720, seconds=8.0, frames=201, fps=25)
+    cpu_size(job)
+    assert (job.width, job.height) == (512, 288) and job.seconds == 5 and job.frames == 121
+    pic = JobSpec(model="z-image", adapter="comfyui", task="image", width=1344, height=768)
+    cpu_size(pic)
+    assert (pic.width, pic.height) == (512, 288)
+    gpu._cache.update(t=0.0, gpu=None)

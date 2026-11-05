@@ -18,7 +18,7 @@ test("GPU page: workers, limits and the router", async ({ page, request, baseURL
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
 
-  await page.goto("/facts");
+  await page.goto("/explainer");
   await page.getByRole("link", { name: /GPU/ }).first().click();
   await expect(page).toHaveURL(/\/gpu$/);
   await expect(page.getByRole("heading", { name: "GPU", exact: true })).toBeVisible();

@@ -23,11 +23,11 @@ const input =
   "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30";
 const btn = "inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-50";
 const primary =
-  "inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-xl bg-primary hover:bg-[#8873be] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
 
 function Card({ icon, title, sub, children, id, right }: { icon: ReactNode; title: string; sub?: string; children: ReactNode; id: string; right?: ReactNode }) {
   return (
-    <section id={id} className="rounded-2xl border border-border bg-card/50 p-5" data-testid={`gpu-${id}`}>
+    <section id={id} className="rounded-xl border border-border bg-card/50 p-5" data-testid={`gpu-${id}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">{icon}{title}</h2>
@@ -43,7 +43,7 @@ function Card({ icon, title, sub, children, id, right }: { icon: ReactNode; titl
 
 function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card/40 p-4">
+    <div className="rounded-xl border border-border bg-card/40 p-4">
       <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
       {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
@@ -66,7 +66,7 @@ function VramBar({ w }: { w: GpuWorker }) {
   return (
     <div>
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>VRAM</span>
+        <span>{w.gpu?.device === "cpu" ? `Memory: ${w.gpu.ram_gb ?? 0} GB RAM + ${w.gpu.swap_gb ?? 0} GB page file (CPU, ≤${w.gpu.max_side ?? 512}px, ≤${w.gpu.max_seconds ?? 5}s clips)` : "VRAM"}</span>
         <span data-testid="vram-text">{used.toFixed(1)} / {total.toFixed(0)} GB</span>
       </div>
       <div className="mt-1 flex h-2.5 overflow-hidden rounded-full bg-muted" role="img" aria-label={`VRAM ${used.toFixed(1)} of ${total} GB used`}>
@@ -101,13 +101,13 @@ function WorkerCard({ w, onChanged }: { w: GpuWorker; onChanged: () => void }) {
       : state.startsWith("ready") ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
         : "bg-red-500/10 text-red-600 dark:text-red-400";
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card/40 p-5" data-testid={`worker-${w.id}`}>
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card/40 p-5" data-testid={`worker-${w.id}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-base font-semibold text-foreground">{w.name}</h3>
           <p className="truncate text-xs text-muted-foreground">{w.url}</p>
         </div>
-        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${pill}`} data-testid="worker-state">{state}</span>
+        <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium ${pill}`} data-testid="worker-state">{state}</span>
       </div>
 
       {w.online ? (
@@ -121,7 +121,7 @@ function WorkerCard({ w, onChanged }: { w: GpuWorker; onChanged: () => void }) {
           <VramBar w={w} />
           <div className="flex flex-wrap gap-1.5 text-[11px]">
             {Object.entries(w.supports ?? {}).filter(([k, v]) => v && ["bf16", "fp8", "fp4", "int8", "triton", "sageattention", "flash_attn", "nunchaku"].includes(k)).map(([k]) => (
-              <span key={k} className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">{k}</span>
+              <span key={k} className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">{k}</span>
             ))}
           </div>
 
@@ -228,7 +228,7 @@ function AddWorker({ onChanged }: { onChanged: () => void }) {
     }
   };
   return (
-    <div className="rounded-2xl border border-dashed border-border p-5" data-testid="add-worker">
+    <div className="rounded-xl border border-dashed border-border p-5" data-testid="add-worker">
       <h3 className="flex items-center gap-2 text-base font-semibold text-foreground"><Plus className="h-4 w-4 text-amber-500" />Add a GPU worker</h3>
       <p className="mt-1 text-xs text-muted-foreground">
         Run <span className="font-mono">apps/gpu_worker</span> on the GPU machine (your PC with an RTX card, a RunPod / Vast.ai pod, a cloud VM), then paste its address.

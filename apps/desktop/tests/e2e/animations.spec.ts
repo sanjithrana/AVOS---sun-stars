@@ -194,11 +194,11 @@ async function mockStudio(page: Page): Promise<Studio> {
 }
 
 // ---------- tests ----------
-test("sidebar: Facts and Animations tabs, /dashboard still redirects to /facts", async ({ page }) => {
+test("sidebar: Explainer and Animations tabs, /dashboard still redirects to /explainer", async ({ page }) => {
   await mockStudio(page);
   await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/facts$/);
-  await expect(page.getByRole("heading", { name: "Facts" })).toBeVisible();
+  await expect(page).toHaveURL(/\/explainer$/);
+  await expect(page.getByTestId("explainer-create")).toBeVisible();
   await page.getByRole("link", { name: /Animations/ }).first().click();
   await expect(page).toHaveURL(/\/animations$/);
   await expect(page.getByTestId("composer")).toBeVisible();

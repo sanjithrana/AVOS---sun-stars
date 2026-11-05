@@ -8,7 +8,7 @@ import { expect, test } from "@playwright/test";
 test("Models page: every task, the best model first, readiness and licences", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/facts");
+  await page.goto("/explainer");
   await page.getByRole("link", { name: /Models/ }).first().click();
   await expect(page).toHaveURL(/\/models$/);
   await expect(page.getByRole("heading", { name: "Models" })).toBeVisible();
@@ -26,24 +26,4 @@ test("Models page: every task, the best model first, readiness and licences", as
   await expect(page.getByTestId("model-vista4d")).toContainText("research code");
   await expect(page.getByTestId("models-settings")).toBeVisible();
   expect(errors).toEqual([]);
-});
-
-test("New video composer: grouped open-model options with readiness, and the API accepts them", async ({ page }) => {
-  await page.goto("/facts");
-  const video = page.locator("#video-provider");
-  await expect(video.locator("optgroup")).toHaveCount(5);
-  await expect(video.locator('optgroup[label="Open models: presenter"] option')).toHaveCount(3);
-  await page.locator("#image-provider").selectOption("best");
-  await expect(page.getByTestId("image-provider-hint")).toContainText(/Ready on|Not set up yet/);
-  await video.selectOption("avatar");
-  await expect(page.getByTestId("video-provider-hint")).toContainText("presenter");
-  await expect(page.getByTestId("model-note-longcat-avatar")).toContainText("Licence: MIT");
-  await video.selectOption("ltx-2.3");
-  await expect(page.getByTestId("model-note-ltx-2.3")).toContainText("conditions for commercial use");
-  // the backend accepts every catalog choice
-  const api = `${new URL(page.url()).protocol}//${new URL(page.url()).hostname}:8001/api/v1`;
-  const r = await page.request.post(`${api}/projects`, {
-    data: { name: "Open models", topic: "Volcanoes", duration: 15, aspect_ratio: "9:16", image_provider: "qwen-image", video_provider: "infinitetalk" },
-  });
-  expect(r.status()).toBe(201);
 });

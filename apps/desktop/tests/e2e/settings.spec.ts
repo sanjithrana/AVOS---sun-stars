@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 /**
- * Settings page (shared by Facts and Animations) and the Facts "New video" composer, against the real API.
+ * Settings page (shared by Explainer and Animations), against the real API.
  * Adds models of its own (ids starting with e2e-) and removes them at the end.
  */
 
@@ -20,7 +20,7 @@ test.afterAll(async ({ request, baseURL }) => {
 test("Settings: keys, GPU server, add models (fal, ComfyUI with workflow upload, text), shared with Animations", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/facts");
+  await page.goto("/explainer");
   await page.getByRole("link", { name: /Settings/ }).first().click();
   await expect(page).toHaveURL(/\/settings$/);
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
@@ -77,33 +77,10 @@ test("Settings: keys, GPU server, add models (fal, ComfyUI with workflow upload,
   await add.getByTestId("add-save").click();
   await expect(page.locator('[data-model="e2e-deepseek"]')).toContainText("Ready");
 
-  // Facts: the new composer offers them
-  await page.goto("/facts");
-  await expect(page.getByTestId("facts-composer")).toBeVisible();
-  await expect(page.locator('#image-provider option[value="e2e-flux"]')).toHaveCount(1);
-  await expect(page.locator('#video-provider option[value="e2e-wan"]')).toHaveCount(1);
-  await expect(page.locator('#llm-provider option[value="e2e-deepseek"]')).toHaveCount(1);
-  await page.locator("#video-provider").selectOption("e2e-wan");
-  await expect(page.getByTestId("model-note-e2e-wan")).toContainText("Ready on your GPU server");
-
   // Animations: the text model is a crew; the image model is a backdrop choice
   await page.goto("/animations");
   await page.getByTestId("ai-settings-btn").click();
   await expect(page.getByTestId("ai-settings")).toContainText("E2E DeepSeek");
   await expect(page.locator('[data-testid="image-model"] option[value="e2e-flux"]')).toHaveCount(1);
   expect(errors).toEqual([]);
-});
-
-test("Facts: the New video composer creates a project with the chosen models", async ({ page }) => {
-  await page.goto("/facts");
-  await page.getByRole("button", { name: "New Project" }).first().click();            // header button focuses the composer
-  await expect(page.getByLabel("Topic")).toBeFocused();
-  await page.getByRole("button", { name: "Why the moon changes shape" }).click();
-  await expect(page.getByLabel("Topic")).toHaveValue("Why the moon changes shape");
-  await page.getByLabel("Duration (sec)").fill("15");
-  await page.locator("#image-provider").selectOption("qwen-image");
-  await expect(page.getByTestId("image-provider-hint")).toContainText("Licence: Apache-2.0");
-  await page.locator("#video-provider").selectOption("");
-  await page.getByRole("button", { name: "Create Project" }).click();
-  await expect(page).toHaveURL(/\/project\/[\w-]+/);
 });

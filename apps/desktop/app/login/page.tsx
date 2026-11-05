@@ -26,7 +26,7 @@ export default function LoginPage() {
           <Button className="w-full">Sign In</Button>
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/facts" className="underline underline-offset-4 hover:text-primary">
+            <Link href="/explainer" className="underline underline-offset-4 hover:text-primary">
               Skip to the studio (Demo)
             </Link>
           </p>

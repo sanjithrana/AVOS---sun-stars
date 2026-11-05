@@ -25,11 +25,20 @@ from .config import CONFIG, PROJECTS
 from .llm import agent_kinds, agent_status, agents_info, pull_model, save_agent_settings
 from .series import pipeline as series_pipeline
 from .series.routes import router as series_router
+from .explainer import pipeline as explainer_pipeline
+from .explainer.routes import router as explainer_router
+from .stickman import pipeline as stickman_pipeline
+from .stickman.routes import router as stickman_router
+from .skilllab import pipeline as skill_pipeline
+from .skilllab.routes import router as skill_router
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     J.recover_orphans()   # a job still marked as working was cut off by a restart: say so
     series_pipeline.recover()
+    explainer_pipeline.recover()
+    stickman_pipeline.recover()
+    skill_pipeline.recover()
     yield
     J.stop_all()
     for sid in list(series_pipeline._threads):
@@ -43,6 +52,9 @@ app.add_middleware(
     allow_methods=["*"], allow_headers=["*"],
 )
 app.include_router(series_router)
+app.include_router(explainer_router)
+app.include_router(stickman_router)
+app.include_router(skill_router)
 PROJECTS.mkdir(parents=True, exist_ok=True)
 LANGS = ("zh-TW", "en", "zh-CN")
 

@@ -30,6 +30,14 @@ const nextConfig: NextConfig = {
   // Animations tab: the Animation Studio service (apps/animation_studio, a Python port of ReelMimic's server)
   // is reached through these same-origin paths, so the browser never makes a cross-site call (the live event
   // stream is the one exception, see components/reelmimic/api.ts). ANIMATION_STUDIO_URL overrides where it runs.
+  // The old Facts pages are gone: their links open the Explainer Studio.
+  async redirects() {
+    return [
+      { source: "/facts", destination: "/explainer", permanent: false },
+      { source: "/project/:path*", destination: "/explainer", permanent: false },
+      { source: "/studio/:path*", destination: "/explainer", permanent: false },
+    ];
+  },
   async rewrites() {
     const target = (process.env.ANIMATION_STUDIO_URL || "http://127.0.0.1:8020").replace(/\/$/, "");
     return [

@@ -1,6 +1,6 @@
 "use client";
 
-// Settings shared by Facts and Animations: API keys, the GPU server (ComfyUI), models you add, ComfyUI workflows.
+// Settings shared by Explainer and Animations: API keys, the GPU server (ComfyUI), models you add, ComfyUI workflows.
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,11 +18,11 @@ const input =
   "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30";
 const btn = "inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-50";
 const primary =
-  "inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-xl bg-primary hover:bg-[#8873be] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
 
 function Card({ icon, title, sub, children, id }: { icon: ReactNode; title: string; sub: string; children: ReactNode; id: string }) {
   return (
-    <section id={id} className="rounded-2xl border border-border bg-card/50 p-5" data-testid={`settings-${id}`}>
+    <section id={id} className="rounded-xl border border-border bg-card/50 p-5" data-testid={`settings-${id}`}>
       <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">{icon}{title}</h2>
       <p className="mb-4 mt-1 text-sm text-muted-foreground">{sub}</p>
       {children}
@@ -89,7 +89,7 @@ function Keys({ s }: { s: AppSettings }) {
   const { busy, msg, run } = useSave();
   return (
     <Card id="keys" icon={<KeyRound className="h-5 w-5 text-amber-400" />} title="API keys"
-      sub="Used by both Facts and Animations. A key saved here wins over the same name in apps/.env; Clear goes back to .env. Keys stay on this computer.">
+      sub="Used by Explainer and Animations. A key saved here wins over the same name in apps/.env; Clear goes back to .env. Keys stay on this computer.">
       {groups.map(([group, keys]) => (
         <div key={group} className="mb-4">
           <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group}</h3>
@@ -178,8 +178,8 @@ function ModelRow({ m, s }: { m: CatalogModel; s: AppSettings }) {
         <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-foreground">
           {m.ready ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <CircleDashed className="h-4 w-4 text-muted-foreground" />}
           {m.name}
-          {m.custom && <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-600 dark:text-amber-300">yours · {m.kind}</span>}
-          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{m.task}</span>
+          {m.custom && <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-600 dark:text-amber-300">yours · {m.kind}</span>}
+          <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{m.task}</span>
         </div>
         <div className="text-xs text-muted-foreground">{m.ready ? `Ready on ${({ gpu: "your GPU workers", comfyui: "your GPU server", fal: "fal.ai", cloudflare: "Cloudflare" } as Record<string, string>)[m.backend ?? ""] ?? m.backend}` : m.missing}{m.custom ? ` · ${m.why}` : ""}</div>
       </div>
@@ -223,7 +223,7 @@ function AddModel({ s }: { s: AppSettings }) {
     });
     setName(""); setId(""); setEndpoint(""); setBaseUrl(""); setModel(""); setInputs(null); setOutput(""); setNotes(""); setLicense("");
     return r;
-  }, kind === "comfyui" ? "Added — now upload its workflow in the list above" : "Added — it's now in the Facts and Animations pickers");
+  }, kind === "comfyui" ? "Added — now upload its workflow in the list above" : "Added — it's now in the Explainer and Animations pickers");
   return (
     <div className="mt-5 rounded-xl border border-dashed border-amber-500/40 p-4" data-testid="add-model">
       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><Plus className="h-4 w-4 text-amber-500" />Add a model</h3>
@@ -293,7 +293,7 @@ function Models({ s }: { s: AppSettings }) {
   ];
   return (
     <Card id="models" icon={<Wand2 className="h-5 w-5 text-amber-400" />} title="Models"
-      sub="Every model Facts and Animations can use. Upload a ComfyUI workflow to run a model on your GPU server, or add any fal.ai, Replicate, ComfyUI or OpenAI-compatible model of your own.">
+      sub="Every model Explainer and Animations can use. Upload a ComfyUI workflow to run a model on your GPU server, or add any fal.ai, Replicate, ComfyUI or OpenAI-compatible model of your own.">
       {groups.map(([title, ms]) => ms.length > 0 && (
         <div key={title} className="mb-4">
           <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
@@ -309,14 +309,14 @@ function Models({ s }: { s: AppSettings }) {
 export default function SettingsPage() {
   const q = useQuery({ queryKey: SETTINGS_KEY, queryFn: settingsApi.get, retry: false });
   const header = (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground"><Settings2 className="h-4 w-4" /> Settings · shared by Facts and Animations</div>
+    <div className="flex items-center gap-2 text-sm text-muted-foreground"><Settings2 className="h-4 w-4" /> Settings · shared by Explainer and Animations</div>
   );
   return (
     <AppShell header={header}>
       <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Settings</h1>
-          <p className="text-muted-foreground">API keys, your GPU server and your own models, for both Facts and Animations.</p>
+          <p className="text-muted-foreground">API keys, your GPU server and your own models, for both Explainer and Animations.</p>
           <nav className="mt-3 flex flex-wrap gap-2 text-sm">
             {[["keys", "API keys"], ["gpu", "GPU server"], ["models", "Models"]].map(([a, l]) => (
               <a key={a} href={`#${a}`} className="rounded-xl border border-border px-3 py-1.5 text-muted-foreground hover:border-amber-500/40 hover:text-foreground">{l}</a>

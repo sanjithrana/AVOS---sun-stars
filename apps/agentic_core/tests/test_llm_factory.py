@@ -101,6 +101,13 @@ def test_llamacpp_local_gguf_server(monkeypatch):
     assert p.name == "llamacpp" and p.base_url == "http://127.0.0.1:8089/v1" and p.model == "qwen2.5-7b-instruct-q4_k_m"
 
 
+def test_colibri_moe_on_cpu(monkeypatch):
+    monkeypatch.setenv("COLIBRI_URL", "http://127.0.0.1:8000/")
+    monkeypatch.delenv("COLIBRI_MODEL", raising=False)
+    p = get_llm_provider("colibri")
+    assert p.name == "colibri" and p.base_url == "http://127.0.0.1:8000/v1" and p.model == "local"
+
+
 def test_answers_are_cached_for_a_while(monkeypatch):
     import asyncio
 

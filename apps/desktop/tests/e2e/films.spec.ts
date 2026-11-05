@@ -74,6 +74,14 @@ test("Films: prompt → breakdown → characters → storyboard → film → pro
   }
   await page.getByTestId("character-wolf").getByTestId("save-library").click();
   await expect(page.getByTestId("character-wolf").getByTestId("save-library")).toHaveText(/Update in library/);
+  // your model choices: e.g. no music for this film
+  const choices = page.getByTestId("model-choices");
+  await choices.locator("button").first().click();
+  await expect(choices.getByTestId("choice-motion")).toContainText("Action shots");
+  await choices.getByTestId("choice-music-model").selectOption("off");
+  await choices.getByTestId("choices-save").click();
+  await expect(choices.getByTestId("choices-save")).toBeDisabled({ timeout: 30_000 });
+  await expect(choices.getByTestId("choice-music")).toContainText("Off");
   await page.getByTestId("make-storyboard").click();
 
   // 3-5. the storyboard: collage + frames, a camera change on one shot, the compiled prompts, the timeline

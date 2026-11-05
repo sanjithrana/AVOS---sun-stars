@@ -34,13 +34,13 @@ export function SeriesHome() {
 
       <section>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground"><Clapperboard className="h-5 w-5 text-amber-500" />Your series</h2>
-        {list.isError ? <p className="rounded-2xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-800 dark:text-amber-200" data-testid="series-offline">{(list.error as Error).message}</p> :
-          list.isLoading ? <div className="h-24 animate-pulse rounded-2xl bg-muted/40" /> : items.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No series yet. Create one above.</p>
+        {list.isError ? <p className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-800 dark:text-amber-200" data-testid="series-offline">{(list.error as Error).message}</p> :
+          list.isLoading ? <div className="h-24 animate-pulse rounded-xl bg-muted/40" /> : items.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">No series yet. Create one above.</p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="series-list">
             {items.map((s) => (
-              <Link key={s.id} href={`/animations/series/${s.id}`} className="group overflow-hidden rounded-2xl border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`series-${s.id}`}>
+              <Link key={s.id} href={`/animations/series/${s.id}`} className="group overflow-hidden rounded-xl border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`series-${s.id}`}>
                 <div className="aspect-video bg-muted/40">
                   {s.thumb ? <img src={seriesApi.file(s.id, s.thumb)} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-muted-foreground"><Users className="h-8 w-8" /></div>}
                 </div>
@@ -104,7 +104,7 @@ function NewSeries() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5 rounded-2xl border border-border bg-card/40 p-5 md:p-6" data-testid="new-series">
+    <form onSubmit={submit} className="space-y-5 rounded-xl border border-border bg-card/40 p-5 md:p-6" data-testid="new-series">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground"><Sparkles className="h-5 w-5 text-amber-500" />New series</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2">

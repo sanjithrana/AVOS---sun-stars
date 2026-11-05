@@ -25,7 +25,7 @@ from typing import Any
 
 import httpx
 
-from . import avos_settings, config, gpu
+from . import avos_settings, config, gpu, provider_health as PH
 
 IMAGE_CHOICES = ("free", "best", "z-image", "qwen-image", "flux-schnell")
 FINISH_CHOICES = ("wan-vace", "wan-2.2-animate", "scail-2", "ltx-2.3")
@@ -108,15 +108,19 @@ def available(model_id: str) -> dict[str, str | None]:
         out["comfyui"] = ("Set your GPU server address (Settings → GPU server, or AI settings)." if not os.environ.get("COMFYUI_URL")
                           else None if wf.is_file() else f"Upload its '{m['comfyui']['template']}' workflow (Settings → Models).")
     if m.get("cloudflare"):
-        out["cloudflare"] = None if os.environ.get("CLOUDFLARE_ACCOUNT_ID") and os.environ.get("CLOUDFLARE_API_TOKEN") \
+        out["cloudflare"] = PH.down("cloudflare") if os.environ.get("CLOUDFLARE_ACCOUNT_ID") and os.environ.get("CLOUDFLARE_API_TOKEN") \
             else "Set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN."
     if m.get("fal"):
-        out["fal"] = None if os.environ.get("FAL_KEY") else "Add a fal.ai key (AI settings or FAL_KEY)."
+        out["fal"] = PH.down("fal") if os.environ.get("FAL_KEY") else "Add a fal.ai key (AI settings or FAL_KEY)."
     return out
 
 
-def backend_for(model_id: str) -> str:
+def backend_for(model_id: str, prefer: str | None = None) -> str:
+    """Where the model runs now. prefer: the place you picked (gpu / comfyui / fal / cloudflare); used when it's usable,
+    else the usual order (your GPUs, free tiers, then paid)."""
     m, avail = get(model_id), available(model_id)
+    if prefer and prefer != "auto" and not m.get("custom") and avail.get(prefer, "missing") is None:
+        return prefer
     if m.get("custom"):
         kind, why = next(iter(avail.items()))
         if why:
@@ -190,6 +194,9 @@ def data_uri(data: bytes) -> str:
 def _fal_check(r: httpx.Response, endpoint: str) -> None:
     if r.status_code < 400:
         return
+    kind = PH.classify(r.status_code, r.text)
+    if kind:      # an empty balance / refused key won't fix itself: skip fal.ai for a while, fall through to the next option
+        raise ModelUnavailable(PH.mark("fal", kind, r.text))
     hint = {401: " Check the fal.ai key.", 403: " Check the fal.ai key.", 402: " Add credit at fal.ai/dashboard/billing."}.get(r.status_code, "")
     raise RuntimeError(f"fal.ai {endpoint}: error {r.status_code}: {r.text[:300]}{hint}")
 
@@ -400,11 +407,27 @@ def run_custom(model_id: str, vals: dict, files: dict, want: str) -> bytes:
     return _download(url)
 
 
-def image(model_id: str, prompt: str, w: int, h: int, seed: int | None = None) -> bytes:
+def uses_references(model_id: str) -> bool:
+    """A model you added whose input template takes pictures ({{image_url}} or {{image_urls}}): it can edit from references."""
+    c = custom(model_id)
+    return bool(c and c.get("task") == "image" and c["kind"] in ("fal", "replicate")
+                and (avos_settings.uses(c.get("inputs"), "image_urls") or avos_settings.uses(c.get("inputs"), "image_url")))
+
+
+def image_edit(model_id: str, prompt: str, refs: list[bytes], w: int, h: int, seed: int | None = None) -> bytes:
+    """A picture drawn from reference pictures (character sheets, the place) by a model you added in Settings.
+    {{image_url}} = the first reference, {{image_urls}} = all of them."""
+    W, H = _size(w, h)
+    vals = _vals(prompt, W, H, seed, image=refs[0] if refs else None)
+    vals["image_urls"] = [data_uri(r) for r in refs[:4]] or None
+    return run_custom(model_id, vals, {}, "image")
+
+
+def image(model_id: str, prompt: str, w: int, h: int, seed: int | None = None, backend: str | None = None) -> bytes:
     if custom(model_id):
         W, H = _size(w, h)
         return run_custom(model_id, _vals(prompt, W, H, seed), {}, "image")
-    backend = backend_for(model_id)
+    backend = backend_for(model_id, backend)
     W, H = _size(w, h)
     if backend == "gpu":
         pl = gpu.pick(model_id, get(model_id).get("fabric"))
@@ -419,6 +442,8 @@ def image(model_id: str, prompt: str, w: int, h: int, seed: int | None = None) -
         acc, tok = os.environ["CLOUDFLARE_ACCOUNT_ID"], os.environ["CLOUDFLARE_API_TOKEN"]
         r = httpx.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{get(model_id)['cloudflare']['model']}",
                        headers={"Authorization": f"Bearer {tok}"}, json={"prompt": prompt[:2000], "steps": 6}, timeout=120)
+        if r.status_code >= 400 and (kind := PH.classify(r.status_code, r.text)):
+            raise ModelUnavailable(PH.mark("cloudflare", kind, r.text))
         r.raise_for_status()
         return base64.b64decode(r.json()["result"]["image"])
     payload: dict[str, Any] = {"prompt": prompt, "image_size": {"width": W, "height": H}, "num_images": 1,
@@ -490,14 +515,23 @@ def finish_shot(model_id: str, prompt: str, *, first_frame: bytes, clip: bytes, 
 def run_model(model_id: str, *, task: str, want: str, prompt: str, w: int = 1280, h: int = 720, seconds: float = 5.0,
               frames: int | None = None, fps: int | None = None, seed: int | None = None, steps: int | None = None,
               inputs: dict[str, bytes | None] | None = None, options: dict | None = None, negative: str = NEGATIVE,
-              timeout: float = 1800, priority: int = 5, tag: str | None = None) -> bytes:
-    """One job on your GPU workers (the studio picks worker, backend and precision) or your ComfyUI server.
+              timeout: float = 1800, priority: int = 5, tag: str | None = None, backend: str | None = None) -> bytes:
+    """One job on your GPU workers (the studio picks worker, backend and precision), your ComfyUI server, or (video,
+    lip-sync, motion transfer) fal.ai.
 
     inputs: image, image2..image4 (reference pictures), audio, video. options: model settings (speech language,
-    voice transcript / description, emotion; music lyrics)."""
-    backend = backend_for(model_id)
+    voice transcript / description, emotion; music lyrics). backend: the place you picked (else the usual order)."""
+    backend = backend_for(model_id, backend)
     m = get(model_id)
     W, H = (w - w % 32, h - h % 32) if want in ("image", "video") else (w, h)
+    if m.get("custom") and backend in ("fal", "replicate"):
+        # a model you added in Settings (fal.ai / Replicate): its own input template, filled from this job
+        ins = inputs or {}
+        vals = _vals(prompt, W, H, seed, seconds, image=ins.get("image"), video=ins.get("video"))
+        vals["negative_prompt"] = negative
+        if ins.get("audio"):
+            vals["audio_url"] = data_uri(ins["audio"])
+        return run_custom(model_id, vals, {}, want)
     if backend == "gpu":
         pl = gpu.pick(model_id, m.get("fabric"))
         if pl is None:
@@ -516,4 +550,49 @@ def run_model(model_id: str, *, task: str, want: str, prompt: str, w: int = 1280
                                     "{{LYRICS}}": (options or {}).get("lyrics") or "[instrumental]",
                                     "{{LANGUAGE}}": (options or {}).get("language") or "en"},
                          files, want, timeout=timeout)
+    if backend == "fal" and m.get("fal") and task in ("video", "avatar", "control"):
+        return fal_video(model_id, prompt=prompt, w=W, h=H, seed=seed, seconds=seconds, inputs=inputs or {}, negative=negative)
     raise ModelUnavailable(f"{m['name']} runs on your GPU workers or GPU server (Settings → GPU workers).")
+
+
+def fal_video(model_id: str, *, prompt: str, w: int, h: int, seed: int | None, seconds: float, inputs: dict[str, bytes | None],
+              negative: str = NEGATIVE) -> bytes:
+    """A clip on fal.ai: image-to-video (Wan 2.2, LTX-2.3), lip-sync (InfiniteTalk, LongCat Avatar), motion transfer
+    (Wan 2.2 Animate, Wan VACE). The same inputs as AVOS Facts (agentic_core/models/video/catalog_video.py)."""
+    m = get(model_id)
+    endpoint = m["fal"]["endpoint"]
+    img = data_uri(inputs["image"]) if inputs.get("image") else None
+    aud = data_uri(inputs["audio"]) if inputs.get("audio") else None
+    vid = data_uri(inputs["video"]) if inputs.get("video") else None
+
+    def nframes(fps: int, mult: int, lo: int, hi: int) -> int:
+        n = max(lo, round(seconds * fps) + 1)
+        n = math.ceil((n - 1) / mult) * mult + 1
+        while n > hi:
+            n -= mult
+        return n
+    data: dict[str, Any] = {"prompt": prompt}
+    if model_id == "wan-2.2":
+        data.update(image_url=img, num_frames=nframes(16, 4, 17, 161), frames_per_second=16, resolution=os.environ.get("WAN_2_2_RESOLUTION") or "720p",
+                    aspect_ratio="auto", negative_prompt=negative)
+    elif model_id == "ltx-2.3":
+        data.update(image_url=img, duration=next((d for d in (6, 8, 10) if seconds <= d + 0.5), 10),
+                    resolution=os.environ.get("LTX_2_3_RESOLUTION") or "1080p", aspect_ratio="auto", generate_audio=False)
+    elif model_id == "infinitetalk":
+        data.update(image_url=img, audio_url=aud, num_frames=nframes(25, 4, 41, 721), resolution=os.environ.get("INFINITETALK_RESOLUTION") or "480p")
+    elif model_id == "longcat-avatar":
+        data.update(image_url=img, audio_url=aud, negative_prompt=negative, resolution=os.environ.get("LONGCAT_AVATAR_RESOLUTION") or "480p",
+                    num_segments=min(10, max(1, math.ceil(seconds / 5.0))))
+    elif model_id == "wan-2.2-animate":
+        data = {"video_url": vid, "image_url": img, "resolution": os.environ.get("WAN_2_2_ANIMATE_RESOLUTION") or "480p"}
+    elif model_id == "wan-vace":
+        data.update(num_frames=nframes(16, 4, 81, 241), resolution=os.environ.get("WAN_VACE_RESOLUTION") or "720p", negative_prompt=negative,
+                    **({"ref_image_urls": [img], "first_frame_url": img} if img else {}), **({"video_url": vid, "task": "depth"} if vid else {}))
+    else:
+        raise ModelUnavailable(f"{m['name']} has no hosted API: run it on your GPU worker.")
+    if seed is not None:
+        data["seed"] = int(seed) % 2_147_483_647
+    url = _first_url(fal_run(endpoint, {k: v for k, v in data.items() if v is not None}), "video", "videos")
+    if not url:
+        raise RuntimeError(f"fal.ai {model_id} returned no video")
+    return _download(url)

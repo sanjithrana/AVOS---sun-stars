@@ -162,6 +162,8 @@ def _gpu_placements(model: dict[str, Any], fabric: dict[str, Any], req: RouteReq
     for adapter in adapters:
         info = st.adapters[adapter]
         precs = [p for p in R.PRECISIONS if p in (info.get("precisions") or ["bf16"]) and p in native]
+        if st.gpu.get("device") == "cpu":   # a CPU computes in bf16 anyway: the smallest weights page least from the SSD
+            precs.sort(key=lambda p: R.vram_need(fabric, p) or 1e9)
         if not precs:
             rejected.append({"model": mid, "backend": "gpu", "worker": st.name, "adapter": adapter,
                              "why": "none of its precisions run natively on this GPU"})
@@ -188,8 +190,9 @@ def _gpu_placements(model: dict[str, Any], fabric: dict[str, Any], req: RouteReq
                 chosen, offload = smallest, True
             else:
                 need = min((R.vram_need(fabric, p) or 0) for p in precs) or fabric.get("min_vram_gb")
+                mem = "memory (RAM + page file: make the page file bigger)" if st.gpu.get("device") == "cpu" else "VRAM"
                 rejected.append({"model": mid, "backend": "gpu", "worker": st.name, "adapter": adapter,
-                                 "why": f"needs about {need:.0f} GB VRAM, {st.gpu.get('name') or 'this GPU'} has {total:.0f} GB"})
+                                 "why": f"needs about {need:.0f} GB {mem}, {st.gpu.get('name') or 'this GPU'} has {total:.0f} GB"})
                 continue
         attention = info.get("attention") or "sdpa"
         speed = R.gpu_speed(st.gpu.get("name"))
@@ -207,7 +210,11 @@ def _gpu_placements(model: dict[str, Any], fabric: dict[str, Any], req: RouteReq
         wait = max(reported, dispatch.pending_seconds(st.id, before_priority=dispatch.current_priority()))
         est = gpu_time + load + wait
         cost = st.cost_per_hour * (gpu_time + load) / 3600.0
-        reasons.append(f"{st.gpu.get('name') or 'GPU'} {total:.0f} GB, {chosen}" + (" with CPU offload (slow)" if offload else ""))
+        if st.gpu.get("device") == "cpu":
+            reasons.append(f"{st.gpu.get('name')}: {st.gpu.get('ram_gb', 0):.0f} GB RAM + {st.gpu.get('swap_gb', 0):.0f} GB page file, "
+                           f"drawn at ≤{st.gpu.get('max_side') or 512}px (slow, free)")
+        else:
+            reasons.append(f"{st.gpu.get('name') or 'GPU'} {total:.0f} GB, {chosen}" + (" with CPU offload (slow)" if offload else ""))
         reasons.append(("loading for an earlier shot" if warm.get("coming") else "already loaded") if warm
                        else f"loads in ~{load:.0f} s")
         if attention != "sdpa":

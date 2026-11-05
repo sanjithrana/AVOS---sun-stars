@@ -14,9 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Light by default; the inline script below applies a saved "dark"
-    // choice before first paint so switching pages/reloading never
-    // flashes light-then-dark. suppressHydrationWarning: the class this
+    // Dark by default; the inline script below applies the saved choice
+    // before first paint so switching pages/reloading never flashes. suppressHydrationWarning: the class this
     // script sets is expected to differ from the server-rendered markup.
     <html lang="en" suppressHydrationWarning>
       <head>

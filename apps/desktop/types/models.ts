@@ -36,6 +36,8 @@ export interface CatalogModel {
   workflow: string | null;
   /** has a verified file list: the Models page shows a Download button */
   download?: boolean;
+  /** versions complete on this PC (Models page downloads), and whether a download is unfinished (.part) */
+  downloaded?: { variants: string[]; partial: boolean; dir: string } | null;
   /** Model Fabric routing data: quality, VRAM per precision, speed, strengths */
   fabric?: { quality: number; vram_gb: Record<string, number>; min_vram_gb?: number; strengths?: string[]; adapters?: string[] };
 }
@@ -44,7 +46,8 @@ export interface ModelsStatus {
   tasks: Record<ModelTask, { label: string; auto: string }>;
   backends: Record<string, { label: string; needs: string; how: string }>;
   models: CatalogModel[];
-  settings: { fal: boolean; comfyui: string | null; workflowDir: string; modelBackend: string; gpuWorkers?: number; gpuWorkersOnline?: number };
+  settings: { fal: boolean; comfyui: string | null; workflowDir: string; modelBackend: string; gpuWorkers?: number; gpuWorkersOnline?: number;
+    modelsDir?: string; providers?: Record<string, string> };
 }
 
 // ---------- Settings page (GET /api/v1/settings) ----------

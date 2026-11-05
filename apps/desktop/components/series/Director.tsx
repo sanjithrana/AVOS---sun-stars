@@ -123,7 +123,7 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
     topCam.lookAt(0, 0, 0.5);
     const helper = new THREE.CameraHelper(shotCam);
     scene.add(helper);
-    const path = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xf59e0b }));
+    const path = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x8b5cf6 }));
     scene.add(path);
     three.current = { renderer, scene, shotCam, topCam, actors: new Map(), helper, path, sun, floor };
     draw();
@@ -169,7 +169,7 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
       T.actors.set(a.id, g);
     });
     stage.props.forEach((p) => {
-      const box = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.25), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
+      const box = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.25), new THREE.MeshStandardMaterial({ color: 0x8b5cf6 }));
       box.position.set(p.x, 0.125, p.z);
       box.name = `prop:${p.name}`;
       const g = new THREE.Group();
@@ -340,7 +340,7 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
             </Panel>
             <Panel title="People">
               <div className="flex flex-wrap gap-1">{stage.actors.map((a) => (
-                <button key={a.id} onClick={() => setSel(a.id)} className={`rounded-full px-2 py-0.5 text-xs ${sel === a.id ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground"}`}>{names[a.id] ?? a.id}{a.speaking ? " 🗣" : ""}</button>))}</div>
+                <button key={a.id} onClick={() => setSel(a.id)} className={`rounded-md px-2 py-0.5 text-xs ${sel === a.id ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground"}`}>{names[a.id] ?? a.id}{a.speaking ? " 🗣" : ""}</button>))}</div>
               {selActor && (
                 <div className="space-y-2" data-testid="director-actor">
                   <Slider label="Left / right" min={-6} max={6} step={0.05} value={selActor.x} testid="director-actor-x"

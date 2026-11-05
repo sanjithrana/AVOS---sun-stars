@@ -49,12 +49,12 @@ export function LibraryAdd({ sid, act, have }: { sid: string; act: Act; have: st
   const qc = useQueryClient();
   const items = lib.data ?? [];
   if (!open) return (
-    <button className="flex min-h-40 items-center justify-center gap-2 rounded-2xl border border-dashed border-border text-sm text-muted-foreground hover:border-amber-500" onClick={() => setOpen(true)} data-testid="open-library">
+    <button className="flex min-h-40 items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:border-amber-500" onClick={() => setOpen(true)} data-testid="open-library">
       <BookUser className="h-4 w-4" />From your library{items.length ? ` (${items.length})` : ""}
     </button>
   );
   return (
-    <div className="space-y-2 rounded-2xl border border-border bg-card/40 p-4 lg:col-span-2" data-testid="library">
+    <div className="space-y-2 rounded-xl border border-border bg-card/40 p-4 lg:col-span-2" data-testid="library">
       <div className="flex items-center gap-2"><BookUser className="h-4 w-4 text-amber-500" /><b className="text-sm text-foreground">Your character library</b><span className="grow" />
         <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>Close</Button></div>
       {!items.length && <p className="text-xs text-muted-foreground">Empty: approve a character and press “Save to library”.</p>}

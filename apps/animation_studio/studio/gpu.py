@@ -102,6 +102,8 @@ def placements(model_id: str, fabric: dict[str, Any] | None = None) -> tuple[lis
             if not a.get("ready") or model_id not in (a.get("models") or []):
                 continue
             precs = [p for p in PRECISIONS if p in (a.get("precisions") or ["bf16"]) and p in native]
+            if (st.get("gpu") or {}).get("device") == "cpu":    # CPU: the smallest weights page least from the SSD
+                precs.sort(key=lambda p: _need(fabric, p) or 1e9)
             if not precs:
                 why.append(f"{w.get('name')} ({name}): no precision it supports runs natively on this GPU")
                 continue
@@ -113,7 +115,8 @@ def placements(model_id: str, fabric: dict[str, Any] | None = None) -> tuple[lis
                 if float(fabric.get("min_vram_gb") or 1e9) <= total and a.get("offload", True):
                     chosen, offload = min(precs, key=lambda p: _need(fabric, p) or 1e9), True
                 else:
-                    why.append(f"{w.get('name')}: not enough VRAM ({total:.0f} GB)")
+                    why.append(f"{w.get('name')}: not enough " + ("memory (RAM + page file) " if (st.get("gpu") or {}).get("device") == "cpu"
+                                                                   else "VRAM ") + f"({total:.0f} GB)")
                     continue
             cost = float(w["cost_per_hour"] if w.get("cost_per_hour") is not None else st.get("cost_per_hour") or 0)
             p = Placement(worker={**w, "cost_per_hour": cost}, adapter=name, precision=chosen,

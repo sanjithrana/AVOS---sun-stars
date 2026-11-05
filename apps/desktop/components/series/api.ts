@@ -1,5 +1,5 @@
 // Series API client: same-origin through the Next rewrite (/studio-api/* → the Animation Studio's /api/*).
-import type { Blueprint, Breakdown, LanguageInfo, LibraryCharacter, Script, SeriesSnapshot, SeriesSummary, SkillInfo, StageGraph } from "./types";
+import type { Blueprint, Breakdown, LanguageInfo, LibraryCharacter, Script, SeriesSnapshot, SeriesSummary, SkillInfo, StageGraph, StepChoice } from "./types";
 
 async function j<T>(r: Response): Promise<T> {
   const text = await r.text().catch(() => "");
@@ -68,6 +68,9 @@ export const seriesApi = {
   redoBreakdown: (sid: string, note: string, prompt?: string) => post<SeriesSnapshot>(`/${sid}/breakdown/redo`, { note, ...(prompt ? { prompt } : {}) }),
   approveBreakdown: (sid: string) => post<SeriesSnapshot>(`/${sid}/breakdown/approve`),
   storyboard: (sid: string) => post<SeriesSnapshot>(`/${sid}/film/storyboard`),
+  // which model runs each step, and where (your GPU, ComfyUI, fal.ai, Cloudflare…)
+  modelChoices: (sid: string) => get<{ steps: StepChoice[]; providers: Record<string, string> }>(`/${sid}/models`),
+  setModelChoices: (sid: string, models: Record<string, { model: string; backend: string }>) => send<SeriesSnapshot>(`/${sid}`, "PATCH", { models }),
   // character library
   library: () => get<LibraryCharacter[]>("/library/characters"),
   deleteLibrary: (lid: string) => send<LibraryCharacter[]>(`/library/characters/${lid}`, "DELETE"),

@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import os
+import platform
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
 
 VERSION = "1.0"
-NAME = os.getenv("WORKER_NAME") or os.uname().nodename
+NAME = os.getenv("WORKER_NAME") or platform.node() or "worker"     # (os.uname doesn't exist on Windows)
 HOST = os.getenv("WORKER_HOST", "0.0.0.0")
 PORT = int(os.getenv("WORKER_PORT", "8700"))
 TOKEN = os.getenv("GPU_WORKER_TOKEN") or None                 # same value as AVOS Settings → API keys
@@ -39,6 +40,16 @@ DIFFUSERS_MODELS_JSON = os.getenv("WORKER_DIFFUSERS_MODELS_JSON") or "" # file w
 
 # Model downloads (AVOS Models page → Download → this worker): where ComfyUI's models folder is
 MODELS_DIR = os.getenv("WORKER_MODELS_DIR") or (str(Path(os.environ["COMFYUI_DIR"]) / "models") if os.getenv("COMFYUI_DIR") else str(DATA / "models"))
+
+# CPU mode (optional, off by default): a PC without an NVIDIA GPU (Intel / AMD). Turn it on with WORKER_DEVICE=cpu
+# (tools/start-cpu.bat does). ComfyUI runs with --cpu; the worker reports RAM + swap as the memory a model may use
+# (weights beyond RAM are paged from the SSD: slow, but they run) and draws at a small size which AVOS scales up.
+# auto = CPU only when nvidia-smi finds no GPU; cuda (default) = never.
+DEVICE = (os.getenv("WORKER_DEVICE") or "cuda").lower()           # cuda | cpu | auto
+CPU_MAX_SIDE = int(os.getenv("WORKER_CPU_MAX_SIDE") or 512)       # longest side drawn on the CPU (pictures and clips)
+CPU_MAX_SECONDS = float(os.getenv("WORKER_CPU_MAX_SECONDS") or 5)  # longest clip made on the CPU (AVOS holds the last frame)
+RAM_GB = float(os.getenv("WORKER_RAM_GB") or 0)                   # 0 = detect
+SWAP_GB = float(os.getenv("WORKER_SWAP_GB") or -1)                # -1 = detect (Windows page file / Linux swap)
 
 # Mock adapter (no GPU needed: for trying AVOS and for tests)
 MOCK_SECONDS = float(os.getenv("WORKER_MOCK_SECONDS") or 1.5)

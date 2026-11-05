@@ -90,7 +90,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
           [d.shots > 0, `${d.shots} timed shots · ${d.seconds}s`], [d.camera > 0, `${d.camera} camera directions`], [d.dialogue > 0, `${d.dialogue} lines`],
           [d.sounds > 0, `${d.sounds} sounds`], [d.music, "music"], [d.rules > 0, `${d.rules} continuity rules`],
         ].map(([ok, label]) => (
-          <span key={String(label)} className={`rounded-full px-2 py-0.5 text-[11px] ${ok ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-muted text-muted-foreground"}`}>{ok ? "✓" : "–"} {label}</span>
+          <span key={String(label)} className={`rounded-md px-2 py-0.5 text-[11px] ${ok ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-muted text-muted-foreground"}`}>{ok ? "✓" : "–"} {label}</span>
         ))}
         <span className="grow" />
         {approved && <Button size="sm" variant="ghost" onClick={() => setOpen(!open)} data-testid="breakdown-toggle">{open ? "Hide" : "Show / edit"} the breakdown</Button>}
@@ -178,7 +178,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
                     <textarea className={`${field} min-h-9 text-xs`} value={x.picture} placeholder="The first frame (what the storyboard frame shows)" onChange={(e) => shot(i, { picture: e.target.value })} />
                     <div className="flex flex-wrap gap-1">
                       {names.map((n) => (
-                        <button key={n} className={`rounded-full px-2 py-0.5 text-[11px] ${x.characters.includes(n) ? "bg-amber-500 text-black" : "bg-muted text-muted-foreground"}`}
+                        <button key={n} className={`rounded-md px-2 py-0.5 text-[11px] ${x.characters.includes(n) ? "bg-amber-500 text-black" : "bg-muted text-muted-foreground"}`}
                           onClick={() => shot(i, { characters: x.characters.includes(n) ? x.characters.filter((c) => c !== n) : [...x.characters, n] })}>{n}</button>
                       ))}
                     </div>

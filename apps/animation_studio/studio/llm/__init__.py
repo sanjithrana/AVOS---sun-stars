@@ -22,7 +22,7 @@ import httpx
 
 from .. import avos_settings, config
 
-AGENT_KINDS = ("ollama", "llamacpp", "groq", "gemini", "openrouter", "openai", "anthropic", "claude", "codex", "builtin")
+AGENT_KINDS = ("ollama", "llamacpp", "colibri", "groq", "gemini", "openrouter", "openai", "anthropic", "claude", "codex", "builtin")
 
 SPEC: dict[str, dict] = {
     "ollama": {"label": "Ollama (local)", "tier": "local", "model": "qwen2.5:7b",
@@ -30,6 +30,10 @@ SPEC: dict[str, dict] = {
     "llamacpp": {"label": "llama.cpp (local GGUF)", "tier": "local", "model": "local", "local": True,
                  "models": ["local"],
                  "fix": "Run llama.cpp's server with a small GGUF model on this computer, e.g. `llama-server -m qwen2.5-7b-instruct-q4_k_m.gguf --port 8080`, or set its address (LLAMACPP_URL)."},
+    "colibri": {"label": "Colibrì (local MoE)", "tier": "local", "model": "local", "local": True, "models": ["local"],
+                "fix": "Run Colibrì's server on this computer: `coli serve --model <path to the model>` (OpenAI API on port 8000; "
+                       "github.com/JustVugg/colibri), or set its address (COLIBRI_URL). It streams huge MoE models from your SSD "
+                       "on a CPU: excellent writing, a few words per second, so long answers take minutes."},
     "groq": {"label": "Groq", "tier": "free", "key": "GROQ_API_KEY", "model": "openai/gpt-oss-120b",
              "base": "https://api.groq.com/openai/v1", "models": ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b"],
              "fix": "Free key (no card) at console.groq.com/keys, paste it here."},
@@ -92,7 +96,7 @@ def model_of(kind: str) -> str:
 async def available_models(kind: str) -> list[str] | None:
     """The model ids an OpenAI-compatible provider offers this key right now (GET /models), or None."""
     s = spec(kind)
-    base = f"{llamacpp_url()}/v1" if kind == "llamacpp" else s.get("base")
+    base = f"{local_url(kind)}/v1" if kind in LOCAL_SERVERS else s.get("base")
     key = os.environ.get(s["key"]) if s.get("key") else "none"
     if not base or not key:
         return None
@@ -125,9 +129,27 @@ def ollama_url() -> str:
             or ("http://host.docker.internal:11434" if in_docker else "http://127.0.0.1:11434")).rstrip("/")
 
 
-def llamacpp_url() -> str:
+LOCAL_SERVERS = {"llamacpp": ("LLAMACPP_URL", 8080), "colibri": ("COLIBRI_URL", 8000)}   # OpenAI-compatible servers on this PC
+
+
+def local_url(kind: str) -> str:
+    env, port = LOCAL_SERVERS[kind]
     in_docker = os.path.exists("/.dockerenv")
-    return (os.environ.get("LLAMACPP_URL") or ("http://host.docker.internal:8080" if in_docker else "http://127.0.0.1:8080")).rstrip("/")
+    return (os.environ.get(env) or (f"http://host.docker.internal:{port}" if in_docker else f"http://127.0.0.1:{port}")).rstrip("/")
+
+
+def llamacpp_url() -> str:
+    return local_url("llamacpp")
+
+
+async def local_models(kind: str) -> list[str] | None:
+    try:
+        async with httpx.AsyncClient(timeout=3) as c:
+            r = await c.get(f"{local_url(kind)}/v1/models")
+            r.raise_for_status()
+            return [m.get("id", "") for m in r.json().get("data") or []]
+    except Exception:
+        return None
 
 
 async def llamacpp_models() -> list[str] | None:
@@ -209,12 +231,13 @@ async def agents_info() -> dict:
                 info.update(ready=True, detail=m + (f" · looks at frames with {vis}" if vis and _has_model(models, vis) else ""))
             info["vision"] = bool(VISION_RX.search(m)) or bool(vis and models and _has_model(models, vis))
             info["visionModel"] = vis
-        elif kind == "llamacpp":
-            have = await llamacpp_models()
+        elif kind in LOCAL_SERVERS:
+            have = await local_models(kind)
             m = (have or ["local"])[0]
-            info.update(model=m, url=llamacpp_url(), models=have or s["models"], needsKey=False, ready=have is not None,
-                        detail=f"{m} · {llamacpp_url()}" if have is not None else f"llama.cpp isn't running at {llamacpp_url()}",
-                        fix=s["fix"], vision=bool(VISION_RX.search(m)))
+            name = s["label"].split(" (")[0]
+            info.update(model=m, url=local_url(kind), models=have or s["models"], needsKey=False, ready=have is not None,
+                        detail=f"{m} · {local_url(kind)}" if have is not None else f"{name} isn't running at {local_url(kind)}",
+                        fix=s["fix"], vision=bool(VISION_RX.search(m)) or (kind == "colibri" and "vision" in m.lower()))
         elif kind in ("claude", "codex"):
             v = _cli_version(kind)
             info.update(ready=bool(v), detail=v or "Not installed on the computer running this service", fix=s["fix"], vision=True)
@@ -430,7 +453,7 @@ class Crew:
                     # the vision model isn't there yet: review with the text model (measurements still apply)
                     self.log({"type": "error", "text": f"{e} Checking without looking at the frames this time."})
                     text = await self._ollama(system, prompt, [], want_json, temperature, max_tokens)
-            elif self.kind in ("llamacpp", "groq", "gemini", "openrouter", "openai") or spec(self.kind).get("custom"):
+            elif self.kind in ("llamacpp", "colibri", "groq", "gemini", "openrouter", "openai") or spec(self.kind).get("custom"):
                 text = await self._openai_compat(system, prompt, images, want_json, temperature, max_tokens)
             elif self.kind == "anthropic":
                 text = await self._anthropic(system, prompt, images, temperature, max_tokens)
@@ -529,8 +552,8 @@ class Crew:
 
     async def _openai_compat(self, system: str, prompt: str, images: list[Path], want_json: bool, temperature: float, max_tokens: int) -> str:
         s = spec(self.kind)
-        if self.kind == "llamacpp":
-            s = {**s, "base": f"{llamacpp_url()}/v1"}
+        if self.kind in LOCAL_SERVERS:
+            s = {**s, "base": f"{local_url(self.kind)}/v1"}
         key = os.environ.get(s["key"]) if s.get("key") else ("none" if s.get("custom") or s.get("local") else None)
         if not key:
             raise CrewError(f"No {s['label']} API key. Add it in AI settings.")
@@ -538,7 +561,10 @@ class Crew:
         if images:
             msgs[-1]["content"] = [{"type": "text", "text": prompt}] + [
                 {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + _img_b64(p)}} for p in images[:4]]
-        body: dict[str, Any] = {"model": model_of(self.kind), "messages": msgs, "temperature": temperature, "max_tokens": max_tokens, "stream": True}
+        model = model_of(self.kind)
+        if self.kind in LOCAL_SERVERS and model == "local":
+            model = ((await local_models(self.kind)) or ["local"])[0]      # the model the local server has loaded
+        body: dict[str, Any] = {"model": model, "messages": msgs, "temperature": temperature, "max_tokens": max_tokens, "stream": True}
         if want_json and self.kind in ("openai", "groq", "gemini"):
             body["response_format"] = {"type": "json_object"}
         if self.kind == "groq" and "gpt-oss" in body["model"]:

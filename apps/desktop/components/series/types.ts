@@ -251,3 +251,8 @@ export interface SeriesSummary {
 }
 
 export interface LanguageInfo { code: string; name: string; script: string; lines: string[]; design: string[]; note: string }
+
+// ---------- your model choices per step (GET /series/{sid}/models) ----------
+export interface ModelOption { id: string; name: string; ready: boolean; backend?: string | null; why?: string | null; price?: string;
+  backends: Record<string, { label: string; why: string | null }> }
+export interface StepChoice { step: string; label: string; model: string; backend: string; options: ModelOption[] }

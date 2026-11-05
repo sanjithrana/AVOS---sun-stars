@@ -11,7 +11,8 @@ import { modelLabel, seriesApi } from "@/components/series/api";
 import { DnaPanel } from "@/components/series/DnaPanel";
 import { fmt, PartReview } from "@/components/series/EpisodePanel";
 import { LibraryAdd } from "@/components/series/Library";
-import { AddCharacter, CharacterCard, ReadyPanel, useAct, useSeries, WorkBar } from "@/components/series/SeriesPage";
+import { ModelChoices } from "@/components/series/ModelChoices";
+import { AddCharacter, CharacterCard, useAct, useSeries, WorkBar } from "@/components/series/SeriesPage";
 import { ShotTools } from "@/components/series/ShotTools";
 import { Storyboard } from "@/components/series/Storyboard";
 import { Timeline } from "@/components/series/Timeline";
@@ -29,7 +30,7 @@ export function FilmPage({ id }: { id: string }) {
   const [openShot, setOpenShot] = useState<string | null>(null);
 
   if (q.isError) return <main className="p-8"><Link href="/animations/films" className="text-sm hover:underline">← Films</Link><p className="mt-4 text-muted-foreground">{(q.error as Error).message}</p></main>;
-  if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse rounded-xl bg-muted/40" /><div className="h-64 animate-pulse rounded-2xl bg-muted/40" /></main>;
+  if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse rounded-xl bg-muted/40" /><div className="h-64 animate-pulse rounded-xl bg-muted/40" /></main>;
   const snap = q.data;
   const s = snap.series;
   const bd = s.breakdown;
@@ -48,9 +49,9 @@ export function FilmPage({ id }: { id: string }) {
         <Link href="/animations/films" className="text-xs text-muted-foreground hover:underline">← Films</Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{snap.language.name}</span>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
-          {bd?.duration ? <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{bd.duration.toFixed(1)} s · {bd.shots?.length} shots</span> : null}
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{snap.language.name}</span>
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
+          {bd?.duration ? <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{bd.duration.toFixed(1)} s · {bd.shots?.length} shots</span> : null}
         </div>
         {s.logline && <p className="mt-2 max-w-4xl text-muted-foreground">{s.logline}</p>}
       </div>
@@ -82,7 +83,7 @@ export function FilmPage({ id }: { id: string }) {
 
       {bd?.status === "approved" && (
         <Stage n={2} id="lock" title="Characters & world: the consistency lock" state={st("lock")}>
-          <ReadyPanel ready={snap.ready} />
+          <ModelChoices sid={id} act={act} />
           <div className="mt-4"><DnaPanel sid={id} dna={s.dna} act={act} /></div>
           <p className="my-4 text-sm text-muted-foreground">Approve each character (sheet + voice) or redesign it with a note. Approved characters can be saved to your library and cast in other films.</p>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" data-testid="characters">
@@ -160,9 +161,9 @@ export function FilmPage({ id }: { id: string }) {
               <video controls className="aspect-video w-full rounded-xl bg-black" src={seriesApi.file(id, ep.video, ep.seconds)} data-testid="film-video" />
             ) : <p className="text-sm text-muted-foreground">Approve the render above to master the film (the parts are joined, the story memory saved).</p>}
             <div className="flex flex-wrap gap-2 text-[11px]">
-              <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">music: {modelLabel(part.musicInfo?.model ?? null)}{part.sound?.music ? ` · “${part.sound.music}”` : ""}</span>
-              {Object.entries(part.ambienceInfo ?? {}).map(([k, v]) => <span key={k} className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">ambience {k}: {modelLabel(v?.model ?? null)}</span>)}
-              <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">loudness −16 LUFS</span>
+              <span className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">music: {modelLabel(part.musicInfo?.model ?? null)}{part.sound?.music ? ` · “${part.sound.music}”` : ""}</span>
+              {Object.entries(part.ambienceInfo ?? {}).map(([k, v]) => <span key={k} className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">ambience {k}: {modelLabel(v?.model ?? null)}</span>)}
+              <span className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">loudness −16 LUFS</span>
             </div>
             <div className="flex flex-wrap gap-3">
               {ep.video && <a className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-accent" href={seriesApi.file(id, ep.video)} download={`${s.title}.mp4`}><Film className="h-4 w-4" />final_master.mp4 ({fmt(ep.seconds)})</a>}
@@ -184,7 +185,7 @@ export function FilmPage({ id }: { id: string }) {
 
 function Stage({ n, id, title, state, children }: { n: number; id: string; title: string; state: string; children: React.ReactNode }) {
   return (
-    <section id={`stage-${id}`} className={`scroll-mt-20 rounded-2xl border p-4 md:p-5 ${state === "yours" ? "border-amber-500/60" : "border-border"} bg-card/20`} data-testid={`film-stage-${id}`}>
+    <section id={`stage-${id}`} className={`scroll-mt-20 rounded-xl border p-4 md:p-5 ${state === "yours" ? "border-amber-500/60" : "border-border"} bg-card/20`} data-testid={`film-stage-${id}`}>
       <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-foreground">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-black">{n}</span>{title}
       </h2>

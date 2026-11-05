@@ -41,6 +41,19 @@ def _angle(cam: dict[str, Any]) -> str:
     return "high angle" if r > 0.35 else "low angle" if r < -0.15 else "eye level"
 
 
+COMPOSITION = {
+    "wide": "Wide establishing composition: the whole place readable, characters small but clear, layered foreground, midground and background.",
+    "medium": "Medium composition, subject on a third of the frame, clear headroom, a little of the background for context.",
+    "two-shot": "Balanced two-shot: both faces readable, the speaker slightly larger, a clean gap between the two silhouettes.",
+    "close-up": "Tight close-up on the face and eyes, shallow depth of field, the background softly out of focus.",
+    "over-the-shoulder": "Over-the-shoulder composition: the foreground shoulder and head soft and dark, the listener's face sharp in the distance.",
+    "insert": "Insert shot: the object fills the frame, sharp detail, a hand or edge of a character only as scale.",
+}
+ANGLE_FEEL = {"low angle": "looking up at the subject so it feels big and powerful",
+              "high angle": "looking down so the subject feels small and vulnerable",
+              "overhead": "seen straight from above like a map"}
+
+
 def _where(x: float, z: float) -> str:
     h = "on the left" if x < -0.3 else "on the right" if x > 0.3 else "in the centre"
     d = " in the foreground" if z > 1.0 else " in the background" if z < -1.0 else ""
@@ -54,7 +67,9 @@ def keyframe_prompt(scene: dict[str, Any], dna: dict, names: dict[str, str], ref
     if refs:
         parts.append("; ".join(f"picture {i + 1} is {r}" for i, r in enumerate(refs)) + ".")
     cam = scene["camera"]
-    parts.append(f"ONE frame of an animated film: {scene['framing']} shot, {_angle(cam)}, {_lens(cam['lens'])}.")
+    ang = _angle(cam)
+    parts.append(f"ONE frame of an animated film: {scene['framing']} shot, {ang}, {_lens(cam['lens'])}.")
+    parts.append(COMPOSITION.get(scene["framing"], COMPOSITION["medium"]) + (f" The camera is {ANGLE_FEEL[ang]}." if ang in ANGLE_FEEL else ""))
     for a in scene["actors"]:
         n = names.get(a["id"], a["id"])
         facing = "facing the camera" if a["facing"] == "camera" else f"facing {names.get(a['facing'], a['facing'])}"
@@ -69,6 +84,8 @@ def keyframe_prompt(scene: dict[str, Any], dna: dict, names: dict[str, str], ref
     parts.append(f"Place: {loc}, {scene['time']}. Lighting: {scene['lighting']['key']}, {scene['lighting']['mood']} mood.")
     if refs:
         parts.append("Every character looks exactly like their sheet (face, hair, outfit, colours); keep the place's look.")
+    if scene["actors"]:
+        parts.append("Strong, readable acting: the pose and the face show the emotion at a glance, clean silhouettes, hands drawn correctly.")
     parts.append(D.style_clause(dna))
     if note:
         parts.append(f"Change: {note}.")
@@ -93,7 +110,7 @@ KEEP = "No character redesign, no face change, no costume change."
 
 
 def motion_prompt(motion: dict[str, Any], scene: dict[str, Any], dna: dict, names: dict[str, str], model: str = "ltx-2.3",
-                  note: str = "", emotion: str = "", location_text: str = "") -> str:
+                  note: str = "", emotion: str = "", location_text: str = "", sound: str = "") -> str:
     beats = _beats(motion, names)
     cam = motion["camera"]
     cam_text = CAMERA_WORDS.get(cam["move"], "The camera holds still")
@@ -113,8 +130,9 @@ def motion_prompt(motion: dict[str, Any], scene: dict[str, Any], dna: dict, name
         # LTX reads one flowing, chronological paragraph: the main action first, then details, camera, light, look
         who = ", ".join(names.get(a["id"], a["id"]) for a in scene["actors"]) or "the scene"
         return (f"{timed} The shot shows {who} in {location_text or scene['location']} ({scene['time']}), {scene['framing']} framing. "
-                f"{cam_text}. Lighting: {scene['lighting']['key']}, {scene['lighting']['mood']} mood. {anim} {style} "
-                f"{REFERENCE} {KEEP}" + (f" {note}." if note else ""))
+                f"{cam_text}. Lighting: {scene['lighting']['key']}, {scene['lighting']['mood']} mood. "
+                + (f"Sound: {sound.strip().rstrip('.')}. " if sound and sound.strip() else "")
+                + f"{anim} {style} {REFERENCE} {KEEP}" + (f" {note}." if note else ""))
     # Wan 2.2 and others: the storyboard-frame template (reference → only this shot → camera → motion → keep)
     return (f"{REFERENCE} Animate only this shot: {timed} Camera movement: {cam_text[0].lower()}{cam_text[1:]}. {anim} {style} {KEEP}"
             + (f" {note}." if note else ""))
@@ -122,9 +140,9 @@ def motion_prompt(motion: dict[str, Any], scene: dict[str, Any], dna: dict, name
 
 def compile_shot(scene: dict[str, Any], motion: dict[str, Any], dna: dict, names: dict[str, str], *, model: str,
                  refs: list[str] | None = None, location_text: str = "", width: int = 1280, height: int = 720,
-                 note: str = "", emotion: str = "") -> dict[str, Any]:
+                 note: str = "", emotion: str = "", sound: str = "") -> dict[str, Any]:
     out = {"keyframe_prompt": keyframe_prompt(scene, dna, names, refs, location_text, note),
-           "motion_prompt": motion_prompt(motion, scene, dna, names, model, note, emotion, location_text),
+           "motion_prompt": motion_prompt(motion, scene, dna, names, model, note, emotion, location_text, sound),
            "negative_prompt": D.negative(dna), "model": model, "width": width, "height": height,
            "duration": motion["duration"], "camera_start": motion["camera"]["from"], "camera_end": camera_at(motion, motion["duration"])}
     out["params_hash"] = hashlib.sha256(json.dumps(out, sort_keys=True, ensure_ascii=False).encode()).hexdigest()

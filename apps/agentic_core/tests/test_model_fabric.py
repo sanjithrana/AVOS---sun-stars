@@ -244,3 +244,19 @@ def test_prewarm_loads_each_model_once_on_different_gpus(ledger, monkeypatch):
     assert done[0] == {"model": "z-image", "worker": "B", "already": True}       # already loaded on B: nothing sent
     assert len(sent) == 1 and sent[0][0] == "http://a/models/load" and sent[0][1]["model"] == "wan-2.2"
     assert ("wan-2.2", "diffusers") in dispatch.on_the_way("wa")
+
+
+def test_a_cpu_worker_runs_what_fits_in_ram_plus_page_file():
+    """An Intel PC without a GPU (ComfyUI --cpu): memory is RAM + page file; it's slow, so it's ranked as slow, and a
+    model that doesn't fit says to grow the page file."""
+    def cpu(swap):
+        w = worker(name="Intel PC", gpu="Intel Core i7 (CPU)", vram=16 + swap, precisions=("bf16", "fp8"))
+        w.report["gpu"].update(device="cpu", ram_gb=16, swap_gb=swap, max_side=512)
+        w.report["adapters"]["diffusers"].update(device="cpu", offload=False)
+        return w
+    p = best(route(RouteRequest(task="video", seconds=5, models=["ltx-2.3"]), [cpu(48)]))
+    assert p.precision == "fp8" and not p.offload and "16 GB RAM + 48 GB page file" in " ".join(p.reasons)
+    fast = best(route(RouteRequest(task="video", seconds=5, models=["ltx-2.3"]), [worker(gpu="NVIDIA GeForce RTX 5090", vram=32)]))
+    assert p.est_seconds > 20 * fast.est_seconds
+    small = route(RouteRequest(task="video", seconds=5, models=["ltx-2.3"]), [cpu(0)])
+    assert not small.placements and "page file" in small.rejected[0]["why"]

@@ -28,7 +28,7 @@ export function EpisodePanel({ sid, snap, ep, act, pending }: { sid: string; sna
   const stuck = ep.status === "error" || ep.status === "stopped" || ep.parts.some((p) => p.status === "error" || p.status === "stopped");
   const done = ep.parts.filter((p) => p.status === "approved").length;
   return (
-    <div className="space-y-4 rounded-2xl border border-border bg-card/30 p-5" data-testid={`episode-${ep.id}`}>
+    <div className="space-y-4 rounded-xl border border-border bg-card/30 p-5" data-testid={`episode-${ep.id}`}>
       <div className="flex flex-wrap items-center gap-3">
         <b className="text-lg text-foreground">Episode {ep.number}: {ep.outline?.title || ep.title}</b>
         <span className="text-sm text-muted-foreground">{ep.targetMinutes} min · {done}/{ep.parts.length} parts approved{ep.source === "script" ? " · your script" : ""}</span>
@@ -87,7 +87,7 @@ function PartCard({ sid, snap, ep, p, act, pending }: { sid: string; snap: Serie
       <button className="flex w-full flex-wrap items-center gap-3 p-3 text-left" onClick={() => setOpen(!isOpen)}>
         <b className="text-sm text-foreground">Part {p.index}</b>
         <span className="text-xs text-muted-foreground"><Clock className="mr-1 inline h-3 w-3" />{p.minutes} min{p.seconds ? ` · ${fmt(p.seconds)} rendered` : p.scriptSeconds ? ` · ~${fmt(p.scriptSeconds)} written` : ""}</span>
-        <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${c}`} data-testid="part-status">{t}</span>
+        <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${c}`} data-testid="part-status">{t}</span>
         {(p.status === "rendering" || p.status === "writing") && <Loader2 className="h-4 w-4 animate-spin text-amber-500" />}
         <span className="grow truncate text-xs text-muted-foreground">{p.summary}</span>
         <ChevronDown className={`h-4 w-4 transition ${isOpen ? "rotate-180" : ""}`} />
@@ -207,10 +207,10 @@ export function PartReview({ sid, snap, ep, p, act, pending }: { sid: string; sn
       {opened && <ShotTools sid={sid} snap={snap} ep={ep} part={p} shot={opened} act={act} onClose={() => setOpen(null)} />}
       <Timeline sid={sid} snap={snap} part={p} video={seriesApi.file(sid, p.video, p.renderedAt)} onOpen={(id) => setOpen(id)} />
       <div className="flex flex-wrap gap-2 text-[11px]">
-        <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">{shots.length} shots · {fmt(p.seconds)}</span>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">music: {modelLabel(p.musicInfo?.model ?? null)}</span>
-        {warned.length > 0 && <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-amber-700 dark:text-amber-300">{warned.length} shot(s) with a warning</span>}
-        {fallbacks.length > 0 && <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-amber-700 dark:text-amber-300">fallbacks used: {fallbacks.map(modelLabel).join(", ")}</span>}
+        <span className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">{shots.length} shots · {fmt(p.seconds)}</span>
+        <span className="rounded-lg bg-muted px-2 py-0.5 text-muted-foreground">music: {modelLabel(p.musicInfo?.model ?? null)}</span>
+        {warned.length > 0 && <span className="rounded-lg bg-amber-500/15 px-2 py-0.5 text-amber-700 dark:text-amber-300">{warned.length} shot(s) with a warning</span>}
+        {fallbacks.length > 0 && <span className="rounded-lg bg-amber-500/15 px-2 py-0.5 text-amber-700 dark:text-amber-300">fallbacks used: {fallbacks.map(modelLabel).join(", ")}</span>}
       </div>
       {p.status === "review" && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/5 p-3">

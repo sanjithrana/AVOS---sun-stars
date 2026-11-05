@@ -583,7 +583,7 @@ def _render(sid: str, s: dict, eid: str, n: int, pdir: Path, redo: list[str], no
         if sh["kind"] != "dialogue":
             return
         c = cast[sh["speaker"]]
-        fp = _fp(sh["text"], sh["emotion"], (c.get("voice") or {}).get("sample"), sh["takes"]["voice"], s.get("language"))
+        fp = _fp(sh["text"], sh["emotion"], (c.get("voice") or {}).get("sample"), sh["takes"]["voice"], s.get("language"), media.choice(s, "lines"))
         if not cached(sh, "line", "line.wav", fp):
             data, info = media.say_line(s, c, sh["text"], sh["emotion"] or "neutral",
                                         media.seed_of(sid, eid, n, sh["id"], sh["takes"]["voice"], sh.get("retry", 0)),
@@ -622,7 +622,7 @@ def _render(sid: str, s: dict, eid: str, n: int, pdir: Path, redo: list[str], no
             return
         note = sh.get("note") or ""
         fp = _fp(media.keyframe_prompt(s, sh, [], note), sh["subjects"], [cast[c].get("sheet") for c in sh["subjects"] if c in cast],
-                 loc.get("plate"), sh["takes"]["picture"])
+                 loc.get("plate"), sh["takes"]["picture"], media.choice(s, "pictures"))
         if cached(sh, "key", "key.png", fp):
             return
         seed = media.seed_of(sid, eid, n, sh["id"], sh["takes"]["picture"], sh.get("retry", 0))
@@ -660,7 +660,8 @@ def _render(sid: str, s: dict, eid: str, n: int, pdir: Path, redo: list[str], no
         kf = (sdir_(sh) / "key.png").read_bytes()
         driver = sdir_(sh) / "driver.mp4" if sh.get("driver") and (sdir_(sh) / "driver.mp4").is_file() else None
         fp = _fp(sh["fp"].get("key"), sh.get("fp", {}).get("line"), sh.get("blueprint") or sh["motion"], sh.get("note"),
-                 sh["seconds"], sh["takes"]["motion"], bool(driver), s.get("dna"))
+                 sh["seconds"], sh["takes"]["motion"], bool(driver), s.get("dna"),
+                 media.choice(s, "lipsync" if _lipsync(sh) else "motion"))
         if cached(sh, "clip", "clip.mp4", fp):
             return
         tag = f"{s['title']} · E{ep['number']}P{n} · {sh['id']} clip"
@@ -695,10 +696,10 @@ def _render(sid: str, s: dict, eid: str, n: int, pdir: Path, redo: list[str], no
     def foley(sh: dict) -> None:
         if not sh.get("sfx"):
             return
-        fp = _fp(sh["fp"].get("clip"), sh["sfx"])
+        fp = _fp(sh["fp"].get("clip"), sh["sfx"], media.choice(s, "sfx"))
         if cached(sh, "sfx", "sfx.wav", fp):
             return
-        data, info = media.sfx(sh, (sdir_(sh) / "clip.mp4").read_bytes(), sh["seconds"], f"{s['title']} · {sh['id']} sound")
+        data, info = media.sfx(sh, (sdir_(sh) / "clip.mp4").read_bytes(), sh["seconds"], f"{s['title']} · {sh['id']} sound", s)
         if data:
             (sdir_(sh) / "sfx.wav").write_bytes(data)
             mark(sh, "sfx", "sfx.wav", fp, info)
@@ -716,7 +717,7 @@ def _render(sid: str, s: dict, eid: str, n: int, pdir: Path, redo: list[str], no
             amb_files[scene_id] = f
             continue
         check(sid)
-        data, info = media.ambience((sdir_(first) / "clip.mp4").read_bytes(), text, first["seconds"], f"{s['title']} · {scene_id} ambience")
+        data, info = media.ambience((sdir_(first) / "clip.mp4").read_bytes(), text, first["seconds"], f"{s['title']} · {scene_id} ambience", s)
         amb_info[scene_id] = {**info, "fp": afp}
         if data:
             f.write_bytes(media.to_wav(data))

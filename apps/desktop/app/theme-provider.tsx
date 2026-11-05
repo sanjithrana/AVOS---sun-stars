@@ -18,7 +18,7 @@ function applyThemeClass(theme: Theme) {
 }
 
 /**
- * Light by default (per the person's own choice), with a persisted
+ * Dark by default (the AVOS look), with a persisted
  * override and a toggle in the Topbar. The class this flips (`dark` on
  * <html>) is exactly what globals.css's `@custom-variant dark` and every
  * shadcn/ui primitive already key off - no separate light/dark component
@@ -29,7 +29,7 @@ function applyThemeClass(theme: Theme) {
  * flash for a person who has chosen dark.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+  const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
     // Read back whatever the pre-paint inline script (or the default)
@@ -70,7 +70,7 @@ export const THEME_BOOTSTRAP_SCRIPT = `
 (function () {
   try {
     var stored = localStorage.getItem("${STORAGE_KEY}");
-    var theme = stored === "dark" || stored === "light" ? stored : "light";
+    var theme = stored === "dark" || stored === "light" ? stored : "dark";
     if (theme === "dark") document.documentElement.classList.add("dark");
   } catch (e) {}
 })();

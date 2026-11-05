@@ -252,6 +252,35 @@ def test_a_text_model_from_settings_runs_as_a_crew(shared, monkeypatch, tmp_path
     assert seen["url"] == "http://ds.local/v1/chat/completions" and seen["body"]["model"] == "deepseek-chat" and seen["auth"] == "Bearer sk-1"
 
 
+def test_colibri_runs_as_a_local_crew(monkeypatch, tmp_path):
+    """Colibrì (a huge MoE model streamed from SSD on the CPU) is an OpenAI-compatible server on port 8000: the crew asks
+    it which model is loaded and uses it; the AI settings show it ready when it answers."""
+    import asyncio
+
+    monkeypatch.setenv("COLIBRI_URL", "http://colibri.local:8000/")
+    seen = {}
+
+    def handler(req):
+        if req.url.path == "/v1/models":
+            return httpx.Response(200, json={"data": [{"id": "glm-5.2"}]})
+        seen.update(url=str(req.url), body=json.loads(req.content))
+        chunk = 'data: {"choices":[{"delta":{"content":"{\\"ok\\": 1}"}}]}\n\ndata: [DONE]\n\n'
+        return httpx.Response(200, content=chunk.encode(), headers={"content-type": "text/event-stream"})
+
+    real = httpx.AsyncClient
+    monkeypatch.setattr(llm_mod.httpx, "AsyncClient", lambda *a, **k: real(*a, **{**k, "transport": httpx.MockTransport(handler)}))
+
+    class Abort:
+        aborted = False
+
+    assert "colibri" in llm_mod.agent_kinds() and llm_mod.local_url("colibri") == "http://colibri.local:8000"
+    crew = llm_mod.Crew("colibri", "j", "fresh", "writer", lambda ev: None, Abort(), tmp_path)
+    assert asyncio.run(crew.ask_json("You write.", "Go")) == {"ok": 1}
+    assert seen["url"] == "http://colibri.local:8000/v1/chat/completions" and seen["body"]["model"] == "glm-5.2"
+    info = next(a for a in asyncio.run(llm_mod.agents_info())["agents"] if a["id"] == "colibri")
+    assert info["ready"] and info["model"] == "glm-5.2" and "colibri" in info["fix"].lower()
+
+
 # ---------- AVOS GPU workers (Settings → GPU workers, shared with Facts) ----------
 @pytest.fixture(scope="module")
 def gpu_worker_url(tmp_path_factory):
@@ -357,3 +386,69 @@ def test_a_retired_groq_model_is_replaced_automatically(shared, monkeypatch, tmp
     assert calls == ["some-vanished-model", "openai/gpt-oss-120b"]
     assert saved == {"STUDIO_GROQ_MODEL": "openai/gpt-oss-120b"}
     assert any("switched to openai/gpt-oss-120b" in (e.get("text") or "") for e in logs)
+
+
+def test_a_broke_fal_account_is_skipped_and_the_next_option_draws(fal, shared, monkeypatch):
+    """fal.ai answering 'Exhausted balance' marks fal.ai as skipped (shared with the Models page), every model says why,
+    and a Series picture falls through to the next option instead of failing."""
+    from studio import provider_health as PH
+    from studio.series import media
+
+    class Broke(FakeFal):
+        def handler(self, request):
+            if request.method == "POST":
+                self.jobs.append((request.url.path.strip("/"), json.loads(request.content)))
+                return httpx.Response(403, json={"detail": "User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing."})
+            return super().handler(request)
+    fake = fal(Broke())
+    PH.clear()
+    assert models.ready("z-image")[0]
+    with pytest.raises(models.ModelUnavailable) as e:
+        models.image("z-image", "a park", 512, 512, 1)
+    assert "no credit left" in str(e.value) and "Exhausted balance" in str(e.value)
+    assert "no credit left" in models.available("qwen-image")["fal"] and not models.ready("wan-2.2")[0]
+    assert "fal" in PH.snapshot() and len(fake.jobs) == 1
+    drawn = {}
+
+    def free_chain(prompt, out, w, h):
+        out.write_bytes(PNG)
+        drawn["free"] = True
+        return out
+    monkeypatch.setattr("studio.render.images.generate_plate", free_chain)
+    data, mid = media._t2i("a park", 512, 512, 1)
+    assert data == PNG and mid == "free picture chain" and drawn["free"] and len(fake.jobs) == 1     # fal.ai not asked again
+    monkeypatch.setenv("FAL_KEY", "a-new-key")                                                       # a new key: tried again
+    assert PH.down("fal") is None
+    PH.clear()
+
+
+def test_clips_run_on_fal_when_there_is_no_gpu(fal, tmp_path):
+    fake = fal(FakeFal(video=b"MP4"))
+    out = models.run_model("wan-2.2", task="video", want="video", prompt="she waves", w=1280, h=720, seconds=4.0, seed=3,
+                           inputs={"image": PNG})
+    assert out == b"MP4"
+    ep, body = fake.jobs[-1]
+    assert ep == "fal-ai/wan/v2.2-a14b/image-to-video" and body["num_frames"] == 65 and body["image_url"].startswith("data:image/png")
+    models.run_model("infinitetalk", task="avatar", want="video", prompt="talks", seconds=2.0, inputs={"image": PNG, "audio": b"RIFF0000WAVE"})
+    ep, body = fake.jobs[-1]
+    assert ep == "fal-ai/infinitalk" and body["audio_url"].startswith("data:audio/wav") and body["num_frames"] == 53
+
+
+def test_your_model_choices_per_step(shared, monkeypatch, tmp_path):
+    """Per film / series: the model and the place for each step; Auto keeps the usual order."""
+    from studio.series import media
+    monkeypatch.setenv("FAL_KEY", "k")
+    with TestClient(app) as c:
+        sid = c.post("/api/series", data={"title": "Picks", "crew": "builtin", "partPlan": "0.25", "cast": "Raju - a boy"}).json()["id"]
+        steps = {x["step"]: x for x in c.get(f"/api/series/{sid}/models").json()["steps"]}
+        assert set(steps) == {"pictures", "motion", "lipsync", "lines", "sfx", "music"} and steps["motion"]["model"] == "auto"
+        wan = next(o for o in steps["motion"]["options"] if o["id"] == "wan-2.2")
+        assert wan["ready"] and wan["backends"]["fal"]["why"] is None and "comfyui" in wan["backends"]
+        assert any(o["id"] == "off" for o in steps["music"]["options"]) and any(o["id"] == "edge" for o in steps["lines"]["options"])
+        r = c.patch(f"/api/series/{sid}", json={"models": {"motion": {"model": "ltx-2.3", "backend": "fal"}, "music": {"model": "off"},
+                                                           "bogus": {"model": "x"}}})
+        s = r.json()["series"]
+        assert s["settings"]["models"] == {"motion": {"model": "ltx-2.3", "backend": "fal"}, "music": {"model": "off", "backend": "auto"}}
+        assert media.ordered(s, "motion", ["wan-2.2", "ltx-2.3"]) == ["ltx-2.3", "wan-2.2"] and media.where(s, "motion", "ltx-2.3") == "fal"
+        assert media.where(s, "motion", "wan-2.2") is None and media.music(s, "x", 10, "t")[1]["note"] == "music off (your choice)"
+        c.post(f"/api/series/{sid}/cancel")

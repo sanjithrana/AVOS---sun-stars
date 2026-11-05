@@ -15,16 +15,21 @@ scene graph (WHERE) + motion blueprint (WHEN) + Design DNA (LOOK) → keyframe p
 ## Keyframe prompt (Qwen-Image-Edit / Z-Image / FLUX)
 
 1. What each reference picture is ("picture 1 is Raju's character sheet; picture 3 is the kitchen").
-2. "ONE frame of an animated episode: <framing>, <angle from camera height>, <lens words (mm)>".
+2. "ONE frame of an animated film: <framing>, <angle from camera height>, <lens words (mm)>", then a composition line
+   for that framing (wide = layered depth, close-up = shallow focus on the eyes…) and what a low or high angle should
+   make the viewer feel.
 3. Each actor: "<name> <left/centre/right, foreground/background>: <pose>, <expression>, facing <x>" (+ "the one
    speaking"); listeners keep their mouths closed.
 4. Props, place + time, lighting key + mood.
-5. "Every character looks exactly like their sheet", the Design DNA style clause, any change note, "no text".
+5. "Every character looks exactly like their sheet", an acting line (readable pose and face, clean silhouettes,
+   correct hands), the Design DNA style clause, any change note, "no text".
 
 ## Motion prompt, phrased per renderer
 
 - **LTX-2.3**: one flowing chronological paragraph: the main action first, then timed actions ("At 1.5s, …"), who and
-  where, the camera move and its ease, light, the DNA's animation and style clauses, "characters stay consistent".
+  where, the camera move and its ease, light, "Sound: <the shot's sound effects>" (LTX-2.3 makes audio too), the DNA's
+  animation clause (which always asks for weight, anticipation and follow-through) and style clause, "characters stay
+  consistent".
 - **Wan 2.2**: short and concrete: the timed actions, the camera, the animation clause, the style clause.
 - **InfiniteTalk / LongCat**: "<name> talks <emotion>, lips in sync…", gestures, camera, style.
 

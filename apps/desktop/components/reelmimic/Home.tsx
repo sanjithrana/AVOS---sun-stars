@@ -47,8 +47,8 @@ export function Home() {
           "Give it a video you love and get a new animation in the same style: it studies the style, plans with you, renders only after you approve, and checks every part before delivering.")}</p>
       </div>
 
-      <Link href="/animations/films" className="flex flex-wrap items-center gap-4 rounded-2xl border-2 border-amber-500/70 bg-gradient-to-r from-amber-500/15 to-orange-500/10 p-4 transition hover:border-amber-500 md:p-5" data-testid="films-link">
-        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg"><I n="film" s={2} /></span>
+      <Link href="/animations/films" className="flex flex-wrap items-center gap-4 rounded-xl border border-amber-500/50 bg-accent p-4 transition hover:border-amber-500 md:p-5" data-testid="films-link">
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary hover:bg-[#8873be] text-white"><I n="film" s={2} /></span>
         <span className="min-w-0 flex-1">
           <b className="block text-foreground">{say("短片：提示詞 → 動畫（推薦）", "Films: prompt → animation (recommended)")}</b>
           <span className="text-sm text-muted-foreground">{say("貼上提示詞（可含時間碼或 JSON）：拆解、鎖定角色與世界、分鏡你核准後才逐格動畫，再配音效與音樂，最後輸出所有專案檔。",
@@ -57,8 +57,8 @@ export function Home() {
         <span className="text-sm font-medium text-amber-600">{say("開啟", "Open")} →</span>
       </Link>
 
-      <Link href="/animations/series" className="flex flex-wrap items-center gap-4 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/10 to-orange-500/5 p-4 transition hover:border-amber-500 md:p-5" data-testid="series-link">
-        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg"><I n="layers" s={2} /></span>
+      <Link href="/animations/series" className="flex flex-wrap items-center gap-4 rounded-xl border border-amber-500/40 bg-accent p-4 transition hover:border-amber-500 md:p-5" data-testid="series-link">
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary hover:bg-[#8873be] text-white"><I n="layers" s={2} /></span>
         <span className="min-w-0 flex-1">
           <b className="block text-foreground">{say("系列動畫", "Series")}</b>
           <span className="text-sm text-muted-foreground">{say("你核准每個角色（外型和聲音），劇集分段製作：先 1 分鐘，再每段 3 分鐘，每段你看過核准才繼續。",
@@ -69,8 +69,8 @@ export function Home() {
 
       <section className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
         {stats.map(([ico, label, value, color]) => (
-          <div key={ico} className="rounded-2xl border border-border bg-card/50 p-4 md:p-6">
-            <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-lg md:h-12 md:w-12 ${color}`}><I n={ico} s={2} style={{ fontSize: 20 }} /></div>
+          <div key={ico} className="rounded-xl border border-border bg-card/50 p-4 md:p-6">
+            <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-[var(--signal)] md:h-12 md:w-12`}><I n={ico} s={2} style={{ fontSize: 20 }} /></div>
             <p className="mb-1 text-2xl font-bold text-foreground md:text-3xl">{list.isLoading ? "–" : value}</p>
             <p className="text-xs text-muted-foreground md:text-sm">{label}</p>
           </div>
@@ -98,7 +98,7 @@ export function Home() {
           {items.length > 0 && <span className="text-sm font-normal text-muted-foreground">{items.length}</span>}
         </h2>
         {items.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border p-12 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-12 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 text-amber-500"><I n="film" style={{ fontSize: 30 }} /></div>
             <h3 className="text-xl font-bold text-foreground">{say("還沒有專案", "No animations yet")}</h3>
             <p className="text-muted-foreground">{say("在上面放一支參考影片並寫下你想做什麼。", "Add a reference video above and describe what you want.")}</p>
@@ -106,7 +106,7 @@ export function Home() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">{items.map((p) => (
             <Link key={p.id} data-testid="animation-card" data-stage={p.stage} href={`/animations/${p.id}`}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card/50 transition-all duration-300 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10"
+              className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card/50 transition-all duration-300 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10"
               onMouseEnter={(e) => { const v = e.currentTarget.querySelector("video"); if (v) { v.currentTime = 3; v.play().catch(() => {}); } }}
               onMouseLeave={(e) => e.currentTarget.querySelector("video")?.pause()}>
               <div className="relative aspect-video bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 bg-cover bg-center" style={{ backgroundImage: p.thumb ? `url("${api.file(p.id, p.thumb)}")` : undefined }}>

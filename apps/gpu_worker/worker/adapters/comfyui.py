@@ -69,6 +69,21 @@ def weight_dtype(precision: str) -> str:
     return "default"
 
 
+def cpu_size(job: JobSpec) -> None:
+    """On a CPU: draw small (AVOS scales the result up to the film's size) and keep clips short (it holds the last
+    frame). Diffusion time grows with pixels × frames, so this is what makes a CPU usable at all."""
+    side = max(job.width, job.height)
+    if side > config.CPU_MAX_SIDE:
+        k = config.CPU_MAX_SIDE / side
+        job.width, job.height = max(256, int(job.width * k) // 32 * 32), max(256, int(job.height * k) // 32 * 32)
+    if job.task in ("video", "avatar", "control") and job.seconds > config.CPU_MAX_SECONDS:
+        fps = job.fps or (round((job.frames - 1) / job.seconds) if job.frames and job.seconds else 16)
+        job.seconds = config.CPU_MAX_SECONDS
+        if job.frames:
+            mult = 8 if (job.frames - 1) % 8 == 0 else 4
+            job.frames = max(9, (round(job.seconds * fps) // mult) * mult + 1)
+
+
 class ComfyUIAdapter(Adapter):
     name = "comfyui"
     precisions = ("bf16", "fp8")
@@ -103,6 +118,9 @@ class ComfyUIAdapter(Adapter):
         data = json.loads(p.read_text("utf-8"))
         if "nodes" in data and "links" in data:
             raise RuntimeError(f"{p.name} is a regular ComfyUI save, not the API format (Workflow → Export (API)).")
+        from worker import autowire
+        if autowire.needs_wiring(data):      # a plain export dropped into the folder: wire the prompt, image, seed … here
+            data, _ = autowire.autowire(data)
         return data
 
     async def unload(self, model: str) -> None:
@@ -150,6 +168,8 @@ class ComfyUIAdapter(Adapter):
             return
 
     async def run(self, job: JobSpec, progress: Progress) -> tuple[bytes, str]:
+        if gpu.is_cpu():
+            cpu_size(job)
         wf = self._workflow(job.model)
         text = json.dumps(wf)
         for ph, (key, _) in FILES.items():

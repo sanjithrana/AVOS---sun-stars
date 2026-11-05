@@ -42,13 +42,17 @@ VIRAL_3D = StylePreset(
         "grid floor and backdrop, vertical framing, sharp focus"
     ),
     script_guidance=(
-        "STYLE: viral 3D-animation facts short (like 'what would happen if...' channels). "
+        "STYLE: viral 3D-animation facts short (like 'what would happen if...' and 'science trick' channels). "
         "Open with a one-line hook question or bold claim in the first 2 seconds. "
         "Short, punchy sentences (max ~12 words), present tense, one surprising fact per scene, "
         "build tension, end with a twist or punchline - no 'subscribe', no outro. "
         "Every visual_description must show ONE concrete physical action by a 3D human "
         "character (or object) in a simple scene, e.g. 'a muscular man in black shorts "
-        "punches a giant gorilla on a blue grid floor'. No text, charts or diagrams in visuals."
+        "punches a giant gorilla on a blue grid floor'. "
+        "Vary the camera: alternate medium shots of the presenter with macro close-ups of hands, props and the key detail. "
+        "When the explanation is invisible (air pressure, electricity, heat), show it as ONE 3D cutaway or cross-section "
+        "with glowing arrows or colour flows - never letters, numbers, labels or charts. "
+        "A short funny cutaway to a second character reacting is welcome near the end."
     ),
     music_mood="suspense",
     caption_words=2,

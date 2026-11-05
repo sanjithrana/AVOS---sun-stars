@@ -51,7 +51,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 
 from ..creative import dna as DNA, scene as SG, skills as SK
 from ..llm import agent_kinds, default_agent
-from . import film, languages, library, pipeline, store, writers
+from . import film, languages, library, media, pipeline, store, writers
 
 router = APIRouter(prefix="/api/series")
 ASPECTS = {"16:9": (1280, 720), "9:16": (720, 1280), "1:1": (960, 960), "4:3": (1024, 768)}
@@ -303,6 +303,11 @@ async def edit(sid: str, req: Request) -> Any:
             s.setdefault("style", {})["prompt"] = b["stylePrompt"][:400]
         if isinstance(b.get("settings"), dict):
             s.setdefault("settings", {}).update({k: bool(v) for k, v in b["settings"].items() if k in ("autoApproveScripts", "shotQA", "storyboardGate")})
+        if isinstance(b.get("models"), dict):           # your model choices per step: {step: {model, backend}}
+            cur = s.setdefault("settings", {}).setdefault("models", {})
+            for step, c in b["models"].items():
+                if step in media.STEP_LABELS and isinstance(c, dict):
+                    cur[step] = {"model": str(c.get("model") or "auto")[:40], "backend": str(c.get("backend") or "auto")[:20]}
         if isinstance(b.get("dna"), dict):
             s["dna"] = DNA.normalize(b["dna"])
             s["dnaAt"] = store.now()
@@ -688,6 +693,18 @@ async def resume(sid: str, eid: str) -> Any:
     if ep.get("status") in ("stopped", "error"):
         store.update_ep(sid, eid, lambda e: e.update(status="in_production" if e.get("outline") else "outlining", error=None))
     return pipeline.snapshot(sid)
+
+
+@router.get("/{sid}/models")
+async def model_options(sid: str) -> Any:
+    """Per step: your choice, every model that can do it, where each can run (your GPU, ComfyUI, fal.ai, Cloudflare)
+    and why not; change it with PATCH /{sid} {"models": {step: {"model", "backend"}}}."""
+    if (bad := _need(sid)):
+        return bad
+    import asyncio
+    from .. import provider_health
+    steps = await asyncio.to_thread(media.model_options, store.load(sid))
+    return {"steps": steps, "providers": provider_health.snapshot()}
 
 
 @router.post("/{sid}/dna/rebuild")

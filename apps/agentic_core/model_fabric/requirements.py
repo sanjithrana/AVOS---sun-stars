@@ -32,8 +32,13 @@ OFFLOAD_SLOWDOWN = 3.0          # running with CPU offload when the model doesn'
 RESERVE_GB = 1.5                # VRAM kept free for activations / the desktop
 
 
+CPU_SPEED = 0.01                # a CPU worker (Intel / AMD, ComfyUI --cpu): ~100x slower than an RTX 4090
+
+
 def gpu_speed(name: str | None) -> float:
     n = (name or "").upper()
+    if n.endswith("(CPU)"):
+        return CPU_SPEED
     for key, factor in GPU_SPEED:
         if key in n:
             return factor

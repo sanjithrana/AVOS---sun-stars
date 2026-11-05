@@ -2,20 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, Clapperboard, Cpu, Lightbulb, Settings2, Star } from "lucide-react";
+import { Boxes, Clapperboard, Cpu, Home, Landmark, Settings2, Sparkles, Wand2 } from "lucide-react";
 import type { ReactNode } from "react";
+import { Mark } from "@/components/layout/Mark";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
-// Two studios: Facts (topic -> narrated facts video) and Animations
-// (ReelMimic: reference video -> new animation in the same style), plus the
-// Models page (which open model does which job, and what is set up).
+// Studios: Explainer (one idea -> a finished explainer video; characters, 3D, AI video and voice chosen per shot)
+// and Animations (films, series, video style), plus the Models page (which open model does which job).
 const NAV = [
   {
-    href: "/facts",
-    label: "Facts",
-    hint: "Narrated fact videos",
-    icon: Lightbulb,
-    match: (p: string) => p.startsWith("/facts") || p.startsWith("/project") || p.startsWith("/studio"),
+    href: "/",
+    label: "Home",
+    hint: "Production assistant",
+    icon: Home,
+    match: (p: string) => p === "/",
+  },
+  {
+    href: "/explainer",
+    label: "Explainer",
+    hint: "Idea to finished video",
+    icon: Sparkles,
+    match: (p: string) => p.startsWith("/explainer"),
+  },
+  {
+    href: "/stickman",
+    label: "Stickman",
+    hint: "Stickman videos, 12 looks",
+    icon: Landmark,
+    match: (p: string) => p.startsWith("/stickman"),
   },
   {
     href: "/animations",
@@ -23,6 +37,13 @@ const NAV = [
     hint: "Films, series, video style",
     icon: Clapperboard,
     match: (p: string) => p.startsWith("/animations"),
+  },
+  {
+    href: "/skills",
+    label: "Skills",
+    hint: "One-subject skills, e.g. toys",
+    icon: Wand2,
+    match: (p: string) => p.startsWith("/skills"),
   },
   {
     href: "/models",
@@ -52,36 +73,37 @@ interface AppShellProps {
   header?: ReactNode;
 }
 
-/** Sidebar + header frame shared by the Facts, Animations and project pages. */
+const ring = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+
+/** Sidebar + header frame shared by every page: frosted glass over the indigo scene, the current page lit in violet. */
 export function AppShell({ children, header }: AppShellProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-border bg-card/30">
-        <Link href="/facts" className="flex items-center gap-2 px-6 py-6 border-b border-border">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/20">
-            <Star className="h-6 w-6 fill-white text-white" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-foreground leading-none">AVOS</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Studio</p>
-          </div>
+    <div className="app-frame flex h-dvh overflow-hidden text-foreground">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
+        <Link href="/" className={`flex h-20 items-center gap-3 px-6 ${ring}`} aria-label="AVOS Studio home">
+          <Mark className="h-7 w-7" />
+          <span className="leading-none">
+            <span className="block text-lg font-semibold tracking-wide">AVOS</span>
+            <span className="mt-1 block text-[11px] text-muted-foreground">Studio</span>
+          </span>
         </Link>
-        <nav className="flex-1 space-y-1 p-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2" aria-label="Main">
           {NAV.map((item) => {
             const active = item.match(pathname);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                aria-current={active ? "page" : undefined}
+                className={`flex min-h-[46px] items-center gap-3 rounded-2xl px-3.5 py-2 text-[13px] font-medium transition-all ${ring} ${
                   active
-                    ? "border border-amber-500/30 bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-700 dark:text-amber-300"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    ? "border border-[rgba(150,130,255,0.35)] bg-[rgba(124,92,255,0.10)] text-foreground"
+                    : "border border-transparent text-muted-foreground hover:bg-[rgba(124,92,255,0.10)] hover:text-foreground hover:shadow-[0_0_22px_-2px_rgba(124,92,255,0.9)] hover:border-[rgba(185,172,255,0.4)]"
                 }`}
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-[var(--signal)]" : ""}`} strokeWidth={1.5} />
                 <span className="flex flex-col leading-tight">
                   {item.label}
                   <span className="text-[11px] font-normal text-muted-foreground">{item.hint}</span>
@@ -90,29 +112,30 @@ export function AppShell({ children, header }: AppShellProps) {
             );
           })}
         </nav>
-        <p className="px-6 py-4 text-[11px] text-muted-foreground/60">AI Video Operating System</p>
+        <p className="px-6 py-5 text-[11px] text-muted-foreground">AI video operating system</p>
       </aside>
 
-      <main className="flex flex-1 flex-col overflow-hidden">
-        <nav className="flex gap-1 border-b border-border bg-card/30 p-2 md:hidden">
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <nav className="flex gap-1 overflow-x-auto border-b border-border bg-sidebar p-2 md:hidden" aria-label="Main">
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${
-                item.match(pathname) ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "text-muted-foreground"
+              aria-current={item.match(pathname) ? "page" : undefined}
+              className={`flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm ${ring} ${
+                item.match(pathname) ? "bg-[rgba(109,76,255,0.22)] text-foreground" : "text-muted-foreground"
               }`}
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className="h-4 w-4" strokeWidth={1.5} />
               {item.label}
             </Link>
           ))}
         </nav>
-        <header className="flex items-center justify-between gap-4 border-b border-border bg-card/20 px-4 py-4 md:px-8">
-          <div className="flex flex-1 items-center gap-4">{header}</div>
+        <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border px-4 md:h-20 md:px-10">
+          <div className="flex min-w-0 flex-1 items-center gap-4">{header}</div>
           <ThemeToggle />
         </header>
-        <div className="flex-1 overflow-auto">{children}</div>
+        <div className="min-h-0 flex-1 overflow-auto overscroll-contain" data-scroll-root>{children}</div>
       </main>
     </div>
   );

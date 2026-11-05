@@ -116,6 +116,97 @@ def generate_plate(prompt: str, out: Path, w: int = 1280, h: int = 720, timeout:
     return out
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# The free picture chain for the studios: honours the SEED and the SIZE (the plate chain above does not), and can look at
+# up to four REFERENCE pictures (a character portrait, a prop, the set) through Cloudflare's FLUX.2 [klein] on the free tier.
+# ---------------------------------------------------------------------------------------------------------------------
+CF_REF_MODEL = "@cf/black-forest-labs/flux-2-klein-9b"
+LAST_FREE: dict[str, str] = {}
+
+
+def cloudflare_ready() -> bool:
+    return bool(os.environ.get("CLOUDFLARE_ACCOUNT_ID") and os.environ.get("CLOUDFLARE_API_TOKEN"))
+
+
+def _small_png(data: bytes, side: int = 500) -> bytes:
+    """A reference must be smaller than 512x512 for FLUX.2 [klein]."""
+    import io
+    from PIL import Image
+    im = Image.open(io.BytesIO(data)).convert("RGB")
+    im.thumbnail((side, side))
+    out = io.BytesIO()
+    im.save(out, "PNG")
+    return out.getvalue()
+
+
+def _cf_image(r: httpx.Response) -> bytes | None:
+    if r.status_code != 200:
+        LAST_FREE["cloudflare"] = f"HTTP {r.status_code}: {r.text[:200]}"
+        return None
+    if r.headers.get("content-type", "").startswith("image/"):
+        return r.content
+    try:
+        j = r.json()
+    except ValueError:
+        return None
+    img = (j.get("result") or {}).get("image") if isinstance(j, dict) else None
+    return base64.b64decode(img) if img else None
+
+
+def cloudflare_flux2(prompt: str, w: int, h: int, seed: int, refs: list[bytes] | None = None, timeout: float = 120) -> bytes | None:
+    """FLUX.2 [klein] on Cloudflare Workers AI: text to picture, or picture FROM up to four reference pictures."""
+    acc, tok = os.environ.get("CLOUDFLARE_ACCOUNT_ID"), os.environ.get("CLOUDFLARE_API_TOKEN")
+    if not (acc and tok):
+        return None
+    model = os.environ.get("CLOUDFLARE_REF_MODEL") or CF_REF_MODEL
+    k = min(1.0, 1920 / max(w, h))
+    W, H = max(256, int(w * k) // 16 * 16), max(256, int(h * k) // 16 * 16)
+    files: dict = {}
+    for i, b in enumerate((refs or [])[:4]):
+        try:
+            files[f"input_image_{i}"] = (f"ref{i}.png", _small_png(b), "image/png")
+        except Exception:  # noqa: BLE001 - an unreadable reference is skipped
+            continue
+    parts = {"prompt": (None, prompt[:2000]), "width": (None, str(W)), "height": (None, str(H)), "seed": (None, str(int(seed) % 2_147_483_647)), **files}
+    try:                                                # always multipart/form-data, even without pictures (the model requires it)
+        r = httpx.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{model}", headers={"Authorization": f"Bearer {tok}"},
+                       files=parts, timeout=timeout)
+        return _cf_image(r)
+    except Exception as e:  # noqa: BLE001
+        LAST_FREE["cloudflare"] = str(e)[:200]
+        return None
+
+
+def free_picture(prompt: str, w: int, h: int, seed: int, refs: list[bytes] | None = None, timeout: float = 120) -> tuple[bytes, str] | None:
+    """(picture, which service) from the free chain, or None. With refs, only a service that really looks at them is used."""
+    if cloudflare_ready():
+        img = cloudflare_flux2(prompt, w, h, seed, refs, timeout)
+        if img:
+            return img, ("Cloudflare FLUX.2 klein (from references)" if refs else "Cloudflare FLUX.2 klein")
+        if not refs:
+            acc, tok = os.environ["CLOUDFLARE_ACCOUNT_ID"], os.environ["CLOUDFLARE_API_TOKEN"]
+            try:
+                r = httpx.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+                               headers={"Authorization": f"Bearer {tok}"}, json={"prompt": prompt[:2000], "steps": 6, "seed": int(seed) % 2_147_483_647}, timeout=timeout)
+                img = _cf_image(r)
+                if img:
+                    return img, "Cloudflare FLUX.1 schnell"
+            except Exception as e:  # noqa: BLE001
+                LAST_FREE["cloudflare"] = str(e)[:200]
+    if refs:
+        return None
+    try:
+        url = (f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt[:900])}?width={w}&height={h}&nologo=true"
+               f"&seed={int(seed) % 2_147_483_647}&model=flux")
+        r = httpx.get(url, timeout=timeout, follow_redirects=True)
+        if r.status_code == 200 and r.headers.get("content-type", "").startswith("image"):
+            return r.content, "Pollinations"
+        LAST_FREE["pollinations"] = f"HTTP {r.status_code}"
+    except Exception as e:  # noqa: BLE001
+        LAST_FREE["pollinations"] = str(e)[:200]
+    return None
+
+
 def load_plate(p: Path | None):
     if not p or not Path(p).exists():
         return None
@@ -126,4 +217,4 @@ def load_plate(p: Path | None):
         return None
 
 
-__all__ = ["images_status", "plate_prompt", "generate_plate", "load_plate", "config"]
+__all__ = ["images_status", "plate_prompt", "generate_plate", "free_picture", "cloudflare_ready", "load_plate", "config"]

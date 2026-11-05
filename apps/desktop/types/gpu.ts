@@ -26,6 +26,12 @@ export interface WorkerGpu {
   driver?: string;
   cuda?: string;
   fake?: boolean;
+  /** "cpu": a PC without an NVIDIA card (ComfyUI --cpu); vram_gb is then RAM + page file */
+  device?: "cpu";
+  ram_gb?: number;
+  swap_gb?: number;
+  max_side?: number;
+  max_seconds?: number;
 }
 
 export interface WorkerAdapter {

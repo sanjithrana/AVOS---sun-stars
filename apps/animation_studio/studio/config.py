@@ -119,8 +119,8 @@ ROUND_RANGE = {"min": 1, "max": 10}
 
 def render_settings() -> dict:
     q = os.environ.get("STUDIO_QUALITY", "720p")
-    img = os.environ.get("STUDIO_IMAGES", "drawn")
-    return {"quality": q if q in ("720p", "1080p") else "720p", "images": img if img in ("drawn", "ai") else "drawn"}
+    img = os.environ.get("STUDIO_IMAGES", "ai")      # AI pictures by default (free chain always works); "drawn" only if you pick it
+    return {"quality": q if q in ("720p", "1080p") else "720p", "images": img if img in ("drawn", "ai") else "ai"}
 
 
 def ffmpeg() -> str:

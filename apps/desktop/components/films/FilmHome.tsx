@@ -60,20 +60,20 @@ export function FilmHome() {
         </p>
         <ol className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
           {["Breakdown", "Characters & world", "Storyboard", "Motion", "Prompts", "Render", "Edit bay"].map((x, i) => (
-            <li key={x} className="rounded-full border border-border px-2 py-0.5"><b className="text-amber-600">{i + 1}</b> {x}</li>
+            <li key={x} className="rounded-lg border border-border px-2 py-0.5"><b className="text-amber-600">{i + 1}</b> {x}</li>
           ))}
         </ol>
       </div>
       <NewFilm />
       <section>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground"><Clapperboard className="h-5 w-5 text-amber-500" />Your films</h2>
-        {list.isError ? <p className="rounded-2xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm" data-testid="films-offline">{(list.error as Error).message}</p> :
-          list.isLoading ? <div className="h-24 animate-pulse rounded-2xl bg-muted/40" /> : films.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No films yet. Paste a prompt above.</p>
+        {list.isError ? <p className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm" data-testid="films-offline">{(list.error as Error).message}</p> :
+          list.isLoading ? <div className="h-24 animate-pulse rounded-xl bg-muted/40" /> : films.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">No films yet. Paste a prompt above.</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="films-list">
               {films.map((f) => (
-                <Link key={f.id} href={`/animations/films/${f.id}`} className="overflow-hidden rounded-2xl border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`film-${f.id}`}>
+                <Link key={f.id} href={`/animations/films/${f.id}`} className="overflow-hidden rounded-xl border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`film-${f.id}`}>
                   <div className="aspect-video bg-muted/40">{f.thumb ? <img src={seriesApi.file(f.id, f.thumb)} alt="" className="h-full w-full object-cover" /> :
                     <div className="flex h-full items-center justify-center text-muted-foreground"><Film className="h-8 w-8" /></div>}</div>
                   <div className="space-y-1 p-4">
@@ -131,7 +131,7 @@ function NewFilm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-2xl border border-border bg-card/40 p-5 md:p-6" data-testid="new-film">
+    <form onSubmit={submit} className="space-y-4 rounded-xl border border-border bg-card/40 p-5 md:p-6" data-testid="new-film">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground"><Sparkles className="h-5 w-5 text-amber-500" />New film</h2>
         <span className="grow" />

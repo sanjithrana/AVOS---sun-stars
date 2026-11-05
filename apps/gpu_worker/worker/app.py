@@ -77,7 +77,8 @@ def create_app(queue: Queue | None = None) -> FastAPI:
             else:                               # switchable per job: the fastest kernel installed here
                 attention = gpu.best_attention(sup, tuple(a.attentions)) if g else "sdpa"
             adapters[name] = {"ready": ok, "why": why, "models": a.models() if ok else [], "precisions": precisions,
-                              "attention": attention, **{k: v for k, v in a.describe().items() if k != "precisions"}}
+                              "attention": attention, **{k: v for k, v in a.describe().items() if k != "precisions"},
+                              **({"device": "cpu", "offload": False} if gpu.is_cpu(g) else {})}
         running = q().running
         busy = running is not None
         loading = busy and running.status == "loading"
@@ -87,7 +88,7 @@ def create_app(queue: Queue | None = None) -> FastAPI:
             "queue_depth": q().queued(), "running": running.public() if running else None,
             "queue": [{"id": j.id, "model": j.spec.model, "task": j.spec.task, "priority": j.spec.priority,
                        "tag": j.spec.tag, "precision": j.spec.precision} for j in q().waiting()[:20]],
-            "status": "loading" if loading else "generating" if busy else ("ready" if g else "ready (no GPU)"),
+            "status": "loading" if loading else "generating" if busy else ("ready (CPU)" if gpu.is_cpu(g) else "ready" if g else "ready (no GPU)"),
             "avg_job_seconds": q().avg_job_seconds(), "cost_per_hour": config.COST_PER_HOUR,
             "reserve_gb": config.RESERVE_GB, "pinned": sorted(config.PINNED), "time": time.time(),
             "models_dir": config.MODELS_DIR,
@@ -214,9 +215,13 @@ def create_app(queue: Queue | None = None) -> FastAPI:
             raise HTTPException(400, "Bad model id.")
         if not body or not all(isinstance(v, dict) and "class_type" in v for v in body.values()):
             raise HTTPException(400, "Not a ComfyUI API-format workflow (Export (API) in ComfyUI).")
+        from worker import autowire
+        wired: dict[str, list[str]] = {}
+        if autowire.needs_wiring(body):
+            body, wired = autowire.autowire(body)
         config.COMFYUI_WORKFLOWS.mkdir(parents=True, exist_ok=True)
         (config.COMFYUI_WORKFLOWS / f"{model}.json").write_text(json.dumps(body, indent=1), "utf-8")
-        return {"ok": True, "model": model}
+        return {"ok": True, "model": model, "autowired": autowire.describe(wired) if wired else None}
 
     return app
 

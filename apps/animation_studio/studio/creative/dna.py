@@ -79,13 +79,15 @@ def motion_clause(dna: dict) -> str:
         bits.append("squash and stretch on big moves")
     if m.get("holds"):
         bits.append("clear holds on key poses")
+    bits.append("natural weight, anticipation before big moves and follow-through after")
     return "Animation: " + ", ".join(b for b in bits if b) + "."
 
 
 def negative(dna: dict, extra: str = "") -> str:
     d = normalize(dna)
     base = ["blurry", "deformed hands", "extra limbs", "extra fingers", "duplicate character", "flicker", "morphing face",
-            "speech bubble", "character sheet layout"]
+            "speech bubble", "character sheet layout", "off-model character", "changed outfit colours", "warped anatomy",
+            "stiff frozen pose", "cropped head", "text artifacts"]
     return ", ".join(dict.fromkeys([*d["avoid"], *base, *([extra] if extra else [])]))
 
 
