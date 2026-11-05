@@ -592,6 +592,38 @@ way, with your approval at every stage. Code: `animation_studio/studio/series/fi
    `breakdown.json`, `consistency_manifest.json`, `storyboard/collage_master.png` + `frames/`, `motion_blueprint.json`,
    `prompts/shot_NN.txt`, `renders/clip_NN.mp4`, `audio/`, `final/final_master.mp4` + `audio_mix.wav`.
 
+### Your own PC as the GPU (v16): ComfyUI in one click, workflows without placeholders, CPU mode
+
+- `apps\tools\setup-comfyui.bat`: installs ComfyUI portable next to AVOS (`D:\star\ComfyUI_windows_portable`) and
+  writes its `extra_model_paths.yaml` so it reads `apps\models` (where the Models page downloads).
+- NVIDIA card: `apps\tools\start-gpu.bat` (ComfyUI + the GPU worker in Docker). No NVIDIA card (Intel / AMD):
+  `apps\tools\start-cpu.bat` (ComfyUI `--cpu` + the worker in ComfyUI's own Python). Then GPU page → add
+  `http://host.docker.internal:8700`.
+- Workflows: in ComfyUI run the model's template once → **Workflow → Export (API)** → Settings → Models → Upload. AVOS
+  wires the prompt / image / audio / seed / size / frames / fps itself and sends it to your workers.
+- **CPU mode** (optional — only when you start `start-cpu.bat` or set `WORKER_DEVICE=cpu`; Intel PC, e.g. 16 GB RAM): the worker reports RAM + page file as its memory; pictures and clips are
+  drawn at ≤512 px and ≤5 s (`WORKER_CPU_MAX_SIDE`, `WORKER_CPU_MAX_SECONDS`) and AVOS scales them up; the smallest
+  weights are chosen (fp8). Z-Image Turbo: minutes per picture. LTX-2.3 22B fp8: needs a page file of ~48 GB
+  (`powershell -ExecutionPolicy Bypass -File apps\tools\set-pagefile.ps1 -Drive D: -SizeGB 48` as Administrator, then
+  restart) and takes a long time per clip — everything beyond your RAM is read from the SSD at every step.
+- **Colibrì** (github.com/JustVugg/colibri, huge MoE text models from SSD on a CPU): run `coli serve --model <path>`
+  (port 8000) and pick **Colibrì (local MoE)** as the AI crew (Facts: `LLM_PROVIDER=colibri`). `COLIBRI_URL` changes
+  the address.
+
+### Choosing models yourself (v17)
+
+- **Films / Series → Models panel**: for each step (pictures, action shots, lip-sync, voices, sound, music) pick the
+  model and where it runs: *Auto* (your GPU worker → your ComfyUI → free tiers → paid APIs), or e.g. LTX-2.3 on
+  **your GPU** (files you downloaded on the Models page), or on **fal.ai** / **Cloudflare** with your API key
+  (Settings → API keys). ✓ / ✗ show what's ready and why not. Music and sound can be turned off; voices can be Edge.
+  Saved choices apply to what's made next (redo shots to re-make finished ones).
+- **Models page**: a model you downloaded shows *Downloaded on this PC* (and an unfinished `.part` download says so).
+  Files alone don't run a model: start ComfyUI + the worker (`tools\start-gpu.bat`, or `tools\start-cpu.bat` without
+  an NVIDIA card — optional CPU mode) and upload the workflow.
+- **A provider with no credit or a refused key** (e.g. fal.ai "Exhausted balance") is skipped for an hour (a new key
+  retries at once; Models page → *Try it again now*): AVOS falls through to your GPU, free tiers or the next model, and
+  a shot that can't be animated anywhere becomes the frame with its camera move instead of failing.
+
 ### The AI crew: local first
 
 Pick it in the composer (gear button = AI settings). Settings apply to new projects.
@@ -1009,3 +1041,36 @@ Frontend
   trace, script approval, storyboard from the real script, playable
   narration with sentence/beat timeline, scene timing from word timestamps.
 - Font fell back to serif (self-referencing CSS variable).
+
+## Explainer Studio (idea -> finished video)
+
+Sidebar -> **Explainer** (`/explainer`). The old Facts tab is gone; its links open this page.
+
+1. Type one idea (length and shape are buttons). Everything else is chosen for you.
+2. The writer drafts the script and shot list (`skills/avos-explainer-director`). You can edit any line or pick how a shot is made.
+3. **Approve** -> the presenter, props and set are drawn, then one storyboard picture per shot. **Approve** again -> voice, shots, captions, `final.mp4`.
+   Tick "Do everything without asking me" to skip both approvals.
+
+How each shot is made is decided per shot by the router (`animation_studio/studio/explainer/router.py`): science cutaways and exact object
+contact -> Blender (`BLENDER_RENDER_URL`); people, reactions, macro looks -> AI video (fal.ai Wan / LTX with a key and credit, ComfyUI, or a GPU
+worker); nothing available -> the picture with a camera move, so a video always comes out. Each shot says which it used and why.
+
+API: `/api/explainer` on the studio service (port 8020, `docker compose restart animation-studio` after code changes).
+Files: `<STUDIO_EXPLAINER>/<id>/` (default next to the projects folder). Continue after any error skips finished work.
+
+## Stickman Studio (history in flat 2D stickman clips)
+
+Sidebar -> **Stickman** (`/stickman`). Follows the "Historical Stickman Video Instructions" sheet:
+
+1. Name an event, or leave it empty and pick from **eight specific ideas** (one is recommended). Defaults: English narration, 9:16, **six 10-second clips = 60 s**.
+2. The studio writes a **fact brief** (what is well-established, what to check, which kinds of sources to check, where sources disagree, what is staging).
+   **It does not check sources itself: the brief is always marked "verification pending". Confirm claims before you publish.**
+3. Story and narration by clip (18-24 spoken words per clip), a roster of 1-3 characters with a fixed **identity paragraph**, a **reference-sheet prompt** per character,
+   a standalone **character consistency agent** prompt, and for every clip a scene-image prompt, a 10-second animation prompt with four timed beats (0-2, 2-5, 5-8, 8-10 s),
+   sound notes and the outgoing continuity state. Prompts are composed by code, so identity paragraphs are repeated verbatim.
+4. You approve the **character sheets**, then it draws the scene images (with the sheets attached where the image model accepts references), animates each clip
+   (AI video if a model is ready, else the picture with a camera move), records the voiceover, burns word-by-word captions, and joins six clips into `final.mp4`.
+5. Download the video, and the **written package** (Markdown, in the sheet's delivery order) to paste into Google Flow or any other tool.
+
+It needs an AI writer (Groq etc.); the built-in crew refuses rather than write history from rules. API: `/api/stickman` on the studio service.
+

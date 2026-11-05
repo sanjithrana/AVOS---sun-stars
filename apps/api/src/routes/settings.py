@@ -5,6 +5,7 @@ Stored in one file (agentic_core/settings_store.py) that the API, the worker and
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -12,7 +13,7 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from agentic_core import settings_store
-from agentic_core.models import catalog
+from agentic_core.models import catalog, comfy_autowire
 from src.errors import APIException
 
 router = APIRouter(prefix="/api/v1/settings", tags=["settings"])
@@ -87,6 +88,15 @@ async def test_gpu() -> dict[str, Any]:
         return {"ok": False, "detail": f"Can't reach {url} ({type(e).__name__}). Is the pod running and port 8188 open?"}
 
 
+@router.post("/providers/{provider}/retry")
+def retry_provider(provider: str) -> dict[str, Any]:
+    """Try a provider that was skipped (no credit / refused key) again now, e.g. after topping up."""
+    from agentic_core.models import provider_health
+
+    provider_health.clear(provider)
+    return {"ok": True, "providers": provider_health.snapshot()}
+
+
 @router.post("/models")
 async def add_model(request: Request) -> dict[str, Any]:
     try:
@@ -123,17 +133,39 @@ async def upload_workflow(model_id: str, request: Request) -> dict[str, Any]:
         raise _bad(ValueError(f"That file isn't JSON: {e}")) from e
     if not isinstance(wf, dict) or ("nodes" in wf and "links" in wf):
         raise _bad(ValueError("This is a regular ComfyUI save. In ComfyUI use Workflow → Export (API) and upload that file."))
-    text = json.dumps(wf)
-    if "{{PROMPT}}" not in text and m["task"] != "avatar":
-        raise _bad(ValueError("The workflow has no {{PROMPT}} placeholder. Type {{PROMPT}} into the prompt box before exporting "
-                              "(see comfyui_workflows/README.md)."))
     if not any(isinstance(n, dict) and "class_type" in n for n in wf.values()):
         raise _bad(ValueError("This doesn't look like a ComfyUI API workflow (no nodes with class_type)."))
+    wired: dict[str, list[str]] = {}
+    if comfy_autowire.needs_wiring(wf):           # a plain export: AVOS finds the prompt, image, seed, size, frames itself
+        wf, wired = comfy_autowire.autowire(wf)
+    text = json.dumps(wf)
+    if "{{PROMPT}}" not in text and m["task"] != "avatar":
+        raise _bad(ValueError("Couldn't find the prompt box in this workflow (no text-encode node feeding a sampler). Type {{PROMPT}} "
+                              "into the positive prompt in ComfyUI, export again with Workflow → Export (API) and upload it."))
     d = catalog.workflow_dir()
     d.mkdir(parents=True, exist_ok=True)
     (d / m["comfyui"]["workflow"]).write_text(json.dumps(wf, indent=1), "utf-8")
-    found = [p for p in ("{{PROMPT}}", "{{IMAGE}}", "{{AUDIO}}", "{{VIDEO}}", "{{SEED}}", "{{FRAMES}}", "{{WIDTH}}", "{{HEIGHT}}") if p in text]
-    return {**_view(), "uploaded": {"model": model_id, "file": m["comfyui"]["workflow"], "placeholders": found}}
+    found = [p for p in ("{{PROMPT}}", "{{NEGATIVE_PROMPT}}", "{{IMAGE}}", "{{AUDIO}}", "{{VIDEO}}", "{{SEED}}", "{{FRAMES}}", "{{WIDTH}}",
+                         "{{HEIGHT}}", "{{FPS}}", "{{WEIGHT_DTYPE}}") if p in text]
+    pushed = await _push_to_workers(Path(m["comfyui"]["workflow"]).stem, wf)
+    return {**_view(), "uploaded": {"model": model_id, "file": m["comfyui"]["workflow"], "placeholders": found,
+                                    "autowired": comfy_autowire.describe(wired) if wired else None, "workers": pushed}}
+
+
+async def _push_to_workers(name: str, wf: dict[str, Any]) -> list[str]:
+    """Send the workflow to every GPU worker now, so it's usable there without the GPU page's 'push' button."""
+    from agentic_core.model_fabric import workers
+
+    out = []
+    async with httpx.AsyncClient(timeout=10.0, headers=workers.headers()) as client:
+        for w in settings_store.workers(enabled_only=True):
+            try:
+                r = await client.put(f"{w['url']}/workflows/{name}", json=wf)
+                out.append(f"{w.get('name') or w['id']}: {'ok' if r.status_code < 400 else r.status_code}")
+                workers.forget(w["id"])
+            except httpx.HTTPError as e:
+                out.append(f"{w.get('name') or w['id']}: unreachable ({type(e).__name__})")
+    return out
 
 
 @router.delete("/models/{model_id}/workflow")

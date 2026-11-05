@@ -7,6 +7,19 @@ Two ways AVOS uses ComfyUI:
    here and `COMFYUI_URL` points at your GPU server, that model runs there (free per call) instead of on fal.ai.
 2. **The older "ComfyUI (your own GPU)" video choice**: a single `video.json` (section further down).
 
+## The quick way (v16)
+
+1. `apps\tools\setup-comfyui.bat` installs ComfyUI portable next to AVOS and points it at `apps\models` (the folder the
+   Models page downloads into).
+2. Start it: `apps\tools\start-gpu.bat` (NVIDIA card: ComfyUI + the GPU worker in Docker) or
+   `apps\tools\start-cpu.bat` (no NVIDIA card: ComfyUI `--cpu` + the worker; slow, free; grow the page file first with
+   `tools\set-pagefile.ps1` for models bigger than your RAM). Add `http://host.docker.internal:8700` on the GPU page.
+3. In ComfyUI open the model's template, run it once, **Workflow → Export (API)**, and upload the file on the Settings
+   page (Models → the model → Upload workflow). **No placeholders to type**: AVOS finds the positive prompt (following the
+   sampler's links), the negative prompt, Load Image / Audio / Video, seeds, width / height, frame counts, frame rates
+   and the diffusion model's weight dtype, puts its placeholders there (`agentic_core/models/comfy_autowire.py`) and
+   sends the workflow to every GPU worker. Placeholders you typed yourself are kept as they are.
+
 ## Per-model workflows
 
 Your laptop (Intel Iris Xe) can't run these. Rent a GPU (RunPod, Vast.ai, Lambda: an A100 80 GB or H100 runs all of
@@ -18,8 +31,9 @@ COMFYUI_URL=http://<gpu server ip>:8188
 STUDIO_COMFYUI_URL=http://<gpu server ip>:8188   # the Animations tab too
 ```
 
-For each model you want on your server: open the workflow in ComfyUI, run it once, put in the placeholders, then
-**Workflow → Export (API)** and save it here under this name:
+For each model you want on your server: open the workflow in ComfyUI, run it once, then **Workflow → Export (API)**
+and upload it on the Settings page (or save it here under this name; plain exports are auto-wired). The placeholders
+each model gets:
 
 | File | Model | Where to get the workflow | Placeholders it needs |
 |---|---|---|---|

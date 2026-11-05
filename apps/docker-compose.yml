@@ -61,6 +61,8 @@ services:
       dockerfile: api/Dockerfile
     image: solunex-api
     container_name: solunex-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8001:8000"
     volumes: &code_volumes
@@ -117,6 +119,7 @@ services:
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1}
       # llama.cpp's llama-server with a small GGUF model on this PC (text AI choice "llama.cpp").
       LLAMACPP_URL: ${LLAMACPP_URL:-http://host.docker.internal:8080}
+      COLIBRI_URL: ${COLIBRI_URL:-http://host.docker.internal:8000}   # Colibrì (huge MoE on CPU + SSD), LLM_PROVIDER=colibri
       LLAMACPP_MODEL: ${LLAMACPP_MODEL:-local}
       # Groq: free tier, no card - a key from console.groq.com/keys.
       GROQ_API_KEY: ${GROQ_API_KEY:-}
@@ -248,6 +251,8 @@ services:
   worker:
     image: solunex-api
     container_name: solunex-worker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes: *code_volumes
     environment: *app_env
     depends_on:
@@ -313,6 +318,7 @@ services:
       STUDIO_OLLAMA_VISION_MODEL: ${STUDIO_OLLAMA_VISION_MODEL:-}
       STUDIO_DEFAULT_AGENT: ${STUDIO_DEFAULT_AGENT:-}
       LLAMACPP_URL: ${LLAMACPP_URL:-}     # empty = http://host.docker.internal:8080
+      COLIBRI_URL: ${COLIBRI_URL:-}       # empty = http://host.docker.internal:8000 (the "Colibrì" AI crew)
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       BUILDERS: ${STUDIO_BUILDERS:-}
       # AI pictures and the optional AI finish (same open models as the Facts tab; also settable in AI settings).

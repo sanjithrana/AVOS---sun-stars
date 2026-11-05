@@ -56,6 +56,17 @@ def test_add_model_upload_workflow_and_delete(client, tmp_path):
     ok = client.put("/api/v1/settings/models/my-wan-lora/workflow", content=json.dumps(wf)).json()
     assert ok["uploaded"]["placeholders"] == ["{{PROMPT}}", "{{IMAGE}}"] and "my-wan-lora.json" in ok["workflows"]
     assert (tmp_path / "wf" / "my-wan-lora.json").is_file()
+    # a plain export (no placeholders typed in ComfyUI) is auto-wired: prompt, negative, image, seed, size, frames
+    plain = {"3": {"class_type": "CLIPTextEncode", "inputs": {"text": "a wolf", "clip": ["2", 0]}},
+             "4": {"class_type": "CLIPTextEncode", "inputs": {"text": "blurry", "clip": ["2", 0]}},
+             "5": {"class_type": "LoadImage", "inputs": {"image": "a.png"}},
+             "6": {"class_type": "WanImageToVideo", "inputs": {"positive": ["3", 0], "negative": ["4", 0], "width": 832, "height": 480, "length": 81}},
+             "7": {"class_type": "KSampler", "inputs": {"positive": ["6", 0], "negative": ["6", 1], "seed": 3}}}
+    up = client.put("/api/v1/settings/models/my-wan-lora/workflow", content=json.dumps(plain)).json()["uploaded"]
+    assert up["placeholders"] == ["{{PROMPT}}", "{{NEGATIVE_PROMPT}}", "{{IMAGE}}", "{{SEED}}", "{{FRAMES}}", "{{WIDTH}}", "{{HEIGHT}}"]
+    assert "{{PROMPT}} → 3 CLIPTextEncode.text" in up["autowired"]
+    saved = json.loads((tmp_path / "wf" / "my-wan-lora.json").read_text())
+    assert saved["4"]["inputs"]["text"] == "{{NEGATIVE_PROMPT}}" and saved["6"]["inputs"]["length"] == "{{FRAMES}}"
     # built-in catalog models take uploads too
     assert client.put("/api/v1/settings/models/wan-2.2/workflow", content=json.dumps(wf)).status_code == 200
     client.put("/api/v1/settings/gpu", json={"comfyui_url": "http://gpu:8188"})
