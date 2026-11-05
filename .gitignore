@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.*
+
+# Dependencies / Packages
+node_modules/
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+
+# Machine Learning Models & Large Files
+*.pt
+*.pth
+*.h5
+*.onnx
+*.bin
+models/
+checkpoint/
+checkpoints/
+music/

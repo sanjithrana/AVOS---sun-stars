@@ -1,0 +1,43 @@
+# --- your videos and local work (never published) ---
+projects/*
+!projects/.gitkeep
+ref/
+_smoke/
+1.md
+
+# --- third-party upstream clones (see THIRD_PARTY_NOTICES.md; fetch them yourself if you want the sources) ---
+_vendor/
+
+# --- secrets & machine-local files ---
+secrets.json
+.env
+.env.*
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# --- build output & dependencies ---
+node_modules/
+app/dist/
+__pycache__/
+*.pyc
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- third-party content we don't redistribute (see THIRD_PARTY_NOTICES.md) ---
+.claude/skills/remotion-best-practices/
+.claude/skills/remotion-captions/
+.claude/skills/remotion-create/
+.claude/skills/remotion-docs/
+.claude/skills/remotion-interactivity/
+.claude/skills/remotion-maps/
+.claude/skills/remotion-markup/
+.claude/skills/remotion-multimedia/
+.claude/skills/remotion-render/
+.claude/skills/remotion-saas/
+.claude/skills/remotion-studio/
+.claude/skills/remotion-upgrade/
+.claude/skills/media-use/audio/assets/sfx/*.mp3

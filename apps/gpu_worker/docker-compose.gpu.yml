@@ -1,0 +1,46 @@
+# Run on the GPU machine (needs the NVIDIA Container Toolkit):
+#   cd apps/gpu_worker && docker compose -f docker-compose.gpu.yml up -d --build
+# Then in AVOS: Settings → GPU workers → add http://<this machine>:8700
+services:
+  gpu-worker:
+    build:
+      context: .
+      args:
+        WITH_DIFFUSERS: ${WITH_DIFFUSERS:-0}
+        WITH_SPEECH: ${WITH_SPEECH:-1}
+    image: avos-gpu-worker
+    container_name: avos-gpu-worker
+    ports:
+      - "8700:8700"
+    environment:
+      WORKER_NAME: ${WORKER_NAME:-}
+      GPU_WORKER_TOKEN: ${GPU_WORKER_TOKEN:-}          # same value as AVOS Settings → API keys
+      WORKER_COST_PER_HOUR: ${WORKER_COST_PER_HOUR:-0}  # e.g. 0.69 for a rented RTX 4090
+      WORKER_ADAPTERS: ${WORKER_ADAPTERS:-comfyui,wan2gp,diffusers,speech,foley}
+      WORKER_PIN: ${WORKER_PIN:-}                       # models never unloaded, e.g. ltx-2.3
+      COMFYUI_URL: ${COMFYUI_URL:-http://host.docker.internal:8188}
+      COMFYUI_ATTENTION: ${COMFYUI_ATTENTION:-sdpa}     # sage if ComfyUI runs with --use-sage-attention
+      WAN2GP_DIR: /opt/Wan2GP
+      WAN2GP_PYTHON: ${WAN2GP_PYTHON:-python}
+      FOLEY_DIR: /opt/HunyuanVideo-Foley                # git clone of Tencent-Hunyuan/HunyuanVideo-Foley
+      FOLEY_SIZE: ${FOLEY_SIZE:-xl}                     # xl (16 GB) or xxl (20 GB)
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - ./workflows:/app/workflows
+      - ./wan2gp_templates:/app/wan2gp_templates
+      - ${WAN2GP_HOST_DIR:-./wan2gp}:/opt/Wan2GP
+      - ${FOLEY_HOST_DIR:-./hunyuan-foley}:/opt/HunyuanVideo-Foley
+      - avos_gpu_worker:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${WORKER_GPU_INDEX:-0}"]
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  avos_gpu_worker:

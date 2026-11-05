@@ -1,0 +1,337 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: solunex-postgres
+    environment:
+      POSTGRES_USER: solunex
+      POSTGRES_PASSWORD: solunex
+      POSTGRES_DB: solunex
+    ports:
+      - "5435:5432"
+    volumes:
+      - solunex_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U solunex -d solunex"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: solunex-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - solunex_redis_data:/data
+    command: redis-server --appendonly yes
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    container_name: solunex-temporal
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: solunex
+      POSTGRES_PWD: solunex
+      POSTGRES_SEEDS: postgres
+    ports:
+      - "7233:7233"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Temporal Web UI -> http://localhost:8233 (auto-setup doesn't serve a UI).
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: solunex-temporal-ui
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8233:8080"
+    depends_on:
+      - temporal
+
+  # FastAPI. Runs `alembic upgrade head` on every start, so the schema is
+  # always current - no manual migration step.
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: solunex-api
+    container_name: solunex-api
+    ports:
+      - "8001:8000"
+    volumes: &code_volumes
+      - ./api/src:/app/src
+      - ./api/tests:/app/tests
+      - ./api/alembic:/app/alembic
+      - ./api/alembic.ini:/app/alembic.ini
+      - ./packages:/app/packages
+      - ./tool_gateway:/app/tool_gateway
+      - ./agentic_core:/app/agentic_core
+      - ./comfyui_workflows:/app/comfyui_workflows
+      - ./music:/app/music
+      - solunex_assets:/data/assets
+      - avos_settings:/data/settings        # Settings page: keys, GPU server, your models (shared with animation-studio)
+      # Models page → Download → "This PC": files land here. Point AVOS_MODELS_HOST_DIR at any folder on your PC
+      # (e.g. D:/AI/ComfyUI/models) in apps/.env; inside the containers it is /models.
+      - ${AVOS_MODELS_HOST_DIR:-./models}:/models
+    environment: &app_env
+      # Asset storage: "local" (the solunex_assets volume) or "s3" (the object-store service below — start it with
+      # `docker compose --profile storage up -d` — or any S3: MinIO, AWS, Cloudflare R2…). Files are also kept in
+      # /data/assets as a cache. Existing assets stay readable after switching.
+      ASSETS_STORAGE: ${ASSETS_STORAGE:-local}
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://object-store:8333}
+      S3_BUCKET: ${S3_BUCKET:-avos-assets}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-avos}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-avos-storage-secret}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      # Shots generated at once ("auto": 2 per online GPU worker, 4 with hosted APIs) and pictures per shot at once.
+      VISUAL_CONCURRENCY: ${VISUAL_CONCURRENCY:-auto}
+      IMAGE_CANDIDATE_CONCURRENCY: ${IMAGE_CANDIDATE_CONCURRENCY:-3}
+      AVOS_MODELS_DIR: /models
+      DOWNLOAD_ROOTS: /models
+      HF_TOKEN: ${HF_TOKEN:-}
+      DATABASE_URL: postgresql+psycopg://solunex:solunex@postgres:5432/solunex
+      TEST_DATABASE_URL: postgresql+psycopg://solunex:solunex@postgres:5432/solunex_test
+      REDIS_URL: redis://redis:6379/0
+      TEMPORAL_HOST: temporal:7233
+      ASSETS_STORAGE_PATH: /data/assets
+      # Browsers on localhost and private LAN IPs (192.168.x.x, 10.x...) are
+      # allowed by default; add exact extra origins here, comma-separated.
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      # Leave empty to use the built-in offline mock LLM. A project's own
+      # llm_provider (set at creation, e.g. "ollama"/"groq"/"openai")
+      # overrides this per project; LLM_PROVIDER below is just the
+      # deployment-wide default when a project didn't pick one.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      LLM_PROVIDER: ${LLM_PROVIDER:-}
+      # Ollama: free, runs on your own machine. On Docker Desktop
+      # (Win/Mac), host.docker.internal reaches a locally-running
+      # `ollama serve`; on Linux, point this at your host's real IP or
+      # run Ollama in a container on this same network instead.
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1}
+      # llama.cpp's llama-server with a small GGUF model on this PC (text AI choice "llama.cpp").
+      LLAMACPP_URL: ${LLAMACPP_URL:-http://host.docker.internal:8080}
+      LLAMACPP_MODEL: ${LLAMACPP_MODEL:-local}
+      # Groq: free tier, no card - a key from console.groq.com/keys.
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
+      # Image generation (video candidate thumbnails). Leave empty to
+      # keep the deterministic MOCK placeholder frames. A project's own
+      # image_provider overrides this per project.
+      IMAGE_PROVIDER: ${IMAGE_PROVIDER:-}
+      POLLINATIONS_MODEL: ${POLLINATIONS_MODEL:-flux}
+      # Optional Pollinations account token, used if its anonymous tier
+      # refuses requests (402).
+      POLLINATIONS_TOKEN: ${POLLINATIONS_TOKEN:-}
+      # Self-hosted Automatic1111/SD-WebUI-compatible server, only used
+      # when image_provider="local" (yours, not a vendor's - genuinely
+      # free/unlimited, but you have to run it).
+      IMAGE_SERVICE_URL: ${IMAGE_SERVICE_URL:-}
+      # Cloudflare Workers AI (free account, no card for this free
+      # allocation - dash.cloudflare.com -> My Profile -> API Tokens):
+      # only used when image_provider="cloudflare" or "chain".
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+      CLOUDFLARE_IMAGE_MODEL: ${CLOUDFLARE_IMAGE_MODEL:-@cf/black-forest-labs/flux-1-schnell}
+      # image_provider="chain" tries Pollinations, then Cloudflare
+      # (skipped once this many images are generated today), then your
+      # self-hosted server if IMAGE_SERVICE_URL is set - automatic
+      # fallback so one provider's free daily quota running out doesn't
+      # stop generation for the rest of the day.
+      CLOUDFLARE_DAILY_IMAGE_LIMIT: ${CLOUDFLARE_DAILY_IMAGE_LIMIT:-1500}
+      # Replicate / Stability AI: PAID APIs, not free - only used when
+      # image_provider="replicate"/"stability", or as a last-resort
+      # fallback in "chain" after every free provider above is
+      # exhausted or fails. A shared daily spend cap (across both
+      # combined) means this can never exceed that many real dollars
+      # per day no matter how it fails over.
+      REPLICATE_API_TOKEN: ${REPLICATE_API_TOKEN:-}
+      REPLICATE_IMAGE_MODEL: ${REPLICATE_IMAGE_MODEL:-black-forest-labs/flux-schnell}
+      REPLICATE_IMAGE_COST_USD: ${REPLICATE_IMAGE_COST_USD:-0.003}
+      STABILITY_API_KEY: ${STABILITY_API_KEY:-}
+      STABILITY_IMAGE_COST_USD: ${STABILITY_IMAGE_COST_USD:-0.03}
+      IMAGE_PAID_DAILY_SPEND_CAP_USD: ${IMAGE_PAID_DAILY_SPEND_CAP_USD:-0.50}
+      # Narration voice. "edge" = free Microsoft Edge neural voices (no
+      # key, needs internet); "mock" = silent placeholder (offline).
+      TTS_PROVIDER: ${TTS_PROVIDER:-edge}
+      TTS_VOICE: ${TTS_VOICE:-en-US-ChristopherNeural}
+      TTS_RATE: ${TTS_RATE:-+0%}
+      # Per-shot video clips. A project's own video_provider (picked in
+      # New Project) overrides VIDEO_PROVIDER, the deployment default:
+      #   motion    free - AI image + smooth camera move (no GPU, no key)
+      #   replicate paid - real AI clips, needs REPLICATE_API_TOKEN above
+      #   comfyui   free - your own GPU via ComfyUI (COMFYUI_URL + workflow)
+      #   local     free - your own generator behind POST /generate
+      # Empty = no clips; the final render then animates each shot's image.
+      VIDEO_PROVIDER: ${VIDEO_PROVIDER:-}
+      VIDEO_SERVICE_URL: ${VIDEO_SERVICE_URL:-}
+      # fal.ai (paid per clip; one key, many video models).
+      FAL_KEY: ${FAL_KEY:-}
+      FAL_VIDEO_MODEL: ${FAL_VIDEO_MODEL:-fal-ai/kling-video/v2.1/standard/image-to-video}
+      FAL_VIDEO_COST_USD: ${FAL_VIDEO_COST_USD:-0.25}
+      FAL_VIDEO_INPUT_JSON: ${FAL_VIDEO_INPUT_JSON:-}
+      REPLICATE_VIDEO_MODEL: ${REPLICATE_VIDEO_MODEL:-bytedance/seedance-1-lite}
+      REPLICATE_VIDEO_RESOLUTION: ${REPLICATE_VIDEO_RESOLUTION:-480p}
+      # Rough cost per clip, recorded on the budget/audit trail (estimate;
+      # your real bill is on replicate.com/account/billing).
+      REPLICATE_VIDEO_COST_USD: ${REPLICATE_VIDEO_COST_USD:-0.15}
+      REPLICATE_VIDEO_INPUT_JSON: ${REPLICATE_VIDEO_INPUT_JSON:-}
+      # ComfyUI running on this PC (see comfyui_workflows/README.md).
+      COMFYUI_URL: ${COMFYUI_URL:-http://host.docker.internal:8188}
+      COMFYUI_WORKFLOW: ${COMFYUI_WORKFLOW:-/app/comfyui_workflows/video.json}
+      COMFYUI_FPS: ${COMFYUI_FPS:-24}
+      COMFYUI_FRAME_MULTIPLE: ${COMFYUI_FRAME_MULTIPLE:-8}
+      COMFYUI_MAX_FRAMES: ${COMFYUI_MAX_FRAMES:-121}
+      # Open models from agentic_core/models/catalog.json (image: best / z-image / qwen-image / flux-schnell;
+      # video: best / wan-2.2 / ltx-2.3 / wan-vace / avatar / longcat-avatar / infinitetalk). Each runs on your
+      # GPU server when comfyui_workflows/<model id>.json exists, else on fal.ai (FAL_KEY). MODEL_BACKEND=fal|comfyui
+      # forces one. See the Models page and comfyui_workflows/README.md.
+      MODEL_BACKEND: ${MODEL_BACKEND:-}
+      COMFYUI_WORKFLOW_DIR: ${COMFYUI_WORKFLOW_DIR:-/app/comfyui_workflows}
+      # Final render: output size (default Full HD, 1080x1920 for 9:16; 720x1280 is faster) and captions.
+      RENDER_SIZE: ${RENDER_SIZE:-}
+      CAPTIONS: ${CAPTIONS:-on}
+      # Background music + cut whooshes from apps/music (see its README).
+      MUSIC: ${MUSIC:-on}
+      MUSIC_VOLUME: ${MUSIC_VOLUME:-0.22}
+      SFX: ${SFX:-on}
+      SFX_VOLUME: ${SFX_VOLUME:-0.5}
+      # Leave empty to use the deterministic MOCK Blender renderer (no GPU).
+      # Set to a headless Blender service (POST /render) for real passes.
+      BLENDER_SERVICE_URL: ${BLENDER_SERVICE_URL:-}
+      # Video provider "blender": the render service above (or your own
+      # Blender on this PC: http://host.docker.internal:8090).
+      BLENDER_RENDER_URL: ${BLENDER_RENDER_URL:-http://blender:8090}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      temporal:
+        condition: service_started
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # S3-compatible object storage for generated assets (ASSETS_STORAGE=s3), optional:
+  #   docker compose --profile storage up -d
+  # SeaweedFS (Apache-2.0). MinIO's images were removed from Docker Hub in September 2026; if you run MinIO (or any
+  # S3) elsewhere, just point S3_ENDPOINT / S3_ACCESS_KEY / S3_SECRET_KEY at it instead.
+  object-store:
+    image: chrislusf/seaweedfs:latest
+    container_name: avos-object-store
+    profiles: ["storage"]
+    command: server -dir=/data -s3 -s3.port=8333
+    ports:
+      - "8333:8333"
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-avos}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-avos-storage-secret}
+    volumes:
+      - avos_object_store:/data
+    restart: unless-stopped
+
+  # Temporal worker - executes CreateVideoWorkflow and its activities.
+  # Without this service, workflows are accepted but never run, and every
+  # generation job would sit in RUNNING forever.
+  worker:
+    image: solunex-api
+    container_name: solunex-worker
+    volumes: *code_volumes
+    environment: *app_env
+    depends_on:
+      api:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    command: ["python", "-m", "src.temporal.worker"]
+    restart: unless-stopped
+
+  # Blender render service (video provider "blender"): renders each shot
+  # as a real 3D scene - built-in mannequin characters or your Mixamo
+  # characters/animations in apps/blender_assets. CPU (Cycles) in Docker;
+  # for GPU speed run blender_service/server.py with your own Blender and
+  # set BLENDER_RENDER_URL=http://host.docker.internal:8090 in .env.
+  blender:
+    # Optional: only built/started with `docker compose --profile blender up -d`. New projects use AI models for
+    # video instead (the "Viral 3D" style asks them for the same Blender-like 3D look, at much higher quality).
+    profiles: ["blender"]
+    build:
+      context: .
+      dockerfile: blender_service/Dockerfile
+    image: solunex-blender
+    container_name: solunex-blender
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./blender_service:/app/blender_service
+      - ./blender_assets:/app/blender_assets
+    environment:
+      BLENDER_ENGINE: ${BLENDER_ENGINE:-cycles}
+      BLENDER_SAMPLES: ${BLENDER_SAMPLES:-16}
+      BLENDER_FPS: ${BLENDER_FPS:-24}
+      BLENDER_WIDTH: ${BLENDER_WIDTH:-540}
+      BLENDER_HEIGHT: ${BLENDER_HEIGHT:-960}
+    restart: unless-stopped
+
+
+  # Animations tab: ReelMimic's workflow rebuilt in Python (apps/animation_studio). The AI crew is
+  # local by default: Ollama running on this PC (`ollama serve`), reached via host.docker.internal.
+  # Free/paid crews (Groq, Gemini, OpenRouter, OpenAI, Anthropic) are picked in the app's AI settings.
+  # Without Docker: double-click apps\start-animations.bat instead (same service, port 8020).
+  animation-studio:
+    build:
+      context: .
+      dockerfile: animation_studio/Dockerfile
+    image: avos-animation-studio
+    container_name: avos-animation-studio
+    ports:
+      - "8020:8020"
+    volumes:
+      - ./animation_studio/studio:/app/animation_studio/studio
+      - ./animation_studio/reelmimic_assets:/app/animation_studio/reelmimic_assets
+      - ./agentic_core/models/catalog.json:/app/animation_studio/catalog.json:ro
+      - ./skills:/app/skills:ro                      # the agents' SKILL.md files (edit them to change how AVOS directs)
+      - ./comfyui_workflows:/app/comfyui_workflows
+      - animation_projects:/data
+      - avos_settings:/data/settings
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-}          # empty = http://host.docker.internal:11434 (Ollama on this PC)
+      # Leave these empty to use what you pick in the app's AI settings (saved in the animation_projects volume).
+      STUDIO_OLLAMA_MODEL: ${STUDIO_OLLAMA_MODEL:-}
+      STUDIO_OLLAMA_VISION_MODEL: ${STUDIO_OLLAMA_VISION_MODEL:-}
+      STUDIO_DEFAULT_AGENT: ${STUDIO_DEFAULT_AGENT:-}
+      LLAMACPP_URL: ${LLAMACPP_URL:-}     # empty = http://host.docker.internal:8080
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      BUILDERS: ${STUDIO_BUILDERS:-}
+      # AI pictures and the optional AI finish (same open models as the Facts tab; also settable in AI settings).
+      FAL_KEY: ${FAL_KEY:-}
+      COMFYUI_URL: ${STUDIO_COMFYUI_URL:-}
+      MODEL_BACKEND: ${MODEL_BACKEND:-}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+      # Series (Animations → Series): stored in the animation_projects volume (/data/series)
+      SERIES_CONCURRENCY: ${SERIES_CONCURRENCY:-}        # shots at once; empty = 2 per online GPU worker
+      STUDIO_REASONING_EFFORT: ${STUDIO_REASONING_EFFORT:-}   # gpt-oss on Groq: low (default) / medium / high
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  avos_object_store:
+  avos_settings:
+  solunex_postgres_data:
+  solunex_redis_data:
+  solunex_assets:
+  animation_projects:

@@ -1,0 +1,31 @@
+* text=auto
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# GitHub language stats: bundled upstream skills keep their own licenses (THIRD_PARTY_NOTICES.md) and are not our code
+.claude/skills/hyperframes*/** linguist-vendored
+.claude/skills/embedded-captions/** linguist-vendored
+.claude/skills/faceless-explainer/** linguist-vendored
+.claude/skills/figma/** linguist-vendored
+.claude/skills/general-video/** linguist-vendored
+.claude/skills/media-use/** linguist-vendored
+.claude/skills/motion-graphics/** linguist-vendored
+.claude/skills/music-to-video/** linguist-vendored
+.claude/skills/pr-to-video/** linguist-vendored
+.claude/skills/product-launch-video/** linguist-vendored
+.claude/skills/remotion-to-hyperframes/** linguist-vendored
+.claude/skills/slideshow/** linguist-vendored
+.claude/skills/captions-overlay/** linguist-vendored
+.claude/skills/cut-the-curve/** linguist-vendored
+.claude/skills/motion-doctrine/** linguist-vendored
+.claude/skills/oversized-cursor/** linguist-vendored
+.claude/skills/seam-craft/** linguist-vendored
+.claude/skills/talking-head-recut/** linguist-vendored
+.claude/skills/frontend-design/** linguist-vendored
+.claude/skills/ffmpeg/** linguist-vendored
+.claude/skills/painted-animation/** linguist-vendored
+.claude/skills/crayon-storybook/** linguist-vendored
+.claude/skills/*/template/render.mjs linguist-vendored
+.claude/skills/video-clone/assets/engine-kit/render.mjs linguist-vendored
+**/package-lock.json linguist-generated
