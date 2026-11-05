@@ -1,22 +1,53 @@
-# Environment variables
-.env
-.env.*
 
+# ---- big downloads / installers (never commit) ----
+# ---- generated files ----
+# ---- OS / editor ----
+# ---- secrets and local data ----
+# ---- stray copies and update bundles ----
 # Dependencies / Packages
-node_modules/
-venv/
-env/
-ENV/
-__pycache__/
-*.pyc
-
+# Environment variables
 # Machine Learning Models & Large Files
+*.7z
+*.bin
+*.db
+*.h5
+*.key
+*.log
+*.onnx
+*.pem
 *.pt
 *.pth
-*.h5
-*.onnx
-*.bin
-models/
+*.pyc
+*.sqlite
+*.sqlite3
+*.tsbuildinfo
+*.zip
+.DS_Store
+.env
+.env.*
+.idea/
+.next/
+.pytest_cache/
+.venv/
+.vscode/
+__pycache__/
+apps/**/data/
+apps/apps/
+avos-all-updates/
+avos-architecture-updated*.zip
+avos-architecture-updated*/
 checkpoint/
 checkpoints/
+ComfyUI_portable.7z
+ComfyUI_windows_portable/
+env/
+ENV/
+models/
 music/
+node_modules/
+out/
+playwright-report/
+test-results/
+Thumbs.db
+venv/
+!.env.example
