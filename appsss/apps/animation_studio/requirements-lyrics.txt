@@ -1,0 +1,4 @@
+# Optional: automatic lyric timing (karaoke captions) against your own song, like ReelMimic.
+# ~200 MB; the speech model downloads on first use.
+faster-whisper>=1.0
+opencc-python-reimplemented>=0.1.7

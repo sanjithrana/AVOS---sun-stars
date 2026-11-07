@@ -1,0 +1,14 @@
+# In-process Diffusers backend (optional). Install the PyTorch build matching your CUDA first, e.g.
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+diffusers>=0.36          # 0.36+: Qwen-Image-Edit-2511 (QwenImageEditPlusPipeline, several reference pictures)
+transformers>=4.51
+accelerate>=1.6
+sentencepiece
+pillow
+imageio[ffmpeg]
+torchao>=0.12          # fp8 / int8 / int4 weight-only quantization
+# Optional speed-ups (match your CUDA / PyTorch versions; see README):
+# triton (Linux; triton-windows on Windows)
+# sageattention>=2.2
+# flash-attn
+# nunchaku             # SVDQuant INT4 / NV FP4 transformers

@@ -97,13 +97,28 @@ RESEARCH_ANSWER = {"name": "Northwind Motors", "kind": "company", "founded": "19
                    "how_it_works": ["It sells cars."], "rivals": ["Atlas Auto"], "turning_points": ["The 1984 price war."]}
 
 
+def _scene_png(w: int, h: int, salt: int) -> bytes:
+    """A stand-in backdrop with real light and shape in it: the run throws away a frame that comes back black or empty."""
+    import io
+    from PIL import Image, ImageDraw
+    im = Image.new("RGB", (max(16, w), max(16, h)), (196, 214 - salt % 30, 176))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, im.height * 0.6, im.width, im.height], fill=(150, 140, 110))
+    for i in range(4):
+        x = im.width * (0.15 + i * 0.2)
+        d.rectangle([x, im.height * (0.25 + (i % 2) * 0.1), x + im.width * 0.12, im.height * 0.62], fill=(90 + i * 24, 80 + i * 20, 70))
+    b = io.BytesIO(); im.save(b, "PNG"); return b.getvalue()
+
+
 def _script(n):
     sc = [{"purpose": f"beat {i}", "narration": "From one garage in 1937 to a giant with 210,000 people building cars across the land today.",
            "visual": "the founder points at factories", "poses": ["pointing right", "arms wide"],
            "setting": "city", "move": "slow push in", "cards": [{"type": "stat", "value": "210,000", "unit": "employees"}, {"type": "stat", "value": "$77B", "unit": "made up"},
                                                                {"type": "caption", "text": "All from one garage", "accent": "garage"}]} for i in range(n)]
-    sc[1]["cards"].append({"type": "vs", "left": "Northwind", "right": "Atlas Auto"})
-    sc[2]["narration"] = "In 2011 it sold 5 million cars. The garage became a giant that builds cars for families everywhere in the world."
+    if len(sc) > 1:                                       # a short act (the tail of a long script) has neither
+        sc[1]["cards"].append({"type": "vs", "left": "Northwind", "right": "Atlas Auto"})
+    if len(sc) > 2:
+        sc[2]["narration"] = "In 2011 it sold 5 million cars. The garage became a giant that builds cars for families everywhere in the world."
     sc[0]["narration"] = "Northwind is worth $19 billion. It started in a garage in 1937 and now employs 210,000 people across many busy factories."
     return {"title": "From a Garage to $19 Billion", "scenes": sc}
 
@@ -117,7 +132,8 @@ def cs_ask(s, who, system, prompt, log=None, **kw):
         return dict(RESEARCH_ANSWER)
     if "You check a business-story script" in system:
         return {"lines": FIXED}
-    return _script(int(re.search(r"exactly (\d+) scenes", prompt).group(1)))
+    m = re.search(r"exactly (\d+) scenes", prompt) or re.search(r"(\d+)-scene story", prompt)
+    return _script(int(m.group(1)))
 
 
 def _patch(monkeypatch):
@@ -200,7 +216,7 @@ def test_scene_backdrop_has_no_people_and_cards_leave_the_character_alone():
     q = CS.scene_prompt({"name": "Northwind"}, sc)
     assert "NO people" in q and "LEFT third" in q and "No text, no letters, no numbers" in q and "dark office" in q
     assert "rival company's taller towers" in CS.scene_prompt({"name": "N"}, sc, True)
-    assert "people" in CS.NEGATIVE and "$19" not in CS.SCRIPT and "Billion" not in CS.SCRIPT and CS.INFO["aspects"] == ["16:9"]
+    assert "people" in CS.NEGATIVE and "$19" not in CS.SCRIPT and "Billion" not in CS.SCRIPT and CS.INFO["aspects"] == ["16:9", "9:16"]
     assert "face stays visible" in CS.motion_prompt(sc)
     pl = cards.plan([{"type": "caption", "text": "All from one garage", "accent": "garage"}, {"type": "stat", "value": "210,000", "unit": "employees"}], 1280, 720)
     cap = next(i for i in pl if i["kind"] == "caption")
@@ -223,8 +239,15 @@ def test_ready_made_characters_are_placed_in_code():
     bg = io.BytesIO(); Image.new("RGB", (640, 360), (90, 170, 90)).save(bg, "PNG")
     out = Image.open(io.BytesIO(compose.place(bg.getvalue(), "young", "welcome", 1280, 720)))
     assert out.size == (1280, 720)
+    import numpy as np
     left = out.crop((0, 0, 640, 720)).getcolors(10**6)
-    assert len(left) > 200 and out.crop((700, 0, 1280, 720)).getcolors(10**6) == [(580 * 720, (90, 170, 90))]   # the character is in the left half only; the right half is untouched
+    right = np.asarray(out.crop((700, 0, 1280, 720)), dtype=float)
+    assert len(left) > 200 and right.std(axis=(0, 1)).max() < 25      # the character is in the left half only; the right half is just paper-textured backdrop
+    assert (np.asarray(out.crop((0, 0, 640, 720))).min(axis=2) > 245).sum() > 500          # the white paper-sticker outline round the cut-out
+    # paper effects: the border is cream with a torn edge, the puppet moves between frames, the sticker has an outline
+    fr = list(compose.scene_frames(bg.getvalue(), "young", ["welcome", "think", "point"], 1280, 720, 1.5, active=1.5))
+    assert len(fr) == 36 and fr[0].size == (1280, 720) and np.abs(np.asarray(fr[10], dtype=float) - np.asarray(fr[30], dtype=float)).mean() > 0.5
+    assert compose.torn_frame(1280, 720).getpixel((2, 360))[3] > 200 and compose.torn_frame(1280, 720).getpixel((640, 360))[3] < 30
 
 
 def _tone(sec):
@@ -235,7 +258,7 @@ def _tone(sec):
     return b.getvalue()
 
 
-def test_silent_narration_and_missing_video_model_stop_the_run(monkeypatch):
+def test_silent_narration_stops_the_run_but_a_missing_video_model_does_not(monkeypatch):
     from studio.explainer import pipeline as xp
     assert CS.is_silent(media.silence(1.0)) and not CS.is_silent(_tone(1.0))
     pid = store.new_id()
@@ -247,12 +270,13 @@ def test_silent_narration_and_missing_video_model_stop_the_run(monkeypatch):
         raise AssertionError("a silent narration must stop the run")
     except RuntimeError as e:
         assert "edge-tts" in str(e)
+    # a missing video model is not a reason to stop: the run says so and carries on with the free paper-puppet motion
     monkeypatch.setattr(CS, "_seedance", lambda s: False)
     try:
         CS.do_animate(pid)
-        raise AssertionError("AI video without a video model must stop the run")
     except RuntimeError as e:
-        assert str(e) == CS.NO_VIDEO
+        assert "no picture yet" in str(e)                 # this fixture has no scene picture; the point is it is not NO_VIDEO
+    assert any(CS.NO_VIDEO_FELL_BACK in x["text"] for x in store.load(pid)["log"])
 
 
 @needs_ffmpeg
@@ -267,7 +291,7 @@ def test_company_story_run_makes_the_video(monkeypatch):
     def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None):
         pics.append((tag, len(refs)))
         assert refs == [] and negative == CS.NEGATIVE and "NO people" in prompt               # backdrops only: the character is placed in code
-        b = io.BytesIO(); Image.new("RGB", (w // 8, h // 8), (90, 160 + len(pics) % 60, 90)).save(b, "PNG"); return b.getvalue(), {"model": "stand-in"}
+        return _scene_png(w // 8, h // 8, len(pics)), {"model": "stand-in"}
 
     monkeypatch.setattr(media, "picture", fake_picture)
     monkeypatch.setattr(xp, "_voice", lambda s, text, p: (_tone(2.0), {"model": "tone"}))
@@ -292,3 +316,222 @@ def test_video_gets_full_model_sheet():
     assert compose.sheet("executive") and compose.sheet("director") and compose.sheet("young")
     assert "model sheet" in cs.motion_prompt({"poses": ["a"]}, True)
     assert "model sheet" not in cs.motion_prompt({"poses": ["a"]}, False)
+
+
+def test_review_pause_plan_changes_and_activity_feed(monkeypatch):
+    import io
+    from PIL import Image
+    from studio import activity
+    from studio.explainer import pipeline as xp
+    _patch(monkeypatch)
+    monkeypatch.setattr(CS, "_seedance", lambda s: False)
+
+    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None):
+        return _scene_png(w // 8, h // 8, 1), {"model": "stand-in"}
+
+    monkeypatch.setattr(media, "picture", fake_picture)
+    monkeypatch.setattr(xp, "_voice", lambda s, text, p: (_tone(2.0), {"model": "tone"}))
+    monkeypatch.setattr(media, "music", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("no music model")))
+    pid = store.new_id()
+    store.save({"id": pid, "skill": CS.ID, "subject": "Northwind Motors", "aspect": "16:9", "seconds": 30, "media": "media", "status": "working", "review": True,
+                "stage": "research", "steps": {}, "log": [], "crew": "groq", "motion": "poses", "style": "2d", "voice": "male", "characters": {"founder": "young"}})
+    pipeline._run(pid, "research")
+    p = store.load(pid)
+    assert p["status"] == "waiting" and p["stage"] == "script" and "cast" not in p["steps"]            # paused after the script, nothing drawn yet
+    plan = CS.plan_of(p)
+    assert [c["id"] for c in plan["characters"] if c["chosen"]] == ["young"] and len(plan["storyboard"]) == 3
+    assert plan["motion"]["engine"] == "poses" and plan["audio"]["words"] > 0 and all(sc["pose_names"] for sc in plan["storyboard"])
+    # the feed shows it as waiting for the person
+    feed = activity.collect()
+    row = next(x for x in feed["jobs"] if x["id"] == pid)
+    assert row["state"] == "waiting" and row["needs"] == 1 and row["href"] == f"/skills/{pid}" and feed["counts"]["waiting"] >= 1
+    # changes from the review: another character and the female voice
+    store.update(pid, lambda q: CS.change_plan(q, {"character": "director", "voice": "female"}))
+    q = store.load(pid)
+    assert q["characters"] == {"founder": "director"} and q["voice"] == "female" and "cast" not in q
+    # approve (what POST /continue does) and the run finishes with the new character
+    store.update(pid, lambda q: q.update(plan_ok=True))
+    pipeline._run(pid, pipeline.resume_stage(store.load(pid)))
+    p = store.load(pid)
+    assert p["status"] == "done", p.get("error")
+    assert p["cast"] == {"founder": "director"} and all(len(sc["pose_pics"]) >= 3 for sc in p["script"]["scenes"])
+    assert not any(x["id"] == pid for x in activity.collect()["jobs"]) and any(x["id"] == pid and x["state"] == "done" for x in activity.collect()["recent"])
+    # a new script is reviewed again
+    store.update(pid, lambda q: CS.reset(q, "script"))
+    assert "plan_ok" not in store.load(pid)
+
+
+def test_reels_and_long_videos():
+    """A company story can be a 9:16 reel, and a five- or ten-minute video uses longer scenes written act by act."""
+    import io
+    import numpy as np
+    from PIL import Image
+    from studio.skilllab import cards, compose
+    assert CS.INFO["aspects"] == ["16:9", "9:16"] and 600 in CS.INFO["seconds"]
+    # longer videos use longer scenes, so the research is not cut into sixty ten-second slices
+    assert (CS.scenes_for(30), CS.scene_seconds(30)) == (3, 10)
+    assert (CS.scenes_for(600), CS.scene_seconds(600)) == (40, 15)
+    assert [x["seconds"] for x in CS.INFO["lengths"]] == CS.INFO["seconds"]
+    lo, hi = CS.words_for(15)
+    assert lo < hi and 30 < lo and hi < 55                      # more words for a longer scene, still speakable
+    # the backdrop is asked for in the shape it will be used in
+    sc = {"n": 1, "visual": "a loom", "purpose": "the start", "setting": "origin", "place": "a small shed", "poses": ["thinking"]}
+    tall = CS.scene_prompt({"name": "N"}, sc, False, "9:16")
+    assert "9:16 vertical reel" in tall and "BOTTOM THIRD" in tall and "NO people" in tall
+    assert "LEFT third" in CS.scene_prompt({"name": "N"}, sc, False, "16:9")          # he changes side scene by scene
+    assert "RIGHT third" in CS.scene_prompt({"name": "N"}, {**sc, "n": 2}, False, "16:9")
+    assert CS.side_of(1, "9:16") == "centre" and CS.side_of(1, "16:9") != CS.side_of(2, "16:9")
+    # in a reel he stands centred at the bottom, and the cards keep out of his way
+    assert compose.layout("centre", 720, 1280).cx == 0.5 and compose.layout("right", 1280, 720).mirror
+    bg = io.BytesIO(); Image.new("RGB", (360, 640), (90, 150, 190)).save(bg, "PNG")
+    out = Image.open(io.BytesIO(compose.place(bg.getvalue(), "young", "welcome", 720, 1280, side="centre")))
+    assert out.size == (720, 1280)
+    top = np.asarray(out.crop((0, 0, 720, 440)), dtype=float)
+    assert top.std(axis=(0, 1)).max() < 25                      # the top of the reel is backdrop only
+    stat = next(i for i in cards.plan([{"type": "stat", "value": "21,000", "unit": "rupees"}], 720, 1280) if i["kind"] == "stat")
+    assert stat["cy"] < 1280 * 0.45                             # above his head
+
+
+def test_a_scene_is_still_made_when_the_models_fail(monkeypatch):
+    """No picture model and no video credit must not stop the run: the backdrop is drawn in code and the motion falls back to the puppet."""
+    from studio.skilllab import compose, store
+    pid = "k-fallback"
+    scene = {"n": 1, "purpose": "the start", "narration": "A small shed in 1868.", "place": "a small shed", "visual": "a loom",
+             "setting": "origin", "move": "slow push in", "rival": False, "poses": ["hand on chin, thinking"], "cards": [], "dropped": 0, "warning": ""}
+    store.save({"id": pid, "skill": CS.ID, "subject": "N", "aspect": "16:9", "seconds": 30, "media": "media", "status": "working", "stage": "scenes",
+                "motion": "video", "characters": {"founder": "young"}, "steps": {}, "log": [], "createdAt": "x", "updatedAt": "x",
+                "research": {"name": "N", "kind": "company"}, "script": {"title": "N", "scenes": [scene]}})
+    from studio.series import media
+    def no_model(*a, **k):
+        raise RuntimeError("no picture model is ready")
+    monkeypatch.setattr(media, "picture", no_model)
+    CS.do_scenes(pid)
+    p = store.load(pid)
+    done = p["script"]["scenes"][0]
+    assert done["picture"] and done["picture_model"] == "drawn in code" and done["side"] == "left"
+    assert any("drew a paper set in code" in x["text"].lower() for x in p["log"])
+    # a backdrop that comes back black or empty is thrown away and drawn again brighter, not pasted into the video
+    import io as _io
+    from PIL import Image as _Image
+    def _png(c):
+        b = _io.BytesIO(); _Image.new("RGB", (640, 360), c).save(b, "PNG"); return b.getvalue()
+    assert "black" in compose.too_dull(_png((12, 10, 14))) and "empty" in compose.too_dull(_png((180, 170, 150)))
+    assert compose.too_dull(compose.paper_scene(1280, 720, 5, "left")) == ""
+    assert "MUCH BRIGHTER" in CS.BRIGHTER
+    # the paper set is a real picture, not a blank sheet
+    assert len(compose.paper_scene(1280, 720, 3, "left", False)) > 5000
+    monkeypatch.setattr(CS, "_seedance", lambda s: True)
+    from studio.stickman import video
+    monkeypatch.setattr(video, "clip", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("fal.ai: no credit left")))
+    CS.do_animate(pid)
+    p = store.load(pid)
+    assert p["script"]["scenes"][0]["video"] and p["steps"]["animate"]["status"] == "done"
+    assert "paper puppet" in (p["steps"]["animate"].get("model") or "")
+    assert any("Carrying on with the free paper-puppet motion" in x["text"] for x in p["log"])
+    store.delete(pid)
+
+
+def test_a_long_video_is_written_act_by_act(monkeypatch):
+    """Twenty-five scenes cannot come from one answer: they are written in passes, each told what the earlier ones said."""
+    _patch(monkeypatch)
+    seen: list[str] = []
+    def ask(s, who, system, prompt, log=None, **kw):
+        if "research desk" in system:
+            return dict(RESEARCH_ANSWER)
+        if "You check a business-story script" in system:
+            return {"lines": FIXED}
+        seen.append(prompt)
+        m = re.search(r"scenes (\d+) to (\d+)", prompt)
+        return _script(int(m.group(2)) - int(m.group(1)) + 1 if m else 25)
+    monkeypatch.setattr(writers, "ask", ask)
+    FIXED.clear()
+    r = CS.research({"id": "x", "crew": "groq"}, "Northwind Motors", None, 25)
+    sc = CS.script({"id": "x", "crew": "groq"}, r, 25, secs=12)
+    assert len(seen) == 4 and len(sc["scenes"]) == 25                      # 8 + 8 + 8 + 1
+    assert [x["n"] for x in sc["scenes"]] == list(range(1, 26))            # numbered straight through
+    titles = [c for x in sc["scenes"] for c in x["cards"] if c["type"] == "title"]
+    assert len(titles) == 1 and sc["scenes"][0]["cards"][0]["type"] == "title"   # only the opening scene gets the company card
+    assert "27-36 spoken words" in seen[0] and "walk the history FORWARD IN TIME" in seen[0]
+    assert "Scenes already written" in seen[1] and "beat 0" in seen[1]      # each act is handed what came before
+    # a long video raises the caps, so nothing the sources gave is thrown away for want of room to tell it
+    short = CS.research({"id": "x", "crew": "groq"}, "Northwind Motors", None, 6)
+    assert len(r["numbers"]) >= len(short["numbers"]) and len(r["milestones"]) >= len(short["milestones"])
+
+
+# ---------------------------------------------------------------- ASMR Cooking
+AC_RECIPE = {
+    "title": "Cheese Corn Nuggets", "ingredients": ["1 cup sweet corn", "100 g mozzarella", "2 tbsp butter"], "tools": ["chef knife", "black bowl"],
+    "shots": [{"title": "Raw spread", "stage": "teaser", "state": "nothing cut yet", "subject": "sweet corn and a block of mozzarella on the board",
+               "action": "the gloved hands set the block down", "physics": "the block settles with a soft give",
+               "asmr": "soft knock as the block lands", "camera": "top-down"},
+              {"title": "Grating cheese", "stage": "prep", "state": "the corn still in its bowl behind", "subject": "a grater and the mozzarella",
+               "action": "the hands draw the block down the grater", "physics": "shreds fall in a loose pile",
+               "asmr": "crisp dry grating", "camera": "45-degree"},
+              {"title": "Frying", "stage": "climax", "state": "the nuggets breaded and resting on the board",
+               "subject": "nuggets lowered into hot oil", "action": "the hands lower a nugget into the oil",
+               "physics": "oil erupts around it and the crust darkens", "asmr": "loud oil sizzle tsssss", "camera": "side"}]}
+
+
+def test_asmr_cooking_locks_the_look_and_the_sound():
+    from studio.skilllab import asmr_cooking as AC, foley, pipeline
+    assert pipeline.SKILLS[AC.ID] is AC and pipeline.spec_of({"skill": AC.ID})["stages"] == AC.STAGES
+    assert AC.INFO["aspects"] == ["9:16", "16:9"] and AC.INFO["native_audio"]
+    assert (AC.shots_for(30), AC.shots_for(180)) == (7, 40) and 3.0 <= AC.seconds_each(45, AC.shots_for(45)) <= 6.0
+    r = AC.norm_recipe(AC_RECIPE, "cheese corn nuggets", 3)
+    assert [s["n"] for s in r["shots"]] == [1, 2, 3] and r["title"] == "Cheese Corn Nuggets"
+    for sh in r["shots"]:                                    # the look is in every picture prompt, word for word
+        q = AC.image_prompt(r, sh)
+        assert AC.HANDS in q and AC.SURFACE in q and AC.LIGHT in q and AC.NEVER in q
+        assert sh["state"] in q and sh["subject"] in q       # continuity and what is in frame are named
+        assert len(q) < 1500                                 # the free picture models cut long prompts
+    m = AC.motion_prompt(r["shots"][2], 4)
+    assert "loud oil sizzle tsssss" in m and "No music, no voice" in m and "no face" in m.lower()
+    assert "face" in AC.NEGATIVE and "watermark" in AC.NEGATIVE
+    # the sound is chosen from the shot's own ASMR line
+    assert [foley.cue_for(s["asmr"]) for s in r["shots"]] == ["knock", "crunch", "sizzle"]
+    w = foley.wav("loud oil sizzle tsssss", 1.0)
+    assert w[:4] == b"RIFF" and len(w) > 40000               # a real second of 48 kHz mono, not silence
+    import numpy as np
+    x = np.frombuffer(w[44:], dtype="<i2").astype(float) / 32768
+    assert 0.02 < float(np.sqrt((x ** 2).mean())) < 0.6 and float(np.abs(x).max()) > 0.5
+
+
+@needs_ffmpeg
+def test_asmr_cooking_run_makes_the_video_without_any_paid_model(monkeypatch):
+    """No fal.ai and no picture model: the run still finishes, with drawn stills, macro moves and sound made in code."""
+    import io
+    from PIL import Image
+    from studio.skilllab import asmr_cooking as AC, store
+    from studio.series import media as M
+    from studio.stickman import video
+    def ask(s, who, system, prompt, log=None, **kw):
+        assert "ASMR cooking channel" in system and "exactly 3 shots" in prompt
+        return dict(AC_RECIPE)
+    monkeypatch.setattr(writers, "ask", ask)
+    monkeypatch.setattr(writers, "uses_ai", lambda s: True)
+    monkeypatch.setattr(AC, "shots_for", lambda total: 3)
+    def fake_picture(prompt, refs, w, h, seed, tag, s=None, negative=None, priority=5):
+        assert AC.HANDS in prompt
+        return _scene_png(w, h, seed), {"model": "test"}
+    monkeypatch.setattr(M, "picture", fake_picture)
+    monkeypatch.setattr(video, "ready", lambda s: False)
+    pid = store.new_id()
+    store.save({"id": pid, "skill": AC.ID, "subject": "cheese corn nuggets", "aspect": "9:16", "seconds": 30, "media": "media",
+                "motion": "video", "status": "working", "stage": "recipe", "steps": {}, "log": [], "crew": "groq",
+                "createdAt": store.now(), "updatedAt": store.now()})
+    try:
+        for st in AC.STAGES:
+            AC.RUN[st](pid)
+        p = store.load(pid)
+        assert p["title"] == "Cheese Corn Nuggets" and len(p["recipe"]["shots"]) == 3
+        assert all(sh["picture"] and sh["video"] for sh in p["recipe"]["shots"])
+        assert p["video"] == "final.mp4" and (store.pdir(pid) / "final.mp4").stat().st_size > 10_000
+        assert "macro move" in (p["steps"]["motion"].get("model") or "")
+        assert any("macro camera move" in x["text"] for x in p["log"])      # it says what it did instead of stopping
+        # the finished file has a sound track, built from the shots' ASMR lines
+        import subprocess
+        out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=codec_type",
+                              "-of", "csv=p=0", str(store.pdir(pid) / "final.mp4")], capture_output=True, text=True).stdout
+        assert "audio" in out
+    finally:
+        store.delete(pid)

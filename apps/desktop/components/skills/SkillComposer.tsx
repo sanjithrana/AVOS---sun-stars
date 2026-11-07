@@ -21,6 +21,7 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
   const [style, setStyle] = useState("2d");
   const [motion, setMotion] = useState("video");
   const [cast, setCast] = useState<{ founder: string }>({ founder: "executive" });
+  const [review, setReview] = useState(true);
   useEffect(() => {
     if (skill) {
       setAspect(skill.aspect); setSeconds(skill.default_seconds);
@@ -32,7 +33,9 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
   const create = useMutation({ mutationFn: skills.create, onSuccess: (r) => router.push(`/skills/${r.id}`) });
   const ok = subject.trim().length > 1 && !!skill;
 
+  const length = skill?.lengths?.find((l) => l.seconds === seconds);
   const story = skill?.kind === "story";
+  const motions = skill?.motions ?? [];                      // a skill can offer motion without being a story (ASMR Cooking)
   const makes = skill?.make ?? [["media", "Pictures and video"], ["prompts", "Prompts only"]];
   if (!skill) return <section className="composer rounded-3xl border border-border p-8 text-sm text-muted-foreground">Pick a skill on the left.</section>;
   return (
@@ -80,7 +83,7 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
               <button key={n} type="button" onClick={() => setSeconds(n)} aria-pressed={seconds === n} className={chip(seconds === n)}>{n >= 60 ? `${n / 60} min` : `${n} s`}</button>
             ))}
           </div>
-          {story && <p className="mt-1.5 text-[11px] text-muted-foreground">{seconds / 10} scenes of 10 seconds.</p>}
+          {story && length && <p className="mt-1.5 text-[11px] text-muted-foreground">{length.scenes} scenes of {length.each} seconds{length.scenes > 12 ? " \u00b7 a long one: that is one picture and one clip per scene" : ""}.</p>}
         </div>
         {story && (
           <div>
@@ -110,6 +113,11 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
               </div>
             </div>
           </div>
+          {media === "media" && (
+            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border p-3 text-sm" data-testid="review-toggle">
+              <input type="checkbox" checked={review} onChange={(e) => setReview(e.target.checked)} className="mt-1 h-4 w-4 accent-[var(--primary)]" />
+              <span><b>Let me review the plan first</b><span className="block text-xs text-muted-foreground">After the script, the run pauses and shows the suggested character, storyboard, motion and voice. Change what you like, then approve. Nothing is drawn or spent before you do.</span></span>
+            </label>)}
           <div>
             <p className="field-label mb-2">Character</p>
             <div className="flex flex-wrap gap-2">
@@ -136,19 +144,29 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
         researched facts: a card whose number isn&apos;t in them is dropped, and a narration line with an unchecked number is rewritten or cut. The story is told by the one
         2D character you pick, placed on a toy-town backdrop in three poses per scene (a cartoon stand-in, never a likeness of a real person). Needs an AI writer (Groq or another crew in Models).
         AI video uses Seedance and needs a fal.ai key with credit (Settings): without it the run stops and tells you, instead of quietly using still pictures.
-        Drawn poses are free: three poses per scene with camera moves.
+        Paper puppet is free: the character sways and flips between three poses on a slowly pushing paper backdrop.
       </p>) : (
       <p className="mt-5 rounded-2xl border border-[rgba(185,172,255,0.35)] p-3 text-xs leading-relaxed text-muted-foreground">
         The compact pod is drawn first, then the transformed toy is drawn from it so finish, colours and table stay the same. The clip is made by Seedance 2.0 from both
         pictures, with its own mechanical sound and no music. Needs a fal.ai key with credit (Settings); without it you get the two pictures joined with a camera move.
       </p>)}
 
+      {!story && motions.length > 1 && (
+        <div className="mt-6" data-testid="motion-options">
+          <p className="field-label mb-2">Motion</p>
+          <div className="flex flex-wrap gap-2">
+            {motions.map(([v, l]) => <button key={v} type="button" onClick={() => setMotion(v)} aria-pressed={motion === v} className={chip(motion === v)}>{l}</button>)}
+          </div>
+        </div>)}
+
       <ModelPicker value={pick} onChange={setPick} />
       {create.isError && <p className="mt-4 rounded-xl border border-red-500/40 bg-red-500/5 p-3 text-sm" role="alert">{(create.error as Error).message}</p>}
       <button type="button" disabled={!ok || create.isPending} data-testid="skill-create"
-        onClick={() => create.mutate({ skill: skill.id, subject: subject.trim(), media, aspect, seconds, voice, ...(story ? { style, motion, characters: cast } : {}), ...choiceBody(pick) })}
+        onClick={() => create.mutate({ skill: skill.id, subject: subject.trim(), media, aspect, seconds, voice, ...(story ? { style, motion, characters: cast, review: media === "media" && review } : motions.length ? { motion } : {}), ...choiceBody(pick) })}
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 font-semibold text-white disabled:opacity-50 sm:w-auto">
-        {create.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5" />}{story ? (media === "prompts" ? "Research and write the script" : "Research and make the video") : media === "prompts" ? "Write the three prompts" : "Make the toy"}
+        {create.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5" />}{story ? (media === "prompts" ? "Research and write the script" : "Research and make the video")
+          : skill.kind === "recipe" ? (media === "prompts" ? "Write the recipe and the shot list" : "Write the recipe and make the video")
+          : media === "prompts" ? "Write the three prompts" : "Make the toy"}
       </button>
     </section>
   );

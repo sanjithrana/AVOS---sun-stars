@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -247,7 +248,7 @@ async def create(req: Request) -> Any:
     crew = b.get("crew") if b.get("crew") in agent_kinds() else default_agent()
     pid = store.new_id()
     p = {"id": pid, "brief": brief[:4000], "title": (brief.split(".")[0].split("\n")[0] or brief)[:60], "seconds": seconds, "aspect": aspect, "language": str(b.get("language") or "en"),
-         "crew": crew, "auto": bool(b.get("auto")), "style": (style_presets.prompt_for(b.get("style_id")) if b.get("style_id") else str(b.get("style") or ""))[:300], "source": source, "mode": mode if mode in ("summarize", "explain", "story", "highlights") else "summarize", "voice": "female" if b.get("voice") == "female" else "male",
+         "crew": crew, "auto": bool(b.get("auto")), "style": (style_presets.prompt_for(b.get("style_id")) if b.get("style_id") else str(b.get("style") or ""))[:600], "source": source, "mode": mode if mode in ("summarize", "explain", "story", "highlights") else "summarize", "voice": "female" if b.get("voice") == "female" else "male",
          "voice_id": (b.get("voice_id") if voice_ids.valid_id(b.get("voice_id")) else None),
          "models": b.get("models") if isinstance(b.get("models"), dict) else {}, "local_only": bool(b.get("local_only")), "research_on": bool(b.get("research", True)) and not source and len(brief) <= 300, "status": "working", "stage": "plan", "plan": None,
          "assets": {}, "log": [], "createdAt": store.now(), "updatedAt": store.now()}
@@ -319,6 +320,21 @@ def master_prompt(pid: str, scene: int | None = None) -> Any:
     if not p.get("plan"):
         return err(409, "There is no script yet.")
     return {"text": master.build(p, scene), "parts": master.parts(p, scene), "scenes": sorted({int(x.get("scene") or 1) for x in p["plan"]["shots"]})}
+
+
+@router.get("/{pid}/picture-prompts.txt")
+def picture_prompts(pid: str) -> Any:
+    """Every shot's picture prompt as one plain-text file, each prompt self-contained and separated by a blank line, so the
+    prompts can be taken to any picture model by hand (the paper-cut workflow's prompt file)."""
+    if (e := _need(pid)):
+        return e
+    p = store.load(pid)
+    if not p.get("plan"):
+        return err(409, "There is no script yet.")
+    text = "\n\n".join(engines.shot_prompt(p, sh) for sh in p["plan"]["shots"])
+    name = re.sub(r"[^a-z0-9]+", "-", (p.get("title") or "prompts").lower()).strip("-")[:48] or "prompts"
+    return Response(text, media_type="text/plain; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{name}-picture-prompts.txt"'})
 
 
 @router.post("/{pid}/assets/redo")

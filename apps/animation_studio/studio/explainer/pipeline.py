@@ -252,7 +252,7 @@ def do_board(pid: str, only: str | None = None, note: str = "") -> None:
         seed = (memory.seed(lead, media.seed_of(pid, "char:" + lead["id"])) + (shot.get("version", 1) - 1 if only else 0)) if lead and not ref_ok \
             else media.seed_of(pid, shot["id"], shot.get("version", 1))
         try:
-            data, info = media.picture(prompt, refs, W, H, seed, f"{pid}:{shot['id']}", s=s, negative=engines.NEG)
+            data, info = media.picture(prompt, refs, W, H, seed, f"{pid}:{shot['id']}", s=s, negative=engines.negative(p))
         except Exception as e:  # noqa: BLE001
             if prompts.is_prompt_fault(str(e)):
                 prompts.record_all(used, "failed", ["refused"], prompt, str(e)[:150])
@@ -264,7 +264,7 @@ def do_board(pid: str, only: str | None = None, note: str = "") -> None:
         extra: list[str] = []
         if chk and not chk.get("same"):                       # drifted: one more try, told exactly what to fix
             store.say(pid, f"{shot['id']}: {lead['name']} did not match the portrait ({chk.get('differences') or 'different look'}); drawing again.", "warn")
-            data, info = media.picture(f"{prompt}. Fix: {chk.get('fix') or lead['look']}", refs, W, H, seed + 7, f"{pid}:{shot['id']}:fix", s=s, negative=engines.NEG)
+            data, info = media.picture(f"{prompt}. Fix: {chk.get('fix') or lead['look']}", refs, W, H, seed + 7, f"{pid}:{shot['id']}:fix", s=s, negative=engines.negative(p))
             chk2 = memory.check(s, portrait, data, lead["name"], _log(pid))
             if chk2 and not chk2.get("same"):
                 extra.append("off_model")
@@ -284,7 +284,7 @@ def do_board(pid: str, only: str | None = None, note: str = "") -> None:
             try:
                 end_refs = [*refs[:3], data]                    # the portraits / prop first, then this shot's first frame
                 end, _ = media.picture(f"The last image is this shot's first frame: keep its camera, framing, set and light; change only the pose and the result of the action. {ep}"
-                                       + (f". Change: {note}" if note else ""), end_refs, W, H, seed, f"{pid}:{shot['id']}:end", s=s, negative=engines.NEG)
+                                       + (f". Change: {note}" if note else ""), end_refs, W, H, seed, f"{pid}:{shot['id']}:end", s=s, negative=engines.negative(p))
                 erel = _save_bytes(pid, f"shots/{shot['id']}/end_v{shot.get('version', 1)}.png", end)
                 eq = quality.check(end, [qc["hash"]])
                 prompts.record_all(eu, "flag" if [x for x in eq["flags"] if x != "duplicate"] else "ok", [x for x in eq["flags"] if x != "duplicate"], ep)

@@ -5,6 +5,7 @@ the ratio, the inherited first frame, three timed beats [0-3s] [3-7s] [7-10s], t
 voice block, the music lock (clip 1 sets it, later clips continue it), the final-frame hand-off and the negatives."""
 from __future__ import annotations
 
+from .. import paper
 from . import spec, styles
 
 NEGATIVE = ("character redesign, style drift, costume or colour changes, extra limbs or fingers, merged bodies, duplicate leads, prop duplication, "
@@ -26,9 +27,14 @@ def palette(p: dict) -> str:
     return ", ".join(out[:4]) or "a small set of saturated accent colours on props only"
 
 
+def is_paper(p: dict) -> bool:
+    return style(p).get("id") == "b5-paper"
+
+
 def style_lock(p: dict) -> str:
     st = style(p)
-    return f"STYLE ({st['name']}): {st['look']} DRAWING GRAMMAR: {st['anchor']}"
+    out = f"STYLE ({st['name']}): {st['look']} DRAWING GRAMMAR: {st['anchor']}"
+    return f"{out} PAPER CRAFT: {paper.TAIL}" if is_paper(p) else out
 
 
 def style_short(p: dict) -> str:
@@ -130,7 +136,9 @@ def animation_prompt(p: dict, clip: dict) -> str:
             f"Camera: {clip['camera_move']}, one motivated move. Prop: {clip['prop_interaction']}. Every limb shows only its current pose; motion trails on props only. "
             f'NARRATION (audio voiceover only, strictly no speech bubbles, no dialogue boxes; do not add, omit, paraphrase, repeat, caption or display any words): "{vo}" '
             f"VOICE: {styles.voice_block(p)} {styles.music_lock(p, clip['n'])} SFX: {', '.join(clip['sfx']) or 'crisp sounds on each physical action'}. "
-            f"FINAL FRAME at 10 s: {final}. {nxt} {negatives(p)}")
+            f"FINAL FRAME at 10 s: {final}. {nxt} "
+            + (f"PAPER MOTION: {paper.animation(spec.CLIP_SECONDS, assemble=clip['n'] <= 1, audio=True, locked=False)} " if is_paper(p) else "")
+            + negatives(p))
 
 
 def global_block(p: dict) -> str:

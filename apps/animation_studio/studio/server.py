@@ -31,6 +31,7 @@ from .stickman import pipeline as stickman_pipeline
 from .stickman.routes import router as stickman_router
 from .skilllab import pipeline as skill_pipeline
 from .skilllab.routes import router as skill_router
+from .activity import router as activity_router
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -55,6 +56,7 @@ app.include_router(series_router)
 app.include_router(explainer_router)
 app.include_router(stickman_router)
 app.include_router(skill_router)
+app.include_router(activity_router)
 PROJECTS.mkdir(parents=True, exist_ok=True)
 LANGS = ("zh-TW", "en", "zh-CN")
 

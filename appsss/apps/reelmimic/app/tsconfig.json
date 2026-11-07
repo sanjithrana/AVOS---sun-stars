@@ -1,0 +1,10 @@
+{
+  // Server, scripts and shared types. Runs on Node's built-in type stripping (no build step); `tsc` only checks.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "allowJs": true
+  },
+  "include": ["server", "scripts", "shared"]
+}

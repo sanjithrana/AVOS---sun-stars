@@ -1,0 +1,21 @@
+"use client";
+
+const SWATCH: Record<string, string> = {
+  auto: "from-slate-500 to-slate-700", "3d": "from-sky-400 to-fuchsia-500", cinematic: "from-amber-500 to-red-800", photoreal: "from-emerald-500 to-teal-800",
+  doc70: "from-yellow-700 to-orange-900", anime: "from-pink-400 to-indigo-500", chalk: "from-emerald-900 to-slate-800", ink: "from-stone-200 to-stone-600", cgi: "from-cyan-400 to-blue-900",
+};
+
+/** The look of the whole video, as tiles you can see (the choice is added to every picture prompt). */
+export function StylePicker({ styles, value, onChange }: { styles: { id: string; name: string }[]; value: string; onChange: (id: string) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Look" data-testid="explainer-style">
+      {styles.map((s) => (
+        <button key={s.id} type="button" role="radio" aria-checked={value === s.id} onClick={() => onChange(s.id)}
+          className={`group overflow-hidden rounded-xl border text-left transition-all duration-200 active:scale-[0.97] ${value === s.id ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border hover:border-amber-500/50"}`}>
+          <div className={`h-12 bg-gradient-to-br ${SWATCH[s.id] ?? SWATCH.auto} transition-transform duration-300 group-hover:scale-110`} />
+          <p className="px-2 py-1.5 text-xs font-medium">{s.name}</p>
+        </button>
+      ))}
+    </div>
+  );
+}

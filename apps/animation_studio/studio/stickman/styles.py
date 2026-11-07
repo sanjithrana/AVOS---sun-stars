@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .. import paper
+
 REFS = Path(__file__).parent / "style_refs"
 
 _LIMBS = ("Exactly two arms and two legs are visible per figure. Each limb appears only in its current pose: raising or lowering the right arm "
@@ -127,6 +129,18 @@ STYLES: list[dict] = [
                 "stick limbs, simple small feet, compact rounded white cartoon gloves outlined in black."),
      "negative": "no gore, no photorealism, no 3D rendering, no cluttered detail",
      "music": "a quiet continuous dark ambient bed with low drones; causal sound effects for every danger"},
+    # AVOS's own look (not from the Stickman Video Director repo): the handcrafted paper-cut craft rules live in studio/paper.py
+    {"id": "b5-paper", "name": "Paper-cut Diorama", "group": "Autopilot", "arc": "story", "fixed": True, "code": "B5", "autopilot": True,
+     "made_for": "History, nature, space, science and business documentaries with a premium handcrafted look",
+     "look": ("A handcrafted paper-cut tabletop diorama: every object cut from layered cardstock, handmade paper and kraft paper with exposed edges, "
+              "stacked contours, visible fibres and real paper thickness, each layer casting its own shadow. Soft museum lighting from the top left, warm "
+              "bounce fill, deep paper shadows, generous negative space, one hero subject per shot and a palette taken from the subject itself."),
+     "anchor": ("The same paper puppet in every shot: a figure cut from thick cardstock with a round paper head, simple cut-paper face parts (two punched "
+                f"eyes and a small cut mouth), flat layered paper limbs joined at visible paper hinges, and a visible cut edge all round. {_LIMBS} The "
+                "puppet keeps the exact same paper colours, proportions and cut edges in every shot."),
+     "negative": ("no smooth digital vector art, no photorealism, no 3D CGI render, no glossy plastic, no gradients painted over the paper, no cartoon "
+                  "clip art, no children's book illustration, no flat shadeless shapes, no missing paper thickness"),
+     "music": "a warm handcrafted underscore of felt piano, soft woodwind and brushed percussion, with close paper ASMR under the action, narration prominent"},
 ]
 BY_ID = {s["id"]: s for s in STYLES}
 DEFAULT = "a5-history"

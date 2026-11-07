@@ -8,9 +8,19 @@ from typing import Any
 
 import httpx
 
-from .. import models
+from .. import models, paper
 from . import cinema, prompts
 from ..series import media
+
+def paper_look(p: dict) -> bool:
+    """True when this video is being made in the handcrafted paper-cut look."""
+    return paper.is_paper(look(p))
+
+
+def topic_of(p: dict) -> str:
+    pl = p.get("plan") or {}
+    return " ".join(str(x) for x in (p.get("brief"), pl.get("logline"), p.get("title")) if x)[:400]
+
 
 NEG = ("blurry, low quality, distorted face, extra fingers, warped anatomy, off-model character, changed outfit, "
        "text, letters, numbers, labels, watermark, logo, captions, stiff frozen pose")
@@ -118,6 +128,8 @@ def shot_prompt_used(p: dict, shot: dict, moment: str = "start") -> tuple[str, l
         parts.append("a clean 3D cross-section cutaway showing the inside")
     if shot["visualization"]["force_arrows"]:
         parts.append("glowing translucent 3D arrows and colour flows showing the force, no text")
+    if paper_look(p):
+        parts.append(paper.tail(topic_of(p)).rstrip("."))
     parts.append("same art style as every other shot, sharp focus on the subject, correct anatomy and hands, no text, no letters, no captions")
     return ". ".join(x for x in parts if x), used
 
@@ -146,6 +158,8 @@ def animation_prompt(p: dict, shot: dict) -> str:
     """What MOVES in this shot, written the way image-to-video models follow best: the camera move and the one main action in
     the first sentence (strong verbs, real speed and weight), then secondary motion, then timed beats and the exact end frame.
     The picture already holds who/where/style, so this never re-describes the look."""
+    if paper_look(p):
+        return paper_motion(p, shot)
     who = ", ".join(c["name"] for c in p["plan"]["characters"] if c["id"] in shot["characters"])
     things = ", ".join(x["name"] for x in p["plan"]["props"] if x["id"] in shot["props"])
     moving = shot["action"].rstrip(".")
@@ -174,6 +188,20 @@ def animation_prompt(p: dict, shot: dict) -> str:
     return " ".join(bits)
 
 
+def paper_motion(p: dict, shot: dict) -> str:
+    """The paper-cut shot moves as handcrafted stop-motion: locked camera, the sheet assembles itself (on longer shots), then
+    the picture lives. The one action of the shot is added, because the scene still has to tell its beat."""
+    secs = float(shot.get("seconds") or 4)
+    first = int(shot.get("n") or shot.get("index") or 0) <= 1
+    act = str(shot.get("action") or "").rstrip(".")
+    out = paper.animation(secs, assemble=first)
+    if act:
+        out += f" Within that, the one thing that happens is: {act}, played as cut-paper parts sliding, tilting and settling rather than bending or morphing."
+    if shot.get("end_state"):
+        out += f" End exactly on: {str(shot['end_state']).rstrip('.')}."
+    return out
+
+
 def beats(seconds: float) -> str:
     """Timed beats so the model knows when things happen: establish, main move, reveal, a readable hold."""
     a, b, c = round(seconds * 0.2, 1), round(seconds * 0.6, 1), round(seconds * 0.85, 1)
@@ -187,6 +215,11 @@ def motion_prompt(prompt: str, mv: str, sfx: str | None = "", pid: str = "") -> 
     if not body.lower().startswith("starting from"):
         body = "Starting from the attached image. " + body
     return f"{body}. Camera: {mv}. {prompts.pick('motion.keep', pid)[0]}" + (f" Sound: {sfx}." if sfx else "")
+
+
+def negative(p: dict) -> str:
+    """What the pictures must never become. The paper look adds the materials it must not slip into."""
+    return f"{NEG}, {paper.NEGATIVE}" if paper_look(p) else NEG
 
 
 def ai_video(s: dict, shot: dict, key: bytes, seconds: float, seed: int, prompt: str, tag: str) -> tuple[bytes, dict]:

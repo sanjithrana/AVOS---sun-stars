@@ -130,6 +130,9 @@ def local_only(s: dict | None) -> bool:
 
 
 LOCAL_BACKENDS = ("gpu", "comfyui")
+WAY_OUT = ("Two ways on: start the AVOS GPU worker on this PC and check Settings - GPU workers (from inside Docker the address is "
+           "http://host.docker.internal:8700, and the worker has to listen on 0.0.0.0, not 127.0.0.1), or turn off \"This PC only\" in "
+           "Settings so the free Cloudflare and Pollinations models can draw it. Nothing was sent anywhere.")
 
 
 def ordered(s: dict | None, step: str, default: list[str]) -> list[str]:
@@ -159,7 +162,7 @@ def where(s: dict | None, step: str, mid: str) -> str | None:
     name = models.get(mid)["name"]
     why = "; ".join(f"{x}: {avail[x]}" for x in allowed if avail.get(x)) or "it has no local version"
     place = "this PC" if local_only(s) else (b or "that place")
-    raise models.ModelUnavailable(f"{name} is set to run only on {place}, but it can't right now ({why}). Other providers were NOT tried.")
+    raise models.ModelUnavailable(f"{name} is set to run only on {place}, but it can't right now ({why}). {WAY_OUT if local_only(s) else 'Other providers were NOT tried.'}")
 
 
 def usable(s: dict | None, step: str, mid: str) -> bool:
@@ -187,8 +190,10 @@ def _t2i(prompt: str, w: int, h: int, seed: int, prefer: list[str] | None = None
             except Exception as e:  # noqa: BLE001 - a provider failing (no credit, a refused key, down): try the next one
                 errors.append(f"{mid}: {str(e)[:200]}")
     if only or local_only(s):                       # you picked this model / this PC: nothing else is tried
-        raise Fallback("The picture model you chose could not draw it: " + (" | ".join(errors) or "it isn't set up") +
-                       " (Other providers were not tried because you picked this model. Change the pictures model to Automatic to allow them.)")
+        joined = " | ".join(errors) or "it isn't set up"
+        raise Fallback(("Nothing could draw it on this PC: " + joined + " " + WAY_OUT) if local_only(s) else
+                       ("The picture model you chose could not draw it: " + joined +
+                        " (Other providers were not tried because you picked this model. Set Pictures to Automatic in Settings - Models to allow them.)"))
     from ..render.images import free_picture, generate_plate    # the free chain: Cloudflare FLUX.2 / FLUX.1, then Pollinations
     got = free_picture(prompt, w, h, seed)                       # with the seed and the size (one face seed per character)
     if got:

@@ -41,7 +41,10 @@ def _parse(text: str) -> tuple[dict[str, str], str]:
         for line in m.group(1).splitlines():
             if ":" in line:
                 k, v = line.split(":", 1)
-                meta[k.strip()] = v.strip()
+                v = v.strip()
+                if len(v) > 1 and v[0] == v[-1] and v[0] in "\"'":     # a quoted value, as some SKILL.md files write it
+                    v = v[1:-1].strip()
+                meta[k.strip()] = v
         text = text[m.end():]
     return meta, text.strip()
 

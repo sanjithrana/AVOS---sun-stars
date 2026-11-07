@@ -1,0 +1,217 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* System font stacks (no network font download needed). These used to
+     reference themselves (var(--font-sans) inside --font-sans), which is
+     invalid, so every page silently fell back to the browser's serif. */
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-heading: "Segoe UI Variable Display", "Segoe UI Light", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Violet palette. Everything in the app that was written as amber-* / orange-* now renders violet / fuchsia, so the
+   whole desktop (every page) takes the new colour without touching each component. */
+@theme {
+  --color-amber-50: #f5f3ff; --color-amber-100: #ede9fe; --color-amber-200: #ddd6fe; --color-amber-300: #c4b5fd;
+  --color-amber-400: #a78bfa; --color-amber-500: #8b5cf6; --color-amber-600: #7c3aed; --color-amber-700: #6d28d9;
+  --color-amber-800: #5b21b6; --color-amber-900: #4c1d95; --color-amber-950: #2e1065;
+  --color-orange-50: #fdf4ff; --color-orange-100: #fae8ff; --color-orange-200: #f5d0fe; --color-orange-300: #f0abfc;
+  --color-orange-400: #e879f9; --color-orange-500: #d946ef; --color-orange-600: #c026d3; --color-orange-700: #a21caf;
+  --color-orange-800: #86198f; --color-orange-900: #701a75; --color-orange-950: #4a044e;
+  --color-yellow-400: #a78bfa; --color-yellow-500: #8b5cf6;
+}
+
+/* AVOS look: near-black, hairline borders, light-weight type, one warm signal (amber) used for the active state. */
+:root {
+  --background: oklch(0.985 0.003 95);
+  --foreground: oklch(0.2 0.004 285);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.004 285);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.004 285);
+  --primary: oklch(0.56 0.24 295);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.955 0.004 95);
+  --secondary-foreground: oklch(0.2 0.004 285);
+  --muted: oklch(0.955 0.004 95);
+  --muted-foreground: oklch(0.52 0.01 285);
+  --accent: oklch(0 0 0 / 5%);
+  --accent-foreground: oklch(0.2 0.004 285);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0 0 0 / 11%);
+  --input: oklch(0 0 0 / 14%);
+  --ring: oklch(0.58 0.2 295);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.985 0.003 95);
+  --sidebar-foreground: oklch(0.2 0.004 285);
+  --sidebar-primary: oklch(0.2 0.004 285);
+  --sidebar-primary-foreground: oklch(0.985 0.003 95);
+  --sidebar-accent: oklch(0 0 0 / 5%);
+  --sidebar-accent-foreground: oklch(0.2 0.004 285);
+  --sidebar-border: oklch(0 0 0 / 11%);
+  --sidebar-ring: oklch(0.58 0.2 295);
+  --signal: oklch(0.56 0.24 295);
+}
+
+.dark {
+  --background: oklch(0.135 0.012 290);
+  --foreground: oklch(0.95 0.004 95);
+  --card: oklch(0.19 0.02 290 / 70%);
+  --card-foreground: oklch(0.95 0.004 95);
+  --popover: oklch(0.2 0.003 285);
+  --popover-foreground: oklch(0.95 0.004 95);
+  --primary: oklch(0.62 0.24 295);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.25 0.02 290);
+  --secondary-foreground: oklch(0.95 0.004 95);
+  --muted: oklch(0.25 0.02 290);
+  --muted-foreground: oklch(0.67 0.008 285);
+  --accent: oklch(1 0 0 / 7%);
+  --accent-foreground: oklch(0.95 0.004 95);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.75 0.1 295 / 17%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.72 0.17 295);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.135 0.012 290);
+  --sidebar-foreground: oklch(0.95 0.004 95);
+  --sidebar-primary: oklch(0.72 0.17 295);
+  --sidebar-primary-foreground: oklch(0.165 0.003 285);
+  --sidebar-accent: oklch(1 0 0 / 7%);
+  --sidebar-accent-foreground: oklch(0.95 0.004 95);
+  --sidebar-border: oklch(0.75 0.1 295 / 17%);
+  --sidebar-ring: oklch(0.72 0.17 295);
+  --signal: oklch(0.72 0.19 295);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+/* Smooth for everyone, still for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+html { scroll-behavior: smooth; }
+
+/* Display type: light and tight, like the reference. Used for the big headings only. */
+.display { font-family: var(--font-heading); font-weight: 300; letter-spacing: -0.025em; line-height: 1.05; text-wrap: balance; }
+/* The one animation on the home page: the lines between the nodes draw once. */
+@keyframes avos-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.avos-draw { stroke-dasharray: 1; stroke-dashoffset: 0; animation: avos-draw 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+
+/* ---- Purple lights -------------------------------------------------------------------------------------
+   Soft violet light pools fixed to the window, a glow under the main actions, and glass panels. All of it is
+   unlayered so it wins over the utility classes without editing each page. */
+body {
+  background-image:
+    radial-gradient(60rem 34rem at 88% -8%, oklch(0.55 0.25 295 / 0.42), transparent 62%),
+    radial-gradient(46rem 30rem at -6% 108%, oklch(0.5 0.24 320 / 0.32), transparent 60%),
+    radial-gradient(38rem 24rem at 50% 42%, oklch(0.45 0.2 280 / 0.14), transparent 70%);
+  background-attachment: fixed;
+}
+:root:not(.dark) body {
+  background-image:
+    radial-gradient(60rem 34rem at 88% -8%, oklch(0.85 0.1 295 / 0.55), transparent 62%),
+    radial-gradient(46rem 30rem at -6% 108%, oklch(0.88 0.08 320 / 0.45), transparent 60%);
+}
+/* the shell and page wrappers let the light show through */
+body > div, body > div > div.bg-background, .bg-background.h-screen { background-color: transparent; }
+main { background: transparent; }
+aside { background: color-mix(in oklab, var(--sidebar) 70%, transparent); backdrop-filter: blur(18px); }
+header { backdrop-filter: blur(14px); }
+
+/* glass panels */
+.dark .bg-card { backdrop-filter: blur(12px); }
+.dark .bg-card, .dark [class~="border"][class*="rounded"] { box-shadow: 0 0 0 1px oklch(0.75 0.1 295 / 0.06), 0 18px 40px -24px oklch(0.4 0.25 295 / 0.45); }
+
+/* the lit buttons: anything solid-violet (formerly amber) glows */
+[class~="bg-amber-500"], [class*="from-amber-500"], [class~="bg-amber-600"], [class~="bg-primary"] {
+  box-shadow: 0 0 0 1px oklch(0.75 0.15 295 / 0.35), 0 8px 28px -6px oklch(0.6 0.27 295 / 0.65);
+}
+[class~="bg-amber-500"]:hover, [class*="from-amber-500"]:hover { box-shadow: 0 0 0 1px oklch(0.8 0.15 295 / 0.5), 0 10px 36px -4px oklch(0.65 0.27 295 / 0.8); }
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none; border-color: oklch(0.68 0.2 295 / 0.8); box-shadow: 0 0 0 3px oklch(0.6 0.25 295 / 0.22), 0 0 22px -4px oklch(0.6 0.27 295 / 0.5);
+}
+::selection { background: oklch(0.6 0.25 295 / 0.35); }
+.avos-glow { box-shadow: 0 0 0 1px oklch(0.75 0.15 295 / 0.35), 0 0 46px -6px oklch(0.6 0.27 295 / 0.6); }
+.avos-glow-text { text-shadow: 0 0 24px oklch(0.65 0.27 295 / 0.55); }
+
+/* type like the reference: light, tight, large headings */
+h1 { font-family: var(--font-heading); font-weight: 300; letter-spacing: -0.025em; }
+h2 { font-family: var(--font-heading); font-weight: 400; letter-spacing: -0.015em; }
+
+/* every panel and field takes the glass look, in light and dark */
+.bg-card { backdrop-filter: blur(12px); }
+textarea, select, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
+  background-color: color-mix(in oklab, var(--card) 55%, transparent);
+  border-color: var(--border);
+}
+textarea { border-radius: 1.25rem; }
+select { border-radius: 9999px; }
+details, [role="alert"] { backdrop-filter: blur(10px); }
+a:not([class]) { color: var(--signal); }
+hr { border-color: var(--border); }
+/* small uppercase section labels, like the reference */
+.uppercase { letter-spacing: 0.14em; }
+
+/* scrollbars that match */
+* { scrollbar-width: thin; scrollbar-color: oklch(0.6 0.12 295 / 0.45) transparent; }

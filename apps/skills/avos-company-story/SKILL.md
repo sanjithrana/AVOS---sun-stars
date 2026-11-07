@@ -21,5 +21,5 @@ Rules:
 - Every year and number must be written in the cited source. Give every number the year it refers to ("as of"), when the source says.
 - 5-8 story moments, in time order, covering as many of beginning, bet, crisis, turning point, breakthrough, rivalry and today as the sources support. These are what the video is built on, so make them vivid and specific.
 - 8-14 milestones in time order, from the start to the latest year in the sources; leave out trivia (awards, single ad campaigns, minor lawsuits).
-- Up to 8 numbers: the biggest and most telling (size today, the first sale, the crisis, the turning point).
+- Up to 12 numbers. Prefer a GROWTH TRAIL: the same measure (revenue, users, employees, valuation, stores, units sold) at different years, from the start to the latest, so the video can show how it grew. Add the first sale, the money it started with, the crisis and the size today. Each with the year it refers to.
 - Leave a field empty rather than guess.

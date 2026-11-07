@@ -7,6 +7,7 @@ import { Film } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { SkillList } from "@/components/skills/SkillList";
 import { SkillComposer } from "@/components/skills/SkillComposer";
+import { AgentSkills } from "@/components/skills/AgentSkills";
 import { skills } from "@/lib/skills";
 
 const LABEL: Record<string, string> = { working: "Working", done: "Ready", error: "Stopped with an error", stopped: "Stopped" };
@@ -36,6 +37,8 @@ export default function SkillsHome() {
           </div>
           <div className="min-w-0"><SkillComposer skill={cur} /></div>
         </div>
+
+        <AgentSkills />
 
         <section>
           <h2 className="mb-4 text-lg font-semibold">Your runs</h2>

@@ -1,0 +1,36 @@
+# Pinned to versions verified together (full Week 1 + Week 2 test suite
+# and end-to-end demo run green against Postgres 16 / Redis 7 / Temporal).
+# Unpinned deps previously let `docker compose up --build` pull
+# SQLAlchemy 2.1, which no longer installs greenlet by default and
+# crashed the API on startup.
+
+# Web / API
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+sse-starlette==3.4.11
+httpx==0.28.1
+
+# Data / contracts
+pydantic==2.13.5
+pydantic-settings==2.15.0
+jsonschema==4.26.0
+sqlalchemy[asyncio]==2.1.1
+greenlet==3.5.6
+psycopg[binary]==3.3.6
+alembic==1.20.0
+redis==8.1.0
+
+# QA: decode generated frames (PNG / JPEG / WebP) to check size, aspect and blank frames
+pillow==11.3.0
+
+# Narration voice (free Microsoft Edge neural voices, no key)
+edge-tts==7.2.8
+
+# Workflow + agents
+temporalio==1.33.0
+langgraph==1.2.12
+
+# Tests
+pytest==9.1.1
+pytest-asyncio==1.4.0
+fakeredis==2.38.0

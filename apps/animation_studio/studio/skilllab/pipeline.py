@@ -2,14 +2,14 @@
 keeps finished steps on Continue, and can make one step (and what follows) again.
 
 Mechanical Toy: design lock → three prompts → compact picture → transformed picture (from the compact one) → transformation clip.
-Company Story: see company_story.py."""
+Company Story: see company_story.py.  ASMR Cooking: see asmr_cooking.py."""
 from __future__ import annotations
 
 import threading
 from typing import Any
 
 from ..series import media
-from . import base, company_story as CS, mechanical_toy as MT
+from . import asmr_cooking as AC, base, company_story as CS, mechanical_toy as MT
 from . import store
 from .base import SIZES, Stopped, sdict
 
@@ -64,13 +64,18 @@ def do_video(pid: str) -> None:
         raise RuntimeError("Both pictures are needed before the clip.")
     secs = int(p.get("seconds") or 15)
     _step(pid, "video", status="working")
+    clip = engine = note = None
     if video.ready(s):
         store.say(pid, f"Seedance 2.0 is making the {secs}-second transformation from both pictures (this can take several minutes).")
-        clip = video.clip(p["prompts"]["video"], [a, b], None, secs, p.get("aspect") or "9:16", audio=True)
-        engine, note = "Seedance 2.0 reference-to-video", "native mechanical sound"
-    else:
+        try:
+            clip = video.clip(p["prompts"]["video"], [a, b], None, secs, p.get("aspect") or "9:16", audio=True)
+            engine, note = "Seedance 2.0 reference-to-video", "native mechanical sound"
+        except Exception as e:  # noqa: BLE001 - a finished clip beats a stopped run; Make the clip again once the credit is back
+            store.say(pid, f"Seedance could not make the clip ({str(e)[:160]}). Joining the two pictures with a camera move instead.", "warn")
+    if clip is None:
         clip = engines.keypose(s, a, b, secs, "push")
-        engine, note = "key-pose animatic", "No fal.ai key with credit (Settings), so this is the two pictures joined with a camera move, without sound. Add a key and press Make the clip again."
+        engine, note = "key-pose animatic", ("No video model could make it (a fal.ai key with credit in Settings, or your own GPU worker), so this is the "
+                                             "two pictures joined with a camera move, without sound. Press Make the clip again once one is ready.")
     name = _write(pid, "transformation.mp4", clip)
     _set(pid, video=name, engine=engine)
     _step(pid, "video", status="done", model=engine, note=note)
@@ -91,10 +96,11 @@ def _mt_reset(p: dict, step: str, n: int | None = None) -> None:
     p["version"] = int(p.get("version", 1)) + 1
 
 
-SKILLS = {MT.ID: MT, CS.ID: CS}
+SKILLS = {MT.ID: MT, CS.ID: CS, AC.ID: AC}
 SPEC: dict[str, dict[str, Any]] = {
     MT.ID: {"stages": MT_STAGES, "labels": MT_LABELS, "run": MT_RUN, "last": lambda p: "design" if p.get("media") == "prompts" else "video", "reset": _mt_reset},
     CS.ID: {"stages": CS.STAGES, "labels": CS.LABELS, "run": CS.RUN, "last": CS.last_stage, "reset": CS.reset},
+    AC.ID: {"stages": AC.STAGES, "labels": AC.LABELS, "run": AC.RUN, "last": AC.last_stage, "reset": AC.reset},
 }
 STAGES, LABELS = MT_STAGES, MT_LABELS          # kept for older callers
 
@@ -106,6 +112,17 @@ def spec_of(p: dict) -> dict:
 def busy(pid: str) -> bool:
     t = _threads.get(pid)
     return bool(t and t.is_alive())
+
+
+def _review_pause(pid: str, st: str, only: bool) -> bool:
+    """Company Story: after the script, wait for the person to review the plan (character, storyboard, motion, voice) when they asked for that.
+    Continue accepts the plan (routes.resume sets plan_ok) and the run goes on."""
+    p = store.load(pid)
+    if only or st != "script" or p.get("skill") != CS.ID or not p.get("review") or p.get("plan_ok") or p.get("media") != "media":
+        return False
+    _set(pid, status="waiting", stage="script")
+    store.say(pid, "The script and the plan are ready for your review. Change the character, motion or voice if you like, then press Approve and make the video.")
+    return True
 
 
 def _run(pid: str, start: str, only: bool = False) -> None:
@@ -122,6 +139,8 @@ def _run(pid: str, start: str, only: bool = False) -> None:
             except Exception:
                 _step(pid, st, status="error")
                 raise
+            if _review_pause(pid, st, only):
+                return
         _set(pid, status="done")
         store.say(pid, "Ready." if last != stages[-1] else "Your finished media is ready.")
     except Stopped:

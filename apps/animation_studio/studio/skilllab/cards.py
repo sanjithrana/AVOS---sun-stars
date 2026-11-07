@@ -22,8 +22,9 @@ import re
 import subprocess
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 PAPER = (247, 242, 230, 255)
 INK = (24, 38, 74, 255)          # navy
@@ -87,6 +88,11 @@ def _card(size: tuple[int, int], radius: int = 6) -> Image.Image:
     d = ImageDraw.Draw(im)
     d.rounded_rectangle((10, 12, w + 10, h + 12), radius, fill=SHADOW)
     d.rounded_rectangle((4, 4, w + 4, h + 4), radius, fill=PAPER, outline=(205, 196, 176, 255), width=2)
+    if w > 90:                                                   # a strip of translucent tape holds the paper note on
+        tw, tx = min(70, w // 3), (w + 8) // 2
+        tape = Image.new("RGBA", (tw, 17), (236, 214, 130, 150))
+        ImageDraw.Draw(tape).line((0, 0, tw, 0), fill=(255, 245, 190, 120))
+        im.alpha_composite(tape.rotate(-2.5, expand=True, resample=Image.BICUBIC), (tx - tw // 2, 0))
     return im
 
 
@@ -242,7 +248,7 @@ def _plan(key: str, W: int, H: int) -> tuple:
     stats = [c for c in cards if c.get("type") == "stat"][:3]
     m = W * 0.03                                  # safe margin
     # The open area beside the founder: the right half in landscape, the top half in portrait.
-    zx0, zx1 = (W * 0.50, W - m) if not portrait else (m, W - m)
+    zx0, zx1 = (W * 0.50, W - m) if not portrait else (m, W - m)   # the open area beside him: the right half, or the top of a reel
     items: list[dict] = []
 
     def add(kind: str, card: dict | None, anchor: str, x: float, y: float, at: float, angle: float, max_w: float, text: str = "", zone=None) -> None:
@@ -252,11 +258,13 @@ def _plan(key: str, W: int, H: int) -> tuple:
     if vs:
         if cap:
             add("banner", cap, "top", W / 2, m, 0.3, -0.8, W * 0.70, zone=(m, m, W - m, H * 0.30))
-        add("badge", None, "center", W / 2, H * 0.47, 0.6, 0, W * 0.2, zone=(W * 0.38, H * 0.25, W * 0.62, H * 0.72))
+        # portrait: the badge and the two name tags sit in the upper half, clear of the character at the bottom of a reel
+        by, ty, tz = (H * 0.47, H * 0.74, H * 0.6) if not portrait else (H * 0.30, H * 0.41, H * 0.34)
+        add("badge", None, "center", W / 2, by, 0.6, 0, W * 0.2, zone=(W * 0.38, by - H * 0.22, W * 0.62, by + H * 0.25))
         if vs.get("left"):
-            add("tag_l", None, "center", W * 0.22, H * 0.74, 1.0, -1.5, W * 0.40, str(vs["left"]), zone=(m, H * 0.6, W * 0.49, H - m))
+            add("tag_l", None, "center", W * 0.22, ty, 1.0, -1.5, W * 0.40, str(vs["left"]), zone=(m, tz, W * 0.49, min(H - m, ty + H * 0.2)))
         if vs.get("right"):
-            add("tag_r", None, "center", W * 0.76, H * 0.74, 1.2, 1.5, W * 0.40, str(vs["right"]), zone=(W * 0.51, H * 0.6, W - m, H - m))
+            add("tag_r", None, "center", W * 0.76, ty, 1.2, 1.5, W * 0.40, str(vs["right"]), zone=(W * 0.51, tz, W - m, min(H - m, ty + H * 0.2)))
     else:
         if title:
             add("title", title, "topright", zx1, m, 0.3, -1.5, (zx1 - zx0) * (0.86 if not portrait else 0.9))
@@ -269,7 +277,8 @@ def _plan(key: str, W: int, H: int) -> tuple:
                 x = (W * (0.28, 0.72, 0.5)[i])
             else:
                 x = zx0 + (zx1 - zx0) * (0.36, 0.68, 0.42)[i]
-            add("stat", c, "center", x, H * (0.36 if right else 0.44) + i * H * 0.04, 0.9 + i * 0.7, (-1.8, 1.4, -0.8)[i],
+            # portrait: the stats sit in the upper half, clear of the character who fills the bottom of a reel
+            add("stat", c, "center", x, H * (0.36 if right else 0.26) + i * H * (0.04 if right else 0.05), 0.9 + i * 0.7, (-1.8, 1.4, -0.8)[i],
                 (zx1 - zx0) * (0.62 if not portrait else 0.48))
         if cap:
             cx0 = W * 0.36 if not portrait else m                  # landscape: right of the character, who stands in the left third
@@ -342,9 +351,10 @@ def overlay(cards: list[dict], W: int, H: int, t: float) -> Image.Image:
         if s <= 0:
             continue
         k = round(_ease((t - it["at"]) / 1.3), 3) if it["kind"] == "stat" else 1.0
-        angle = it["angle"] + (math.sin(t * 22) * 2.5 if it["kind"] == "badge" and it["at"] < t < it["at"] + 0.6 else 0)
+        settle = 1 - _ease((t - it["at"]) / 0.5)                   # a paper note dropped on: comes down from above, wobbling, then lies flat
+        angle = it["angle"] + (math.sin(t * 22) * 2.5 if it["kind"] == "badge" and it["at"] < t < it["at"] + 0.6 else 0) + math.sin(t * 14) * 3.0 * settle
         im = _still(json.dumps(it, sort_keys=True), k) if k >= 1.0 or it["kind"] != "stat" else _render(it, it["u"], k)
-        _place(layer, im, it["cx"], it["cy"], s, angle)
+        _place(layer, im, it["cx"], it["cy"] - settle * H * 0.06, s, angle)
     return layer
 
 
@@ -407,16 +417,41 @@ def _clip_frames(base: Path, W: int, H: int, seconds: float, ffmpeg: str):
         dec.wait()
 
 
-def burn(base: Path | list[bytes], cards: list[dict], out: Path, W: int, H: int, seconds: float, ffmpeg: str = "ffmpeg", active: float | None = None) -> Path:
-    """Composite the cards over `base`: a clip (any size; scaled and cropped to W×H, held on its last frame to `seconds`) or a list
-    of pose pictures (made into a pose montage)."""
-    frames = pose_frames(base, W, H, seconds, active=active) if isinstance(base, list) else _clip_frames(Path(base), W, H, seconds, ffmpeg)
+def _slide_in(fr: Image.Image, t: float, W: int, H: int, dur: float = 0.42) -> Image.Image:
+    """The first moments of a scene: the picture slides in over the paper like a new sheet, with a shadow on its leading edge."""
+    if t >= dur:
+        return fr
+    x = int((1 - _ease(t / dur)) * W)
+    canvas = Image.new("RGBA", (W, H), (236, 228, 208, 255))
+    sh = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rectangle((x - 14, 0, x, H), fill=(30, 22, 12, 110))
+    canvas.alpha_composite(sh.filter(ImageFilter.GaussianBlur(7)))
+    canvas.paste(fr.convert("RGBA"), (x, 0))
+    return canvas
+
+
+def burn(base: Path | list[bytes] | Any, cards: list[dict], out: Path, W: int, H: int, seconds: float, ffmpeg: str = "ffmpeg", active: float | None = None,
+         paper: bool = True) -> Path:
+    """Composite the cards over `base`: a clip (any size; scaled and cropped to W×H, held on its last frame to `seconds`), a list of
+    pictures (a crossfading montage) or an iterator of W×H frames. With `paper` every frame gets the torn paper border and the scene
+    slides in like a new sheet."""
+    if isinstance(base, list):
+        frames = pose_frames(base, W, H, seconds, active=active)
+    elif isinstance(base, (str, Path)):
+        frames = _clip_frames(Path(base), W, H, seconds, ffmpeg)
+    else:
+        frames = base
+    from . import compose
+    border = compose.torn_frame(W, H) if paper else None
     enc = subprocess.Popen([ffmpeg, "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
                             "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-pix_fmt", "yuv420p", str(out)], stdin=subprocess.PIPE)
     try:
         for i, fr in enumerate(frames):
+            fr = fr.convert("RGBA")
+            if border is not None:
+                fr.alpha_composite(border)
+                fr = _slide_in(fr, i / FPS, W, H)
             if cards:
-                fr = fr.convert("RGBA")
                 fr.alpha_composite(overlay(cards, W, H, i / FPS))
             enc.stdin.write(fr.convert("RGB").tobytes())
     finally:

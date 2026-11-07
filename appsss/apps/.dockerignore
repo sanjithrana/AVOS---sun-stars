@@ -1,0 +1,22 @@
+# Build context is the repo root; keep it small.
+**/node_modules
+**/.next
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+.git
+my_venv
+solunex
+desktop
+docs
+blender_assets/**/*.fbx
+blender_assets/**/*.glb
+blender_assets/**/*.obj
+music/**/*.mp3
+music/**/*.wav
+reelmimic
+animation_studio/projects
+animation_studio/.venv
+models
+gpu_worker/data
+minio_data

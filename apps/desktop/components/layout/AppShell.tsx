@@ -6,6 +6,7 @@ import { Boxes, Clapperboard, Cpu, Home, Landmark, Settings2, Sparkles, Wand2 } 
 import type { ReactNode } from "react";
 import { Mark } from "@/components/layout/Mark";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { TopBar } from "@/components/layout/TopBar";
 
 // Studios: Explainer (one idea -> a finished explainer video; characters, 3D, AI video and voice chosen per shot)
 // and Animations (films, series, video style), plus the Models page (which open model does which job).
@@ -27,7 +28,7 @@ const NAV = [
   {
     href: "/stickman",
     label: "Stickman",
-    hint: "Stickman videos, 12 looks",
+    hint: "Stickman videos, 13 looks",
     icon: Landmark,
     match: (p: string) => p.startsWith("/stickman"),
   },
@@ -133,6 +134,7 @@ export function AppShell({ children, header }: AppShellProps) {
         </nav>
         <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border px-4 md:h-20 md:px-10">
           <div className="flex min-w-0 flex-1 items-center gap-4">{header}</div>
+          <TopBar />
           <ThemeToggle />
         </header>
         <div className="min-h-0 flex-1 overflow-auto overscroll-contain" data-scroll-root>{children}</div>

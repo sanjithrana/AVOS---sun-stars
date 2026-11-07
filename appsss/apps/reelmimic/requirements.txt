@@ -1,0 +1,10 @@
+# ReelMimic — Python dependencies (analysis, preview grabs, lyrics timing)
+numpy
+opencv-python
+scenedetect
+librosa
+Pillow
+yt-dlp
+# optional: automatic lyrics timing against the user's audio
+faster-whisper
+opencc-python-reimplemented

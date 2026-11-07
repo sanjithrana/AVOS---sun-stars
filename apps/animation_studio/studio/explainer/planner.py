@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any, Callable
 
+from .. import paper
+from ..creative import skills as SK
 from ..series import languages, writers
 from . import cinema, memory, prompts, research, spec
 
@@ -88,6 +90,10 @@ def plan(s: dict, log: Callable[[dict], None] | None = None, note: str = "") -> 
         rules += ex
         used.append(["director.explain", ev])
     rules += BRIEF_EXTRA
+    if paper.is_paper(s.get("style")):
+        # the handcrafted paper-cut look: one visual idea per sentence, hero rule, fresh background, museum light (apps/skills/avos-paper-art)
+        secs = float(s.get("seconds") or 60)
+        rules += paper.for_writer(SK.load("avos-paper-art", ""), secs) + paper.narration_rules(secs)
     src = s.get("source")
     if src:
         from . import article

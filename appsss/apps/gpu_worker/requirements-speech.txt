@@ -1,0 +1,10 @@
+# Series voices on this GPU worker (the "speech" backend). Install PyTorch for your CUDA first, e.g.
+#   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
+# Chatterbox Multilingual (MIT): 23 languages incl. Hindi + English, voice cloning, emotion level
+chatterbox-tts>=0.1.4
+# Indic Parler-TTS (Apache-2.0, gated on Hugging Face): new voices from a description, 21 languages
+git+https://github.com/huggingface/parler-tts.git
+# IndicF5 (MIT, gated): 11 Indian languages (Tamil, Telugu, Bengali, Marathi, ...), voice cloning
+git+https://github.com/ai4bharat/IndicF5.git
+soundfile
+numpy

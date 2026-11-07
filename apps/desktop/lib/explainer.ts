@@ -99,6 +99,7 @@ export const explainer = {
   shotAgain: (id: string, sid: string, what: "picture" | "clip", note = "", engine?: Engine, extra?: { prompt?: string; anim?: string }) => post<Project>(`/${id}/shots/${sid}`, { what, note, engine, ...extra }),
   remove: (id: string) => call<{ ok: true }>(`/${id}`, { method: "DELETE" }),
   shotPack: (id: string) => `/studio-api/explainer/${id}/shot-pack`,
+  picturePrompts: (id: string) => `/studio-api/explainer/${id}/picture-prompts.txt`,
   useClip: async (id: string, sid: string, file: File) => {
     const r = await fetch(`/studio-api/explainer/${id}/shots/${sid}/clip`, { method: "POST", body: file, headers: { "Content-Type": file.type || "video/mp4" } });
     const d = await r.json().catch(() => null);
