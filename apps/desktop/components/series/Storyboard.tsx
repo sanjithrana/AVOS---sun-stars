@@ -43,10 +43,10 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
       {opened && <ShotTools sid={sid} snap={snap} ep={ep} part={part} shot={opened} act={act} onClose={() => setOpen(null)} />}
       {zoom && part.storyboard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4" onClick={() => setZoom(false)}>
-          <img src={seriesApi.file(sid, part.storyboard, v)} alt="storyboard" className="max-h-full max-w-full rounded-xl" />
+          <img src={seriesApi.file(sid, part.storyboard, v)} alt="storyboard" className="max-h-full max-w-full" />
         </div>
       )}
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-3">
+      <div className="flex flex-wrap items-center gap-3 border border-amber-500/40 bg-amber-500/5 p-3">
         <Clapperboard className="h-5 w-5 text-amber-500" />
         <div className="min-w-0 flex-1">
           <b className="text-sm text-foreground">The storyboard: nothing moves until you approve it</b>
@@ -59,9 +59,9 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
       </div>
 
       {part.storyboard && (
-        <button className="group relative block w-full overflow-hidden rounded-xl border border-border bg-black" onClick={() => setZoom(true)} data-testid="storyboard-collage">
+        <button className="group relative block w-full overflow-hidden border border-border bg-black" onClick={() => setZoom(true)} data-testid="storyboard-collage">
           <img src={seriesApi.file(sid, part.storyboard, v)} alt="The numbered storyboard" className="w-full" />
-          <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-black/60 px-2 py-1 text-xs text-white opacity-80 group-hover:opacity-100"><Maximize2 className="h-3 w-3" />collage_master.png</span>
+          <span className="absolute right-2 top-2 flex items-center gap-1 bg-black/60 px-2 py-1 text-xs text-white opacity-80 group-hover:opacity-100"><Maximize2 className="h-3 w-3" />collage_master.png</span>
         </button>
       )}
 
@@ -69,11 +69,11 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5" data-testid="frames">
         {shots.map((s, i) => (
-          <div key={s.id} className={`overflow-hidden rounded-xl border bg-card/40 ${sel.includes(s.id) ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border"}`} data-testid={`frame-${s.id}`}>
+          <div key={s.id} className={`overflow-hidden border bg-card/40 ${sel.includes(s.id) ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border"}`} data-testid={`frame-${s.id}`}>
             <button className="relative block aspect-video w-full bg-muted/40" onClick={() => toggle(s.id)} title="Select to redraw or change the camera">
               {s.files.key && <img src={seriesApi.file(sid, s.files.key, `${v}-${s.takes?.picture}-${s.keyOverride?.history?.length ?? 0}`)} alt={s.picture} className="h-full w-full object-cover" />}
-              <span className="absolute left-1 top-1 rounded bg-amber-500 px-1.5 py-0.5 text-[11px] font-bold text-black">{String(i + 1).padStart(2, "0")}</span>
-              <span className="absolute bottom-1 left-1 rounded bg-black/65 px-1.5 py-0.5 text-[10px] text-white">{t0[i].toFixed(1)}–{(t0[i] + s.seconds).toFixed(1)}s</span>
+              <span className="absolute left-1 top-1 bg-amber-500 px-1.5 py-0.5 text-[11px] font-bold text-black">{String(i + 1).padStart(2, "0")}</span>
+              <span className="absolute bottom-1 left-1 bg-black/65 px-1.5 py-0.5 text-[10px] text-white">{t0[i].toFixed(1)}–{(t0[i] + s.seconds).toFixed(1)}s</span>
               {s.qa?.key && !s.qa.key.pass && <AlertTriangle className="absolute right-1 top-1 h-4 w-4 text-amber-400" />}
             </button>
             <div className="space-y-1 p-2 text-[11px]">
@@ -88,7 +88,7 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
       </div>
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <div className="space-y-2 rounded-xl border border-border p-3" data-testid="redraw-panel">
+        <div className="space-y-2 border border-border p-3" data-testid="redraw-panel">
           <b className="flex items-center gap-2 text-sm text-foreground"><RefreshCw className="h-4 w-4" />Redraw {sel.length ? `${sel.length} selected frame${sel.length > 1 ? "s" : ""}` : "frames (select them above)"}</b>
           <input className={field} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What to change: e.g. the rabbit is smaller, the road is wetter, warmer light" data-testid="redraw-note" />
           <div className="flex gap-2">
@@ -99,7 +99,7 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
             {sel.length > 0 && <Button size="sm" variant="ghost" onClick={() => setSel([])}><X />Clear</Button>}
           </div>
         </div>
-        <div className="space-y-2 rounded-xl border border-border p-3" data-testid="camera-panel">
+        <div className="space-y-2 border border-border p-3" data-testid="camera-panel">
           <b className="flex items-center gap-2 text-sm text-foreground"><Camera className="h-4 w-4" />Camera on {sel.length ? `${sel.length} selected shot${sel.length > 1 ? "s" : ""}` : "every shot"}</b>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
             <select className={field} value={cam.move} onChange={(e) => setCam({ ...cam, move: e.target.value })} data-testid="cam-move">
@@ -121,7 +121,7 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
         </div>
       </div>
 
-      <details className="rounded-xl border border-border p-3 text-xs" data-testid="prompts">
+      <details className="border border-border p-3 text-xs" data-testid="prompts">
         <summary className="cursor-pointer font-semibold text-foreground">Stage 5 · what each model will be told (compiled from the frame, the sheets, the world and the motion blueprint)</summary>
         <div className="mt-2 space-y-3">
           {shots.map((s, i) => (

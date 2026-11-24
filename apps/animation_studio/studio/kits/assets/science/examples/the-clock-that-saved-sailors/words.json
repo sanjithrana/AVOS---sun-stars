@@ -1,0 +1,827 @@
+[
+{
+"text": "In",
+"start": 0.1,
+"end": 0.26
+},
+{
+"text": "seventeen",
+"start": 0.28,
+"end": 0.81
+},
+{
+"text": "thirty,",
+"start": 0.81,
+"end": 1.34
+},
+{
+"text": "a",
+"start": 1.68,
+"end": 1.76
+},
+{
+"text": "country",
+"start": 1.84,
+"end": 2.14
+},
+{
+"text": "carpenter",
+"start": 2.26,
+"end": 2.78
+},
+{
+"text": "told",
+"start": 2.82,
+"end": 3.02
+},
+{
+"text": "London",
+"start": 3.14,
+"end": 3.52
+},
+{
+"text": "he",
+"start": 3.58,
+"end": 3.68
+},
+{
+"text": "could",
+"start": 3.7,
+"end": 3.9
+},
+{
+"text": "save",
+"start": 4.0,
+"end": 4.24
+},
+{
+"text": "the",
+"start": 4.28,
+"end": 4.4
+},
+{
+"text": "navy\u2026",
+"start": 4.48,
+"end": 4.88
+},
+{
+"text": "with",
+"start": 5.28,
+"end": 5.36
+},
+{
+"text": "a",
+"start": 5.42,
+"end": 5.5
+},
+{
+"text": "clock.",
+"start": 5.56,
+"end": 6.06
+},
+{
+"text": "Back",
+"start": 6.52,
+"end": 6.7
+},
+{
+"text": "then,",
+"start": 6.76,
+"end": 7.02
+},
+{
+"text": "ships",
+"start": 7.3,
+"end": 7.5
+},
+{
+"text": "at",
+"start": 7.54,
+"end": 7.68
+},
+{
+"text": "sea",
+"start": 7.76,
+"end": 8.0
+},
+{
+"text": "had",
+"start": 8.06,
+"end": 8.26
+},
+{
+"text": "no",
+"start": 8.38,
+"end": 8.58
+},
+{
+"text": "idea",
+"start": 8.66,
+"end": 9.14
+},
+{
+"text": "where",
+"start": 9.16,
+"end": 9.3
+},
+{
+"text": "they",
+"start": 9.34,
+"end": 9.48
+},
+{
+"text": "were.",
+"start": 9.52,
+"end": 9.76
+},
+{
+"text": "In",
+"start": 10.24,
+"end": 10.36
+},
+{
+"text": "seventeen-oh-seven,",
+"start": 10.42,
+"end": 11.38
+},
+{
+"text": "four",
+"start": 11.74,
+"end": 11.96
+},
+{
+"text": "warships",
+"start": 12.08,
+"end": 12.58
+},
+{
+"text": "hit",
+"start": 12.62,
+"end": 12.74
+},
+{
+"text": "the",
+"start": 12.78,
+"end": 12.86
+},
+{
+"text": "rocks.",
+"start": 12.92,
+"end": 13.32
+},
+{
+"text": "Over",
+"start": 13.76,
+"end": 13.92
+},
+{
+"text": "a",
+"start": 14.16,
+"end": 14.39
+},
+{
+"text": "thousand",
+"start": 14.39,
+"end": 14.62
+},
+{
+"text": "sailors",
+"start": 14.76,
+"end": 15.14
+},
+{
+"text": "drowned.",
+"start": 15.24,
+"end": 15.68
+},
+{
+"text": "So",
+"start": 16.079,
+"end": 16.16
+},
+{
+"text": "when",
+"start": 16.2,
+"end": 16.28
+},
+{
+"text": "this",
+"start": 16.32,
+"end": 16.46
+},
+{
+"text": "carpenter",
+"start": 16.52,
+"end": 16.9
+},
+{
+"text": "showed",
+"start": 16.98,
+"end": 17.2
+},
+{
+"text": "up\u2026",
+"start": 17.28,
+"end": 17.38
+},
+{
+"text": "the",
+"start": 17.76,
+"end": 17.88
+},
+{
+"text": "experts",
+"start": 17.94,
+"end": 18.32
+},
+{
+"text": "laughed.",
+"start": 18.46,
+"end": 18.9
+},
+{
+"text": "A",
+"start": 19.3,
+"end": 19.4
+},
+{
+"text": "clock?",
+"start": 19.48,
+"end": 19.9
+},
+{
+"text": "On",
+"start": 20.24,
+"end": 20.32
+},
+{
+"text": "a",
+"start": 20.38,
+"end": 20.4
+},
+{
+"text": "rolling",
+"start": 20.54,
+"end": 20.86
+},
+{
+"text": "ship?",
+"start": 21.04,
+"end": 21.3
+},
+{
+"text": "Every",
+"start": 21.7,
+"end": 21.92
+},
+{
+"text": "clock",
+"start": 22.04,
+"end": 22.3
+},
+{
+"text": "had",
+"start": 22.34,
+"end": 22.42
+},
+{
+"text": "a",
+"start": 22.46,
+"end": 22.54
+},
+{
+"text": "swinging",
+"start": 22.6,
+"end": 22.94
+},
+{
+"text": "pendulum.",
+"start": 22.98,
+"end": 23.44
+},
+{
+"text": "One",
+"start": 23.86,
+"end": 23.96
+},
+{
+"text": "big",
+"start": 24.02,
+"end": 24.2
+},
+{
+"text": "wave\u2026",
+"start": 24.24,
+"end": 24.56
+},
+{
+"text": "and",
+"start": 24.94,
+"end": 25.0
+},
+{
+"text": "it",
+"start": 25.04,
+"end": 25.14
+},
+{
+"text": "stopped.",
+"start": 25.22,
+"end": 25.58
+},
+{
+"text": "So",
+"start": 26.02,
+"end": 26.36
+},
+{
+"text": "he",
+"start": 26.44,
+"end": 26.54
+},
+{
+"text": "built",
+"start": 26.58,
+"end": 26.78
+},
+{
+"text": "clocks",
+"start": 26.82,
+"end": 27.16
+},
+{
+"text": "with",
+"start": 27.2,
+"end": 27.34
+},
+{
+"text": "no",
+"start": 27.42,
+"end": 27.6
+},
+{
+"text": "pendulum",
+"start": 27.64,
+"end": 28.02
+},
+{
+"text": "at",
+"start": 28.06,
+"end": 28.14
+},
+{
+"text": "all.",
+"start": 28.22,
+"end": 28.44
+},
+{
+"text": "His",
+"start": 28.76,
+"end": 28.92
+},
+{
+"text": "first",
+"start": 28.98,
+"end": 29.24
+},
+{
+"text": "one",
+"start": 29.28,
+"end": 29.52
+},
+{
+"text": "was",
+"start": 29.58,
+"end": 29.8
+},
+{
+"text": "huge.",
+"start": 29.92,
+"end": 30.34
+},
+{
+"text": "His",
+"start": 30.62,
+"end": 30.82
+},
+{
+"text": "third",
+"start": 30.88,
+"end": 31.24
+},
+{
+"text": "took",
+"start": 31.3,
+"end": 31.42
+},
+{
+"text": "him",
+"start": 31.46,
+"end": 31.64
+},
+{
+"text": "nineteen",
+"start": 31.7,
+"end": 32.28
+},
+{
+"text": "years.",
+"start": 32.34,
+"end": 32.72
+},
+{
+"text": "Then",
+"start": 33.1,
+"end": 33.42
+},
+{
+"text": "he",
+"start": 33.48,
+"end": 33.58
+},
+{
+"text": "built",
+"start": 33.6,
+"end": 33.76
+},
+{
+"text": "the",
+"start": 33.8,
+"end": 33.92
+},
+{
+"text": "fourth\u2026",
+"start": 33.98,
+"end": 34.34
+},
+{
+"text": "and",
+"start": 34.68,
+"end": 34.8
+},
+{
+"text": "it",
+"start": 34.84,
+"end": 34.98
+},
+{
+"text": "fit",
+"start": 35.08,
+"end": 35.2
+},
+{
+"text": "in",
+"start": 35.24,
+"end": 35.3
+},
+{
+"text": "his",
+"start": 35.34,
+"end": 35.46
+},
+{
+"text": "hand.",
+"start": 35.54,
+"end": 35.94
+},
+{
+"text": "Eighty-one",
+"start": 36.38,
+"end": 36.78
+},
+{
+"text": "days",
+"start": 36.82,
+"end": 37.04
+},
+{
+"text": "at",
+"start": 37.08,
+"end": 37.2
+},
+{
+"text": "sea,",
+"start": 37.3,
+"end": 37.5
+},
+{
+"text": "all",
+"start": 37.78,
+"end": 37.9
+},
+{
+"text": "the",
+"start": 37.92,
+"end": 38.0
+},
+{
+"text": "way",
+"start": 38.02,
+"end": 38.12
+},
+{
+"text": "to",
+"start": 38.16,
+"end": 38.26
+},
+{
+"text": "Jamaica\u2026",
+"start": 38.3,
+"end": 38.76
+},
+{
+"text": "it",
+"start": 39.12,
+"end": 39.22
+},
+{
+"text": "lost",
+"start": 39.28,
+"end": 39.56
+},
+{
+"text": "five",
+"start": 39.8,
+"end": 40.06
+},
+{
+"text": "seconds.",
+"start": 40.2,
+"end": 40.66
+},
+{
+"text": "Here's",
+"start": 41.08,
+"end": 41.28
+},
+{
+"text": "why",
+"start": 41.3,
+"end": 41.44
+},
+{
+"text": "that",
+"start": 41.48,
+"end": 41.62
+},
+{
+"text": "matters.",
+"start": 41.68,
+"end": 42.1
+},
+{
+"text": "The",
+"start": 42.44,
+"end": 42.56
+},
+{
+"text": "Earth",
+"start": 42.62,
+"end": 42.86
+},
+{
+"text": "turns",
+"start": 42.96,
+"end": 43.28
+},
+{
+"text": "fifteen",
+"start": 43.32,
+"end": 43.72
+},
+{
+"text": "degrees",
+"start": 43.76,
+"end": 44.26
+},
+{
+"text": "every",
+"start": 44.32,
+"end": 44.56
+},
+{
+"text": "hour.",
+"start": 44.66,
+"end": 44.9
+},
+{
+"text": "Know",
+"start": 45.26,
+"end": 45.38
+},
+{
+"text": "the",
+"start": 45.42,
+"end": 45.5
+},
+{
+"text": "time",
+"start": 45.56,
+"end": 45.76
+},
+{
+"text": "back",
+"start": 45.8,
+"end": 46.0
+},
+{
+"text": "home",
+"start": 46.04,
+"end": 46.34
+},
+{
+"text": "and",
+"start": 46.46,
+"end": 46.54
+},
+{
+"text": "the",
+"start": 46.58,
+"end": 46.66
+},
+{
+"text": "time",
+"start": 46.7,
+"end": 46.9
+},
+{
+"text": "where",
+"start": 46.94,
+"end": 47.06
+},
+{
+"text": "you",
+"start": 47.1,
+"end": 47.2
+},
+{
+"text": "are\u2026",
+"start": 47.3,
+"end": 47.48
+},
+{
+"text": "and",
+"start": 47.76,
+"end": 47.86
+},
+{
+"text": "you",
+"start": 47.9,
+"end": 47.98
+},
+{
+"text": "know",
+"start": 48.02,
+"end": 48.22
+},
+{
+"text": "exactly",
+"start": 48.28,
+"end": 48.88
+},
+{
+"text": "where",
+"start": 48.92,
+"end": 49.06
+},
+{
+"text": "you",
+"start": 49.1,
+"end": 49.18
+},
+{
+"text": "are.",
+"start": 49.28,
+"end": 49.44
+},
+{
+"text": "The",
+"start": 49.8,
+"end": 49.9
+},
+{
+"text": "experts",
+"start": 49.96,
+"end": 50.36
+},
+{
+"text": "still",
+"start": 50.5,
+"end": 50.72
+},
+{
+"text": "wouldn't",
+"start": 50.76,
+"end": 50.98
+},
+{
+"text": "pay",
+"start": 51.04,
+"end": 51.2
+},
+{
+"text": "him.",
+"start": 51.22,
+"end": 51.36
+},
+{
+"text": "The",
+"start": 52.34,
+"end": 52.46
+},
+{
+"text": "king",
+"start": 52.56,
+"end": 52.82
+},
+{
+"text": "had",
+"start": 52.88,
+"end": 53.0
+},
+{
+"text": "to",
+"start": 53.02,
+"end": 53.14
+},
+{
+"text": "step",
+"start": 53.2,
+"end": 53.42
+},
+{
+"text": "in.",
+"start": 53.48,
+"end": 53.64
+},
+{
+"text": "Today,",
+"start": 54.02,
+"end": 54.32
+},
+{
+"text": "your",
+"start": 54.58,
+"end": 54.7
+},
+{
+"text": "phone",
+"start": 54.72,
+"end": 54.98
+},
+{
+"text": "finds",
+"start": 55.02,
+"end": 55.26
+},
+{
+"text": "you",
+"start": 55.3,
+"end": 55.36
+},
+{
+"text": "the",
+"start": 55.4,
+"end": 55.48
+},
+{
+"text": "same",
+"start": 55.54,
+"end": 55.74
+},
+{
+"text": "way.",
+"start": 55.78,
+"end": 56.02
+},
+{
+"text": "GPS\u2026",
+"start": 56.52,
+"end": 57.32
+},
+{
+"text": "is",
+"start": 57.7,
+"end": 57.86
+},
+{
+"text": "just",
+"start": 57.94,
+"end": 58.2
+},
+{
+"text": "very",
+"start": 58.48,
+"end": 58.72
+},
+{
+"text": "good",
+"start": 58.82,
+"end": 59.0
+},
+{
+"text": "clocks.",
+"start": 59.06,
+"end": 59.54
+}
+]

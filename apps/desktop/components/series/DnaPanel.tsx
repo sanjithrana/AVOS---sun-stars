@@ -20,11 +20,11 @@ export function DnaPanel({ sid, dna, act }: { sid: string; dna?: DesignDNA; act:
   const skills = useQuery({ queryKey: ["series", "skills"], queryFn: seriesApi.skills, enabled: open, staleTime: 60_000 });
   const set = (patch: Partial<DesignDNA>) => setD({ ...(cur as DesignDNA), ...patch });
   return (
-    <div className="rounded-xl border border-border bg-card/30" data-testid="dna-panel">
+    <div className="border border-border bg-card/30" data-testid="dna-panel">
       <button className="flex w-full items-center gap-2 p-4 text-left" onClick={() => setOpen(!open)}>
         <Dna className="h-4 w-4 text-amber-500" /><b className="text-sm text-foreground">Design DNA</b>
         <span className="truncate text-sm text-muted-foreground">{dna ? `${dna.medium} · ${dna.line}` : "written with the cast"}</span>
-        <span className="flex gap-1">{(dna?.palette ?? []).map((c) => <i key={c} className="h-4 w-4 rounded" style={{ background: c }} title={c} />)}</span>
+        <span className="flex gap-1">{(dna?.palette ?? []).map((c) => <i key={c} className="h-4 w-4" style={{ background: c }} title={c} />)}</span>
         <span className="grow" /><ChevronDown className={`h-4 w-4 transition ${open ? "rotate-180" : ""}`} />
       </button>
       {open && cur && (

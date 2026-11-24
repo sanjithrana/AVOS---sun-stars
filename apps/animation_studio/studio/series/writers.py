@@ -73,6 +73,14 @@ def system(skill: str, fallback: str) -> str:
     return f"[{skill}]\n" + SK.load(skill, fallback)
 
 
+def directed(skill: str, fallback: str) -> str:
+    """A shot-planning agent's instructions: its own (as system() gives them) followed by the house rules every AVOS
+    director shares (studio/house.py). Only planners get these; research desks, inspectors and editors do not, so
+    nobody pays for rules they cannot use."""
+    from .. import house
+    return system(skill, fallback) + "\n\n" + house.rules()
+
+
 def ask(s: dict, who: str, system: str, prompt: str, log: Callable[[dict], None] | None = None,
         max_tokens: int = 6000, temperature: float = 0.7, images: list | None = None) -> Any:
     """One JSON answer from the series' crew (None with the built-in crew). Waits and retries when the provider's

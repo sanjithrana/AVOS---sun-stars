@@ -104,7 +104,7 @@ export function StoryboardView({ p, shots, sheet, go }: { p: Project; shots: Sho
         <div className="space-y-5">
           {chars.filter((c) => b.cast[c.id]).map((c) => (
             <section key={c.id} className="space-y-2">
-              <h3 className="flex items-center gap-2 text-sm font-semibold">{c.name}{c.memory && <span className="rounded-full border border-[rgba(185,172,255,0.45)] px-2 py-0.5 text-[10px] font-medium text-[var(--signal)]">Remembered</span>}</h3>
+              <h3 className="flex items-center gap-2 text-sm font-semibold">{c.name}{c.memory && <span className="rounded-full border border-[rgba(200,255,58,0.45)] px-2 py-0.5 text-[10px] font-medium text-[var(--signal)]">Remembered</span>}</h3>
               <Board p={p} rel={b.cast[c.id]} alt={`${c.name}: identity portrait, design sheet and locked look`} />
             </section>
           ))}
@@ -209,7 +209,7 @@ export function CharactersView({ p, shots, sel, go }: { p: Project; shots: Shot[
       </div>
       <section className={card}>
         <p className={label}>Character{c.role ? ` · ${c.role}` : ""}</p>
-        <h2 className="mt-1 flex items-center gap-2 text-xl font-semibold">{c.name}{c.memory && <span className="rounded-full border border-[rgba(185,172,255,0.45)] px-2 py-0.5 text-[11px] font-medium text-[var(--signal)]" data-testid="char-remembered">Remembered</span>}</h2>
+        <h2 className="mt-1 flex items-center gap-2 text-xl font-semibold">{c.name}{c.memory && <span className="rounded-full border border-[rgba(200,255,58,0.45)] px-2 py-0.5 text-[11px] font-medium text-[var(--signal)]" data-testid="char-remembered">Remembered</span>}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{c.look}</p>
         {p.assets[`ref:${c.id}`] && <FadeImg src={explainer.file(p.id, p.assets[`ref:${c.id}`])} alt={`${c.name} identity portrait`} className="mt-3 max-h-80 rounded-lg bg-muted" />}
         {c.voice && <p className="mt-2 text-sm"><b>Voice:</b> <span className="text-muted-foreground">{c.voice}</span></p>}

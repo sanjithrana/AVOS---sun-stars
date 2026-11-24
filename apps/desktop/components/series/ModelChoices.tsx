@@ -11,7 +11,7 @@ import { seriesApi } from "./api";
 import type { Act } from "./shared";
 import type { StepChoice } from "./types";
 
-const sel = "w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground";
+const sel = "w-full border border-border bg-background px-2 py-1.5 text-sm text-foreground";
 
 export function ModelChoices({ sid, act, open: startOpen = false }: { sid: string; act: Act; open?: boolean }) {
   const qc = useQueryClient();
@@ -30,7 +30,7 @@ export function ModelChoices({ sid, act, open: startOpen = false }: { sid: strin
   });
 
   return (
-    <div className="rounded-xl border border-border bg-card/30" data-testid="model-choices">
+    <div className="border border-border bg-card/30" data-testid="model-choices">
       <button className="flex w-full items-center gap-2 p-4 text-left" onClick={() => setOpen(!open)}>
         <Cpu className="h-4 w-4 text-amber-500" />
         <b className="text-sm text-foreground">Models</b>
@@ -40,7 +40,7 @@ export function ModelChoices({ sid, act, open: startOpen = false }: { sid: strin
       {open && (
         <div className="space-y-3 border-t border-border p-4">
           {Object.entries(q.data?.providers ?? {}).map(([p, msg]) => (
-            <p key={p} className="flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/5 p-2 text-xs text-amber-800 dark:text-amber-200" data-testid={`provider-${p}`}>
+            <p key={p} className="flex items-start gap-2 border border-amber-500/40 bg-amber-500/5 p-2 text-xs text-amber-800 dark:text-amber-200" data-testid={`provider-${p}`}>
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />{msg}
             </p>
           ))}
@@ -51,7 +51,7 @@ export function ModelChoices({ sid, act, open: startOpen = false }: { sid: strin
               const opt = current(s, d.model);
               const where = opt ? Object.entries(opt.backends) : [];
               return (
-                <div key={s.step} className="space-y-1.5 rounded-xl border border-border p-3" data-testid={`choice-${s.step}`}>
+                <div key={s.step} className="space-y-1.5 border border-border p-3" data-testid={`choice-${s.step}`}>
                   <b className="text-sm text-foreground">{s.label}</b>
                   <div className="grid grid-cols-2 gap-2">
                     <select className={sel} value={d.model} data-testid={`choice-${s.step}-model`}

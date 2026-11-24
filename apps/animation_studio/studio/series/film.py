@@ -375,8 +375,21 @@ def analyze(s: dict, prompt: str, note: str = "", log: Callable[[dict], None] | 
             bd = normalize(data, s)
             if sk["shots"] and all(x.get("start") is not None for x in sk["shots"]) and len(bd["shots"]) < len(sk["shots"]):
                 pass        # the analyst merged sections: still usable, the creator can split them on the breakdown
-            return bd
+            return directed(bd, log)
     return normalize(builtin_breakdown(prompt, sk), s)
+
+
+def directed(bd: dict, log: Callable[[dict], None] | None = None) -> dict:
+    """The house director reads the breakdown (studio/house.py) and says what it would change. It changes nothing:
+    this is the creator's own prompt, and the analyst is told never to invent a different story."""
+    from .. import house
+    found = house.review([house.card(i + 1, x.get("location"), x.get("action"), x.get("framing"), x.get("camera"))
+                         for i, x in enumerate(bd.get("shots") or [])])
+    if found:
+        bd["house"] = {"found": [list(f) for f in found], "note": house.note_of(found)}
+        if log:
+            log({"type": "text", "who": "director", "text": bd["house"]["note"] + " Your prompt is kept as written."})
+    return bd
 
 
 def _library_names(s: dict) -> list[str]:

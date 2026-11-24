@@ -1,70 +1,80 @@
-import json
+"""The packaging team, with the searches faked (no network)."""
+from __future__ import annotations
 
 import pytest
 
-from studio.explainer import planner, research
+from studio.autoclip import meta, pipeline, research, store
 
-PAGES = [{"title": "Eddy current", "url": "https://en.wikipedia.org/wiki/Eddy_current",
-          "text": "An eddy current is a loop of electric current induced within conductors by a changing magnetic field in the conductor. "
-                  "Eddy currents flow in closed loops within conductors, in planes perpendicular to the magnetic field. "
-                  "They can be induced within nearby stationary conductors by a time-varying magnetic field. " * 2},
-         {"title": "Lenz's law", "url": "https://en.wikipedia.org/wiki/Lenz%27s_law",
-          "text": "Lenz's law states that the direction of the electric current induced in a conductor by a changing magnetic field is such that the magnetic field created by the induced current opposes the initial changing magnetic field. " * 2}]
-
-
-def _s(crew="builtin"):
-    return {"id": "x", "crew": crew, "language": "en", "brief": "how a magnet falls in a copper pipe", "seconds": 30, "aspect": "9:16"}
+ROWS = [
+    {"id": "a1", "title": "Speed DESTROYS the cops in GTA 6 💀 #ishowspeed #gta6", "description": "@IShowSpeed went crazy #ishowspeed #gta6 #speed #fyp", "tags": [], "channel": "Clips", "views": 26_000_000, "track": "Raya (Slowed)", "artist": "Zericxxn"},
+    {"id": "a2", "title": "IShowSpeed plays GTA 6 for the first time", "description": "#ishowspeed #gta6 #gaming #viral", "tags": ["ishowspeed", "gta 6"], "channel": "X", "views": 11_000_000, "track": "Raya (Slowed)", "artist": "Zericxxn"},
+    {"id": "a3", "title": "Speed rage quits 😭", "description": "#ishowspeed #rage #speed", "tags": [], "channel": "Y", "views": 9_000_000, "track": "Other song", "artist": "Z"},
+    {"id": "a4", "title": "gta 6 speed funny", "description": "#gta6 #speed #shorts #trending", "tags": [], "channel": "Z", "views": 400_000},
+    {"id": "a5", "title": "GTA 5 Speed", "description": "#gta5 #ishowspeed", "tags": [], "channel": "W", "views": 300_000},
+    {"id": "a6", "title": "speed", "description": "#ishowspeed #speed #gta6", "tags": [], "channel": "V", "views": 200_000},
+]
 
 
-def test_clean_topic_and_wikipedia_reply_parsing(monkeypatch):
-    assert research._clean("How does a magnet fall in a copper pipe?") == "a magnet fall in a copper pipe"
-    reply = {"query": {"pages": [{"title": "B", "index": 2, "fullurl": "https://en.wikipedia.org/wiki/B", "extract": "x" * 300},
-                                 {"title": "A", "index": 1, "fullurl": "https://en.wikipedia.org/wiki/A", "extract": "y" * 300},
-                                 {"title": "short", "index": 3, "fullurl": "https://en.wikipedia.org/wiki/S", "extract": "tiny"},
-                                 {"title": "bad", "index": 4, "fullurl": "http://evil.example/x", "extract": "z" * 300}]}}
-    monkeypatch.setattr(research, "_get", lambda params: reply)
-    got = research.find("magnet copper pipe")
-    assert [p["title"] for p in got] == ["A", "B"]                       # ordered by search rank; short and non-https dropped
+@pytest.fixture(autouse=True)
+def root(tmp_path, monkeypatch):
+    monkeypatch.setattr(store, "ROOT", tmp_path / "ac")
+    monkeypatch.setattr(research, "_api_search", lambda q, n: None)
+    monkeypatch.setattr(research, "_ytdlp_search", lambda q, n: [dict(r) for r in ROWS])
+    monkeypatch.setattr(research, "_details", lambda ids: {})
 
 
-def test_no_ai_writer_uses_sourced_opening_sentences(monkeypatch):
-    monkeypatch.setattr(research, "find", lambda t, limit=3: PAGES)
-    r = research.run(_s(), "magnets and copper")
-    assert r["status"] == "ok" and len(r["facts"]) >= 3
-    assert all(f["source"]["url"].startswith("https://en.wikipedia.org/") for f in r["facts"])
+JOB = {"title": "IShowSpeed plays GTA 6 stream", "source": {"channel": "IShowSpeed", "url": "https://youtu.be/x", "channel_url": "https://youtube.com/@IShowSpeed"}}
+CLIP = {"n": 1, "title": "Speed vs the cops", "text": "bro the cops are chasing me in gta 6 this is crazy chat", "moment": "cop chase", "franchise": "gta6"}
 
 
-def test_ai_facts_are_checked_against_the_sources(monkeypatch):
-    monkeypatch.setattr(research, "find", lambda t, limit=3: PAGES)
-    answer = {"research_questions": ["Why is it slow?"], "misconceptions": ["Copper is magnetic"],
-              "verified_facts": [{"fact": "A moving magnet induces circulating currents in copper.", "source": 1},
-                                 {"fact": "The induced field opposes the magnet's motion.", "source": 2},
-                                 {"fact": "Energy is lost mostly as heat in the pipe.", "source": 1},
-                                 {"fact": "A made up fact from a source that does not exist.", "source": 9}]}
-    monkeypatch.setattr(research.writers, "ask", lambda *a, **k: answer)
-    r = research.run(_s("ollama"), "magnets and copper")
-    assert r["status"] == "ok" and len(r["facts"]) == 3                  # the fact citing source 9 is dropped
-    assert r["misconceptions"] == ["Copper is magnetic"]
+def test_query_is_who_and_which_game():
+    assert research.query_for(JOB, CLIP) == "IShowSpeed GTA 6"
+    assert research.query_for({"title": "my cooking video", "source": {}}, {"title": "", "text": "we cook pasta tonight with garlic"}) != ""
 
 
-def test_unusable_ai_answer_falls_back_and_web_failure_is_a_soft_skip(monkeypatch):
-    monkeypatch.setattr(research, "find", lambda t, limit=3: PAGES)
-    monkeypatch.setattr(research.writers, "ask", lambda *a, **k: {"verified_facts": []})
-    assert research.run(_s("ollama"), "magnets")["status"] == "ok"      # opening sentences
-    def boom(t, limit=3):
-        raise research.ResearchError("couldn't reach Wikipedia (Network is unreachable)")
-    monkeypatch.setattr(research, "find", boom)
-    r = research.run(_s(), "magnets")
-    assert r["status"] == "skipped" and "Network is unreachable" in r["reason"] and research.facts_block(r) == ""
+def test_analysis_scores_tags_by_views_and_finds_the_sound():
+    a = research.analyse(ROWS)
+    tags = [h["tag"] for h in a["hashtags"]]
+    assert tags[:2] == ["ishowspeed", "gta6"] and "fyp" not in tags and "shorts" not in tags and "viral" not in tags
+    assert a["sounds"][0]["title"] == "Raya (Slowed)" and a["sounds"][0]["uses"] == 2
+    assert "@IShowSpeed" in a["mentions"] and a["examples"][0]["views"] == 26_000_000
 
 
-def test_the_script_prompt_carries_the_facts(monkeypatch):
-    seen = {}
-    monkeypatch.setattr(research, "find", lambda t, limit=3: PAGES)
-    r = research.run(_s(), "magnets")
-    def fake(s, who, system, prompt, *a, **k):
-        seen["prompt"] = prompt
-        return None
-    monkeypatch.setattr(planner.writers, "ask", fake)
-    planner.plan({**_s(), "research": r})
-    assert "Verified facts" in seen["prompt"] and "eddy current" in seen["prompt"].lower()
+def test_rules_pack_never_uses_the_wrong_game():
+    res = research.top_shorts("IShowSpeed GTA 6")
+    pk = research.recommend(JOB, CLIP, res)
+    assert pk["hashtags"][0] == "ishowspeed" and "gta6" in pk["hashtags"] and "gta5" not in pk["hashtags"] and len(pk["hashtags"]) <= 5
+    assert pk["mentions"] == ["@IShowSpeed"] and "@IShowSpeed" in pk["description"] and pk["sound"]["title"] == "Raya (Slowed)" and pk["by"] == "rules"
+
+
+def test_the_checker_drops_what_the_ai_invents():
+    res = research.top_shorts("IShowSpeed GTA 6")
+    ai = lambda sysm, prompt: {"title": "Speed escapes the cops in GTA 5", "description": "Speed vs the cops #fake", "hashtags": ["#ishowspeed", "madeuptag", "gta6", "copchase"],  # noqa: E731
+                               "mentions": ["@IShowSpeed", "@randomguy"], "hook": "He did NOT expect this"}
+    pk = research.recommend(JOB, CLIP, res, ai)
+    assert pk["by"] == "ai" and pk["title"] is None                         # names a game the footage is not: dropped
+    assert "madeuptag" not in pk["hashtags"] and pk["hashtags"][:2] == ["ishowspeed", "gta6"]
+    assert pk["mentions"] == ["@IShowSpeed"] and "#fake" not in pk["description"] and pk["hook"] == "He did NOT expect this"
+
+
+def test_run_applies_packs_and_uses_the_sound_from_the_shelf(monkeypatch):
+    from studio.autoclip import music
+    monkeypatch.setattr(music, "tracks", lambda: [{"id": "t1", "name": "Raya slowed", "builtin": False}])
+    clips = [dict(CLIP)]
+    logs: list[str] = []
+    summary = research.run(JOB, clips, None, logs.append)
+    assert "IShowSpeed GTA 6" in summary and clips[0]["seo"]["music_id"] == "t1" and any("Best hashtags" in x for x in logs)
+    pipeline.apply_packs(clips)
+    assert "#ishowspeed" in clips[0]["description"]
+    desc, tags = meta.build(clips[0], JOB)
+    assert tags[0] == "ishowspeed" and desc.rstrip().endswith("#Shorts") and meta.mention_title("Speed vs the cops", JOB, clips[0]).endswith("@IShowSpeed")
+
+
+def test_research_is_cached(monkeypatch):
+    calls = []
+    monkeypatch.setattr(research, "_ytdlp_search", lambda q, n: calls.append(q) or [dict(r) for r in ROWS])
+    research.top_shorts("IShowSpeed GTA 6")
+    research.top_shorts("IShowSpeed GTA 6")
+    assert len(calls) == 1
+    research.top_shorts("IShowSpeed GTA 6", fresh=True)
+    assert len(calls) == 2

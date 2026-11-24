@@ -60,7 +60,7 @@ export function SeriesPage({ id }: { id: string }) {
   const { act, err, pending } = useAct(id);
 
   if (q.isError) return <main className="p-8"><Link href="/animations/series" className="text-sm hover:underline">← Series</Link><p className="mt-4 text-muted-foreground">{(q.error as Error).message}</p></main>;
-  if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse rounded-xl bg-muted/40" /><div className="h-64 animate-pulse rounded-xl bg-muted/40" /></main>;
+  if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse bg-muted/40" /><div className="h-64 animate-pulse bg-muted/40" /></main>;
   const { series: s, episodes } = q.data;
   const approved = s.characters.filter((c) => c.status === "approved").length;
   const openEp = episodes.find((e) => e.status !== "done");
@@ -71,15 +71,15 @@ export function SeriesPage({ id }: { id: string }) {
         <Link href="/animations/series" className="text-xs text-muted-foreground hover:underline">← Series</Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
-          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{q.data.language.name}</span>
-          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
-          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">parts: {s.partPlan.join(" → ")} min</span>
+          <span className="bg-muted px-2 py-0.5 text-xs text-muted-foreground">{q.data.language.name}</span>
+          <span className="bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
+          <span className="bg-muted px-2 py-0.5 text-xs text-muted-foreground">parts: {s.partPlan.join(" → ")} min</span>
         </div>
         {(s.logline || s.premise) && <p className="mt-2 max-w-4xl text-muted-foreground">{s.logline || s.premise}</p>}
       </div>
 
       <WorkBar snap={q.data} onStop={() => act("stop", () => seriesApi.cancel(id))} />
-      {err && <p className="rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300" data-testid="series-action-error">{err}</p>}
+      {err && <p className="border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300" data-testid="series-action-error">{err}</p>}
       <ModelChoices sid={id} act={act} />
       <DnaPanel sid={id} dna={s.dna} act={act} />
 
@@ -99,7 +99,7 @@ export function SeriesPage({ id }: { id: string }) {
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground"><Clapperboard className="h-5 w-5 text-amber-500" />Places</h2>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {s.locations.map((l) => (
-              <div key={l.id} className="w-56 shrink-0 overflow-hidden rounded-xl border border-border bg-card/40" data-testid={`location-${l.id}`}>
+              <div key={l.id} className="w-56 shrink-0 overflow-hidden border border-border bg-card/40" data-testid={`location-${l.id}`}>
                 <div className="aspect-video bg-muted/40">{l.plate ? <img src={seriesApi.file(id, l.plate)} alt={l.name} className="h-full w-full object-cover" /> :
                   <div className="flex h-full items-center justify-center text-xs text-muted-foreground">{l.status === "error" ? "couldn't paint" : "painted on first use"}</div>}</div>
                 <div className="flex items-center justify-between gap-2 p-2">
@@ -125,7 +125,7 @@ export function SeriesPage({ id }: { id: string }) {
       </section>
 
       {s.story.episodes.length > 0 && (
-        <section className="rounded-xl border border-border bg-card/30 p-5">
+        <section className="border border-border bg-card/30 p-5">
           <h3 className="mb-2 font-semibold text-foreground">The story so far</h3>
           <ul className="space-y-1 text-sm text-muted-foreground">{s.story.episodes.map((e) => <li key={e.episode}><b className="text-foreground">Episode {e.episode}:</b> {e.summary}</li>)}</ul>
           {s.story.facts.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Remembered: {s.story.facts.join(" · ")}</p>}
@@ -140,7 +140,7 @@ export function WorkBar({ snap, onStop }: { snap: SeriesSnapshot; onStop: () => 
   if (!snap.busy && w.state !== "error" && w.state !== "stopped") return null;
   const pct = w.total ? Math.round((100 * (w.done || 0)) / w.total) : null;
   return (
-    <div className={`rounded-xl border p-4 ${w.state === "error" ? "border-red-500/40 bg-red-500/5" : "border-amber-500/40 bg-amber-500/5"}`} data-testid="work-bar">
+    <div className={`border p-4 ${w.state === "error" ? "border-red-500/40 bg-red-500/5" : "border-amber-500/40 bg-amber-500/5"}`} data-testid="work-bar">
       <div className="flex flex-wrap items-center gap-3">
         {snap.busy ? <Loader2 className="h-4 w-4 animate-spin text-amber-500" /> : <AlertTriangle className="h-4 w-4 text-red-500" />}
         <b className="text-sm text-foreground">{snap.busy ? w.label : w.state === "error" ? "Something failed" : "Stopped"}</b>
@@ -148,7 +148,7 @@ export function WorkBar({ snap, onStop }: { snap: SeriesSnapshot; onStop: () => 
         <span className="grow" />
         {snap.busy && <Button size="sm" variant="outline" onClick={onStop} data-testid="work-stop"><Square />Stop</Button>}
       </div>
-      {pct !== null && snap.busy && <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-all" style={{ width: `${pct}%` }} /></div>}
+      {pct !== null && snap.busy && <div className="mt-3 h-1.5 overflow-hidden bg-muted"><div className="h-full bg-amber-500 transition-all" style={{ width: `${pct}%` }} /></div>}
       {w.error && !snap.busy && <p className="mt-2 text-sm text-red-700 dark:text-red-300">{w.error}</p>}
       {(w.queue?.length ?? 0) > 0 && <p className="mt-2 text-xs text-muted-foreground">Next: {w.queue!.join(" · ")}</p>}
     </div>
@@ -169,7 +169,7 @@ export function ReadyPanel({ ready }: { ready: Readiness }) {
   const missing = STEPS.filter(([k]) => !ready[k]);
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-xl border border-border bg-card/30" data-testid="ready-panel">
+    <div className="border border-border bg-card/30" data-testid="ready-panel">
       <button className="flex w-full items-center gap-2 p-4 text-left" onClick={() => setOpen(!open)}>
         <Cpu className="h-4 w-4 text-amber-500" />
         <b className="text-sm text-foreground">Models</b>
@@ -202,7 +202,7 @@ const STATUS_CHIP: Record<string, [string, string]> = {
 };
 export const Chip = ({ s }: { s: string }) => {
   const [t, c] = STATUS_CHIP[s] ?? [s, "bg-muted text-muted-foreground"];
-  return <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${c}`} data-testid="status-chip">{t}</span>;
+  return <span className={`px-2 py-0.5 text-[11px] font-medium ${c}`} data-testid="status-chip">{t}</span>;
 };
 
 export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Character; act: Act; pending: string | null }) {
@@ -219,7 +219,7 @@ export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Charac
     void act(`upload-${c.id}`, () => seriesApi.uploadCharacter(sid, c.id, fd));
   };
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card/40 p-4" data-testid={`character-${c.id}`}>
+    <div className="flex flex-col gap-3 border border-border bg-card/40 p-4" data-testid={`character-${c.id}`}>
       <div className="flex items-center gap-2">
         <b className="text-lg text-foreground">{c.name}</b>
         <span className="text-xs text-muted-foreground">{[c.role, c.age, c.gender !== "other" ? c.gender : ""].filter(Boolean).join(" · ")}</span>
@@ -227,11 +227,11 @@ export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Charac
         {c.version > 0 && <span className="text-[11px] text-muted-foreground">v{c.version}</span>}
         <Chip s={c.status} />
       </div>
-      <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-muted/40">
+      <div className="relative aspect-[16/9] overflow-hidden bg-muted/40">
         {c.sheet ? <img src={seriesApi.file(sid, c.sheet)} alt={`${c.name} character sheet`} className="h-full w-full cursor-zoom-in object-contain" onClick={() => setZoom(true)} data-testid="sheet" /> : null}
         {working && <div className="absolute inset-0 flex items-center justify-center bg-background/60"><Loader2 className="h-6 w-6 animate-spin text-amber-500" /></div>}
       </div>
-      {zoom && c.sheet && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6" onClick={() => setZoom(false)}><img src={seriesApi.file(sid, c.sheet)} alt="" className="max-h-full max-w-full rounded-xl" /></div>}
+      {zoom && c.sheet && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6" onClick={() => setZoom(false)}><img src={seriesApi.file(sid, c.sheet)} alt="" className="max-h-full max-w-full" /></div>}
       {c.voice?.sample && (
         <div className="flex items-center gap-2">
           <Mic className="h-4 w-4 shrink-0 text-amber-500" />
@@ -240,8 +240,8 @@ export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Charac
       )}
       {c.voice?.sampleText && <p className="text-xs italic text-muted-foreground">“{c.voice.sampleText}”</p>}
       <div className="flex flex-wrap gap-1 text-[11px]">
-        {c.sheetInfo && <span className={`rounded-lg px-2 py-0.5 ${c.sheetInfo.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`} title={c.sheetInfo.note}>look: {modelLabel(c.sheetInfo.model)}</span>}
-        {c.voice?.model && <span className={`rounded-lg px-2 py-0.5 ${c.voice.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>voice: {modelLabel(c.voice.model)}</span>}
+        {c.sheetInfo && <span className={`px-2 py-0.5 ${c.sheetInfo.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`} title={c.sheetInfo.note}>look: {modelLabel(c.sheetInfo.model)}</span>}
+        {c.voice?.model && <span className={`px-2 py-0.5 ${c.voice.fallback ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>voice: {modelLabel(c.voice.model)}</span>}
       </div>
       {!edit ? (
         <div className="space-y-1 text-sm">
@@ -275,10 +275,10 @@ export function CharacterCard({ sid, c, act, pending }: { sid: string; c: Charac
             <Button size="sm" variant="outline" onClick={() => { void act(`redo-${c.id}`, () => seriesApi.redoCharacter(sid, c.id, "look", note)); setNote(""); }} data-testid="redo-look"><Wand2 />Redo look</Button>
             <Button size="sm" variant="outline" onClick={() => { void act(`redo-${c.id}`, () => seriesApi.redoCharacter(sid, c.id, "voice", note)); setNote(""); }} data-testid="redo-voice"><Mic />Redo voice</Button>
             <Button size="sm" variant="ghost" onClick={() => { setForm({ look: c.look, outfit: c.outfit, personality: c.personality, voice: c.voice?.description ?? "", age: c.age }); setEdit(!edit); }}><Pencil />Edit</Button>
-            <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-sm hover:bg-accent" title="Your own drawing of this character: the sheet is drawn from it">
+            <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 px-3 text-sm hover:bg-accent" title="Your own drawing of this character: the sheet is drawn from it">
               <ImagePlus className="h-4 w-4" />Picture<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={upload("picture")} />
             </label>
-            <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-sm hover:bg-accent" title="A recording of the voice you want (10-20 s): every line is cloned from it">
+            <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 px-3 text-sm hover:bg-accent" title="A recording of the voice you want (10-20 s): every line is cloned from it">
               <Upload className="h-4 w-4" />Voice<input type="file" accept="audio/*" className="hidden" onChange={upload("voice")} />
             </label>
           </div>
@@ -292,12 +292,12 @@ export function AddCharacter({ sid, act }: { sid: string; act: Act }) {
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ name: "", look: "", outfit: "", personality: "", voice: "", age: "", gender: "other" });
   if (!open) return (
-    <button className="flex min-h-40 items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:border-amber-500" onClick={() => setOpen(true)} data-testid="add-character">
+    <button className="flex min-h-40 items-center justify-center gap-2 border border-dashed border-border text-sm text-muted-foreground hover:border-amber-500" onClick={() => setOpen(true)} data-testid="add-character">
       <Plus className="h-4 w-4" />Add a character
     </button>
   );
   return (
-    <div className="space-y-2 rounded-xl border border-border bg-card/40 p-4">
+    <div className="space-y-2 border border-border bg-card/40 p-4">
       <input className={field} placeholder="Name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} data-testid="new-char-name" />
       <div className="grid grid-cols-2 gap-2">
         <input className={field} placeholder="Age" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} />
@@ -322,12 +322,12 @@ function NewEpisode({ sid, act, canStart, number }: { sid: string; act: Act; can
   const [script, setScript] = useState("");
   const [title, setTitle] = useState("");
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-card/40 p-5" data-testid="new-episode">
+    <div className="space-y-4 border border-border bg-card/40 p-5" data-testid="new-episode">
       <div className="flex flex-wrap items-center gap-3">
         <b className="text-foreground">Episode {number}</b>
-        <div className="inline-flex rounded-xl border border-border p-0.5 text-sm">
-          <button className={`rounded-lg px-3 py-1 ${mode === "ai" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => setMode("ai")} data-testid="mode-ai">AI writes it</button>
-          <button className={`rounded-lg px-3 py-1 ${mode === "script" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => setMode("script")} data-testid="mode-script">My script</button>
+        <div className="inline-flex border border-border p-0.5 text-sm">
+          <button className={`px-3 py-1 ${mode === "ai" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => setMode("ai")} data-testid="mode-ai">AI writes it</button>
+          <button className={`px-3 py-1 ${mode === "script" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => setMode("script")} data-testid="mode-script">My script</button>
         </div>
       </div>
       {!canStart && <p className="text-sm text-amber-700 dark:text-amber-300">Approve at least one character first.</p>}

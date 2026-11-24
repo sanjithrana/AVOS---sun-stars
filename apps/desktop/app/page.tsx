@@ -73,11 +73,11 @@ export default function Home() {
 
         {/* 2. What you can make */}
         <section aria-labelledby="home-make" className="mt-4">
-          <h2 id="home-make" className="display text-3xl md:text-4xl">What you can make</h2>
+          <h2 id="home-make" className="display underbar text-3xl md:text-4xl">What you can make</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr]">
             {MAKE.map((m, i) => (
               <Link key={m.href} href={m.href} className={`make group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-6 ${i === 0 ? "lg:row-span-1 lg:p-8" : ""}`}>
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgba(185,172,255,0.35)] bg-[rgba(124,92,255,0.14)] transition-shadow group-hover:shadow-[0_0_20px_-2px_rgba(124,92,255,0.9)]"><m.icon className="h-5 w-5 text-[var(--signal)]" strokeWidth={1.5} /></span>
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgba(200,255,58,0.35)] bg-[rgba(200,255,58,0.14)] transition-shadow group-hover:shadow-[0_0_20px_-2px_rgba(200,255,58,0.9)]"><m.icon className="h-5 w-5 text-[var(--signal)]" strokeWidth={1.5} /></span>
                 <p className={`mt-5 font-medium ${i === 0 ? "text-2xl" : "text-xl"}`}>{m.title}</p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
                 <p className="mt-auto pt-6 text-[13px] text-foreground/80"><span className="text-muted-foreground">Try: </span>“{m.eg}”</p>
@@ -90,7 +90,7 @@ export default function Home() {
         <section id="how" aria-labelledby="home-crew" className="mt-24 scroll-mt-24">
           <div className="space-y-8">
             <div className="max-w-2xl">
-              <h2 id="home-crew" className="display text-3xl md:text-4xl">Fifteen agents, one line</h2>
+              <h2 id="home-crew" className="display underbar text-3xl md:text-4xl">Fifteen agents, one line</h2>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                 Each agent does one job and hands its work to the next. The line stops after the script, the characters and the storyboard so you can change anything before it moves on. On every video you can see which agent is working and what it made.
               </p>
@@ -112,7 +112,7 @@ export default function Home() {
         {/* 4. Storyboard levels + the live window */}
         <section aria-labelledby="home-board" className="hero-scene relative -mx-4 mt-24 px-4 md:-mx-10 md:px-10 2xl:-mx-16 2xl:px-16">
           <div className="text-center">
-            <h2 id="home-board" className="display text-3xl md:text-5xl">Storyboards the way studios hand them over</h2>
+            <h2 id="home-board" className="display underbar text-3xl md:text-5xl">Storyboards the way studios hand them over</h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">Not one crowded sheet. Four levels, so every model, and you, look at one clear thing at a time.</p>
           </div>
           <ol className="mx-auto mt-10 grid max-w-6xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -131,7 +131,7 @@ export default function Home() {
         {/* 5. Cast memory */}
         <section aria-labelledby="home-memory" className="mt-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center">
           <div>
-            <h2 id="home-memory" className="display text-3xl md:text-4xl">It remembers your characters</h2>
+            <h2 id="home-memory" className="display underbar text-3xl md:text-4xl">It remembers your characters</h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               Every character gets a locked look, its own seed and a clean identity portrait. Use the same name in your next idea and the same character comes back, video after video. With a vision model in your crew, every frame is checked against the portrait and redrawn if the face drifts.
             </p>
@@ -151,7 +151,7 @@ export default function Home() {
 
         {/* 6. Your projects */}
         <section aria-labelledby="home-videos" className="mt-24">
-          <h2 id="home-videos" className="display text-3xl md:text-4xl">Your projects</h2>
+          <h2 id="home-videos" className="display underbar text-3xl md:text-4xl">Your projects</h2>
           <div className="mt-6">
             {loading ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4" aria-busy="true">{[0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-3xl bg-white/[0.05]" />)}</div>
@@ -166,7 +166,7 @@ export default function Home() {
                 {recent.map((v) => (
                   <li key={`${v.kind}-${v.id}`}>
                     <Link href={v.href} className="group block overflow-hidden rounded-3xl border border-border bg-card focus-visible:outline-2 focus-visible:outline-ring">
-                      <div className="aspect-video bg-gradient-to-br from-[#2a1f8a] to-[#05030f]">
+                      <div className="aspect-video bg-gradient-to-br from-[#2f4a12] to-[#06100a]">
                         {v.thumb && /* eslint-disable-next-line @next/next/no-img-element */ <img src={v.thumb} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
                       </div>
                       <div className="p-4">
@@ -196,10 +196,10 @@ export default function Home() {
         {/* 7. Sign-off */}
         <section className="closing relative mt-24 flex flex-col items-center overflow-hidden rounded-[2rem] border border-border px-6 pb-16 pt-14 text-center">
           <svg className="pointer-events-none absolute inset-x-0 top-0 h-full w-full" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMin slice" aria-hidden>
-            {[200, 310, 430, 560].map((r) => <ellipse key={r} cx="600" cy="200" rx={r * 1.6} ry={r} fill="none" stroke="rgba(170,150,255,0.07)" />)}
+            {[200, 310, 430, 560].map((r) => <ellipse key={r} cx="600" cy="200" rx={r * 1.6} ry={r} fill="none" stroke="rgba(200,255,58,0.07)" />)}
           </svg>
           <Orb size={190} />
-          <h2 className="display relative mt-10 text-3xl md:text-5xl">Ready to make your first video?</h2>
+          <h2 className="display underbar relative mt-10 text-3xl md:text-5xl">Ready to make your first video?</h2>
           <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">Type one idea. The crew does the rest, and stops to ask you at each step.</p>
           <Link href="/explainer" className="relative mt-8 inline-flex h-12 items-center rounded-full bg-primary px-9 text-sm font-semibold" data-testid="home-start">Start a video</Link>
         </section>

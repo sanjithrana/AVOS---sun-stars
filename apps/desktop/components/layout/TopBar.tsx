@@ -10,7 +10,7 @@ import { EMPTY_ACTIVITY, ago, fetchActivity, fetchCaps, type ActivityItem } from
 const PAGES: { href: string; label: string; hint: string }[] = [
   { href: "/", label: "Home", hint: "Production assistant" }, { href: "/explainer", label: "Explainer", hint: "Idea to finished video" },
   { href: "/stickman", label: "Stickman", hint: "Stickman videos" }, { href: "/animations", label: "Animations", hint: "Films, series, video style" },
-  { href: "/skills", label: "Skills", hint: "Company Story, Mechanical Toy" }, { href: "/models", label: "Models", hint: "Open AI models in use" },
+  { href: "/autoclip", label: "Auto Clip", hint: "Long video to Shorts" }, { href: "/connections", label: "Connections", hint: "YouTube, Instagram, TikTok" }, { href: "/skills", label: "Skills", hint: "Company Story, Mechanical Toy" }, { href: "/models", label: "Models", hint: "Open AI models in use" },
   { href: "/gpu", label: "GPU", hint: "Workers, router, runs" }, { href: "/settings", label: "Settings", hint: "Keys, GPU, your models" },
 ];
 
@@ -30,12 +30,12 @@ function Pop({ label, icon, badge, tone, children, wide }: { label: string; icon
   return (
     <div ref={box} className="relative">
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="dialog" aria-label={label} title={label}
-        className={`relative inline-flex h-10 items-center gap-2 rounded-full border px-3 text-sm transition-colors ${open ? "border-[rgba(185,172,255,0.7)] bg-[rgba(124,92,255,0.18)]" : "border-border text-muted-foreground hover:text-foreground"}`}>
+        className={`relative inline-flex h-10 items-center gap-2 border px-3 text-sm transition-colors ${open ?"border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)]" :"border-border text-muted-foreground hover:text-foreground"}`}>
         {icon}<span className="hidden xl:inline">{label}</span>
-        {!!badge && <span className={`absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white ${dot}`}>{badge > 99 ? "99+" : badge}</span>}
+        {!!badge && <span className={`absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center px-1 text-[10px] font-semibold text-white ${dot}`}>{badge > 99 ? "99+" : badge}</span>}
       </button>
       {open && (
-        <div role="dialog" aria-label={label} className={`absolute right-0 top-12 z-50 max-h-[70vh] overflow-y-auto rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl ${wide ? "w-[min(92vw,26rem)]" : "w-[min(92vw,22rem)]"}`}>
+        <div role="dialog" aria-label={label} className={`absolute right-0 top-12 z-50 max-h-[70vh] overflow-y-auto border border-border bg-popover text-popover-foreground shadow-2xl ${wide ?"w-[min(92vw,26rem)]" :"w-[min(92vw,22rem)]"}`}>
           {children}
         </div>
       )}
@@ -52,8 +52,8 @@ function Row({ it, onGo }: { it: ActivityItem; onGo: () => void }) {
   const st = STATE[it.state] ?? STATE.done;
   return (
     <li>
-      <Link href={it.href} onClick={onGo} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[rgba(124,92,255,0.10)]">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted">
+      <Link href={it.href} onClick={onGo} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[rgba(200,255,58,0.10)]">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden border border-border bg-muted">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {it.thumb ? <img src={it.thumb} alt="" className="h-full w-full object-cover" loading="lazy" />
             : it.state === "running" ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : it.state === "error" ? <TriangleAlert className="h-5 w-5 text-red-400" /> : it.state === "waiting" ? <Bell className="h-5 w-5 text-amber-400" /> : <CheckCircle2 className="h-5 w-5 text-muted-foreground" />}
@@ -86,7 +86,7 @@ function Palette({ items, onClose }: { items: ActivityItem[]; onClose: () => voi
   const go = (href: string) => { onClose(); router.push(href); };
   return (
     <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/55 px-4 pt-[14vh]" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }} role="dialog" aria-label="Search">
-      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl">
+      <div className="w-full max-w-xl overflow-hidden border border-border bg-popover text-popover-foreground shadow-2xl">
         <div className="flex items-center gap-3 border-b border-border px-4">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input autoFocus value={q} onChange={(e) => { setQ(e.target.value); setI(0); }} placeholder="Jump to a page or a run…" aria-label="Search pages and runs"
@@ -103,7 +103,7 @@ function Palette({ items, onClose }: { items: ActivityItem[]; onClose: () => voi
           {rows.length === 0 && <li className="px-4 py-6 text-center text-sm text-muted-foreground">Nothing matches.</li>}
           {rows.map((r, n) => (
             <li key={`${r.href}-${n}`}>
-              <button type="button" onMouseEnter={() => setI(n)} onClick={() => go(r.href)} className={`flex w-full items-center gap-3 px-4 py-2.5 text-left ${n === i ? "bg-[rgba(124,92,255,0.16)]" : ""}`}>
+              <button type="button" onMouseEnter={() => setI(n)} onClick={() => go(r.href)} className={`flex w-full items-center gap-3 px-4 py-2.5 text-left ${n === i ?"bg-[rgba(200,255,58,0.16)]" :""}`}>
                 <span className="w-10 shrink-0 text-[10px] uppercase tracking-wider text-muted-foreground">{r.kind}</span>
                 <span className="min-w-0 flex-1"><span className="block truncate text-sm">{r.title}</span><span className="block truncate text-[11px] text-muted-foreground">{r.sub}</span></span>
               </button>
@@ -136,7 +136,7 @@ export function TopBar() {
     return () => window.removeEventListener("keydown", k);
   }, []);
   const c = caps.data;
-  const dot = (ok: boolean | undefined) => <span className={`h-2 w-2 rounded-full ${ok === undefined ? "bg-muted-foreground/40" : ok ? "bg-emerald-400" : "bg-amber-400"}`} />;
+  const dot = (ok: boolean | undefined) => <span className={`h-2 w-2 ${ok === undefined ?"bg-muted-foreground/40" : ok ?"bg-emerald-400" :"bg-amber-400"}`} />;
 
   return (
     <div className="flex items-center gap-2" data-testid="top-bar">
@@ -148,8 +148,8 @@ export function TopBar() {
         </div>
       )}
       <button type="button" onClick={() => setPalette(true)} aria-label="Search (Ctrl K)" title="Search (Ctrl K)"
-        className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
-        <Search className="h-4 w-4" /><span className="hidden 2xl:inline">Search</span><kbd className="hidden rounded border border-border px-1.5 text-[10px] 2xl:inline">Ctrl K</kbd>
+        className="inline-flex h-10 items-center gap-2 border border-border px-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
+        <Search className="h-4 w-4" /><span className="hidden 2xl:inline">Search</span><kbd className="hidden border border-border px-1.5 text-[10px] 2xl:inline">Ctrl K</kbd>
       </button>
       <Pop label="Jobs" icon={running.length ? <Loader2 className="h-4 w-4 animate-spin" /> : <ActivityIcon className="h-4 w-4" />} badge={running.length} tone="run" wide>
         <div className="border-b border-border px-4 py-3"><p className="text-sm font-semibold">Background jobs</p><p className="text-[11px] text-muted-foreground">Generations and renders keep running even if you close the page.</p></div>
@@ -173,7 +173,7 @@ export function TopBar() {
           <li className="flex items-center gap-2">{dot(c?.blender)}3D scenes (Blender)</li>
         </ul>
         {c?.hint && <p className="px-4 pb-2 text-[11px] leading-relaxed text-muted-foreground">{c.hint}</p>}
-        <div className="flex gap-2 border-t border-border px-4 py-3 text-xs"><Link href="/models" className="rounded-full border border-border px-3 py-1.5 hover:text-foreground">Models</Link><Link href="/settings" className="rounded-full border border-border px-3 py-1.5 hover:text-foreground">Settings</Link><Link href="/gpu" className="rounded-full border border-border px-3 py-1.5 hover:text-foreground">GPU</Link></div>
+        <div className="flex gap-2 border-t border-border px-4 py-3 text-xs"><Link href="/models" className="border border-border px-3 py-1.5 hover:text-foreground">Models</Link><Link href="/settings" className="border border-border px-3 py-1.5 hover:text-foreground">Settings</Link><Link href="/gpu" className="border border-border px-3 py-1.5 hover:text-foreground">GPU</Link></div>
       </Pop>
       {palette && <Palette items={[...a.jobs, ...a.recent]} onClose={() => setPalette(false)} />}
     </div>

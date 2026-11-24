@@ -327,3 +327,84 @@ def sheet(cid: str) -> bytes | None:
     """The user's full model sheet (all angles, expressions, poses) - handed to the video model as a reference."""
     f = DIR / cid / "sheet.jpg"
     return f.read_bytes() if f.exists() else None
+
+
+# ---------------------------------------------------------------- is this picture usable at all
+def _debar(im: Image.Image, limit: float = 0.34, dark: float = 26.0) -> Image.Image:
+    """Cuts black bands off the edges of a picture.
+
+    An edit model handed a letterboxed reference keeps the letterbox and hands it on, so one banded shot early in a
+    chain bands every shot after it. Cutting the band off the moment the picture arrives is what stops that spreading.
+
+    A band is found by how bright each edge row or column is on average, not by how flat it is: a band that has been
+    through a video encoder is full of ringing noise and is never flat, and an earlier version that insisted on
+    flatness cut nothing at all from nine real banded frames. Never more than `limit` of the picture comes off any one
+    side, and a picture that is dark all over is left alone -- that is a dull shot, not a band.
+    """
+    g = im.convert("L")
+    w, h = g.size
+    rows = [sum(g.crop((0, y, w, y + 1)).getdata()) / w for y in range(h)]
+    cols = [sum(g.crop((x, 0, x + 1, h)).getdata()) / h for x in range(w)]
+
+    def edges(v: list[float], n: int) -> tuple[int, int]:
+        cap = int(n * limit)
+        lo = 0
+        while lo < cap and v[lo] < dark:
+            lo += 1
+        hi = n - 1
+        while hi > n - 1 - cap and v[hi] < dark:
+            hi -= 1
+        return lo, hi
+
+    top, bot = edges(rows, h)
+    left, right = edges(cols, w)
+    if (top, left, bot, right) == (0, 0, h - 1, w - 1):
+        return im
+    if right - left < w * 0.3 or bot - top < h * 0.3:
+        return im
+    return im.crop((left, top, right + 1, bot + 1))
+
+
+def fill(raw: bytes, w: int, h: int) -> bytes:
+    """Black bands cut off, then scaled to COVER w x h and centre-cropped -- never padded.
+
+    A picture model handed 9:16 often answers in its own shape, and fitting that inside the frame leaves black bands at
+    the top and bottom. A measured run of eleven shots had a band on ten of them, between six and twenty per cent of
+    the frame, which no amount of "no black bars" in the prompt will fix, because by then it is not the model doing it:
+    shot two picked up a band and every later shot copied it from the one before. Cropping loses a strip of the edge;
+    padding loses the shot.
+    """
+    im = _debar(Image.open(io.BytesIO(raw)).convert("RGB"))
+    if im.size == (w, h):
+        return raw
+    im = ImageOps.fit(im, (w, h), Image.LANCZOS, centering=(0.5, 0.5))
+    b = io.BytesIO()
+    im.save(b, "PNG")
+    return b.getvalue()
+
+
+def _thumbprint(raw: bytes, n: int = 16) -> list[int]:
+    im = Image.open(io.BytesIO(raw)).convert("L").resize((n, n), Image.LANCZOS)
+    return list(im.getdata())
+
+
+def sameness(a: bytes, b: bytes) -> float:
+    """How alike two pictures are, 0 (nothing in common) to 1 (the same picture). Cheap: a 16x16 grey thumbprint."""
+    try:
+        pa, pb = _thumbprint(a), _thumbprint(b)
+    except Exception:  # noqa: BLE001 - a picture that will not open is not the same picture
+        return 0.0
+    return 1.0 - sum(abs(x - y) for x, y in zip(pa, pb)) / (len(pa) * 255.0)
+
+
+SAME_ENOUGH = 0.94       # below this two shots read as different; above it a viewer sees the same photograph twice
+
+
+def too_same(a: bytes, b: bytes) -> bool:
+    """True when the model has handed back the picture it was given instead of the next shot.
+
+    An edit model's safest answer is its own input, so a long chain of edits drifts toward no change at all. Measured on
+    a real eleven-shot run: shots that genuinely moved on scored 0.84 to 0.86, and the four that had collapsed into the
+    previous frame scored 0.95 to 0.98. The line sits between them.
+    """
+    return sameness(a, b) >= SAME_ENOUGH

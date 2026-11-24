@@ -130,6 +130,32 @@ def local_only(s: dict | None) -> bool:
 
 
 LOCAL_BACKENDS = ("gpu", "comfyui")
+FREE_BACKENDS = ("gpu", "comfyui", "cloudflare")      # nothing here bills you: your own GPU, or Cloudflare's free tier
+
+
+def tier(s: dict | None) -> str:
+    """What you said about cost: "free" (never a paid service), "paid" (use the paid models, no free stand-in) or "auto"."""
+    t = choice(s, "tier")[0]
+    return t if t in ("free", "paid") else "auto"
+
+
+def _free_place(s: dict | None, mid: str) -> str | None:
+    """Free tier: where this model can run without billing you; raises with the exact reason when nowhere."""
+    avail = models.available(mid)
+    for x in FREE_BACKENDS:
+        if x in avail and avail[x] is None:
+            return x
+    name = models.get(mid)["name"]
+    why = "; ".join(f"{x}: {v}" for x, v in avail.items() if x in FREE_BACKENDS and v) or "it has no free version"
+    raise models.ModelUnavailable(f"{name} can't run free right now ({why}). Cost is set to Free, so no paid service was tried. "
+                                  "Start the AVOS GPU worker, or set Cost to Automatic or Paid to allow fal.ai.")
+
+
+def fal_ok(mid: str) -> bool:
+    try:
+        return models.available(mid).get("fal", "no") is None
+    except Exception:  # noqa: BLE001
+        return False
 WAY_OUT = ("Two ways on: start the AVOS GPU worker on this PC and check Settings - GPU workers (from inside Docker the address is "
            "http://host.docker.internal:8700, and the worker has to listen on 0.0.0.0, not 127.0.0.1), or turn off \"This PC only\" in "
            "Settings so the free Cloudflare and Pollinations models can draw it. Nothing was sent anywhere.")
@@ -147,6 +173,15 @@ def where(s: dict | None, step: str, mid: str) -> str | None:
     a place you chose is down, or "this PC only" is on and no local worker has the model."""
     m, b = choice(s, step)
     b = b if m in (mid, "auto") else None
+    if tier(s) == "free" and not local_only(s) and not (b and m == mid):
+        try:
+            return _free_place(s, mid)
+        except models.ModelUnavailable:
+            raise
+        except Exception:  # noqa: BLE001 - unknown model: let the normal path say so
+            return b
+    if tier(s) == "paid" and not local_only(s) and not b and fal_ok(mid):
+        return "fal"
     if not local_only(s) and not (b and m == mid):
         return b
     try:
@@ -225,10 +260,18 @@ def refs_supported(s: dict | None) -> bool:
                 or (picked == "auto" and not local_only(s) and cloudflare_ready()))
 
 
-def ref_prompt(prompt: str, n: int) -> str:
-    """Tell a reference model what each attached picture is (image 0 = the character, then prop / set) before the shot."""
+def ref_prompt(prompt: str, n: int, roles: str = "") -> str:
+    """Tell a reference model what each attached picture is, before the shot.
+
+    `roles` lets a skill say what its own references are for. Without it the wording is the character wording the story
+    skills need - which is wrong, and quietly harmful, when the reference is a pan of food: telling a model to keep
+    "the same face, hair and outfit" of a chopping board is one of the ways a shot list turns into one photograph
+    repeated.
+    """
     if n <= 0:
         return prompt
+    if roles:
+        return roles + "New picture: " + prompt
     lead = ("Image 0 is the character reference: draw exactly this character, same face, hair, glasses, skin, outfit, colours and "
             "the same art style. ")
     if n > 1:
@@ -237,9 +280,25 @@ def ref_prompt(prompt: str, n: int) -> str:
 
 
 def picture(prompt: str, refs: list[bytes], w: int, h: int, seed: int, tag: str, priority: int = 5, s: dict | None = None,
-            negative: str | None = None) -> tuple[bytes, dict]:
+            negative: str | None = None, roles: str = "") -> tuple[bytes, dict]:
     """A picture from reference pictures when the edit model is ready (and you didn't pick a text-to-image model),
-    else from the text alone."""
+    else from the text alone. `roles` says what the attached pictures are for; see ref_prompt.
+
+    Every call is written to the usage ledger on the way out, which is where the Analytics tab gets its numbers. The
+    meter is here rather than at each skill so one line covers every studio, and it can never fail a render.
+    """
+    data, info = _picture(prompt, refs, w, h, seed, tag, priority, s, negative, roles)
+    try:
+        from ..usage import record
+        run = str(tag or "").split("-")[0]
+        record("image", str(info.get("model") or "unknown"), 1, run=run, note=str(info.get("note") or "")[:120])
+    except Exception:  # noqa: BLE001 - metering never breaks a picture
+        pass
+    return data, info
+
+
+def _picture(prompt: str, refs: list[bytes], w: int, h: int, seed: int, tag: str, priority: int = 5, s: dict | None = None,
+             negative: str | None = None, roles: str = "") -> tuple[bytes, dict]:
     picked, _ = choice(s, "pictures")
     if refs and models.uses_references(picked) and _ready(picked):       # a reference-editing model you added in Settings
         try:
@@ -260,7 +319,7 @@ def picture(prompt: str, refs: list[bytes], w: int, h: int, seed: int, tag: str,
     if refs and picked == "auto" and not local_only(s):         # free: Cloudflare FLUX.2 [klein] draws FROM the portrait, prop and set
         from ..render.images import cloudflare_flux2, cloudflare_ready
         if cloudflare_ready():
-            img = cloudflare_flux2(ref_prompt(prompt, len(refs[:4])), w, h, seed, refs[:4])
+            img = cloudflare_flux2(ref_prompt(prompt, len(refs[:4]), roles), w, h, seed, refs[:4])
             if img:
                 return img, {"model": "Cloudflare FLUX.2 klein (from references)", "fallback": False}
     # nothing to draw from yet (a first character sheet without style pictures): the best text-to-image model is right

@@ -22,7 +22,7 @@ export function HexMesh({ className = "" }: { className?: string }) {
     let w = 0, h = 0, raf = 0, last = 0, visible = true, scrolling = 0;
     const t0 = performance.now();
     const hx = Math.sqrt(3) * R, vy = 1.5 * R;
-    const stops = [[70, 210, 255], [150, 95, 255], [235, 70, 245]];               // cyan, violet, magenta
+    const stops = [[54, 224, 200], [200, 255, 58], [245, 255, 214]];               // teal, lime, pale
     const colours = Array.from({ length: HUES }, (_, i) => {
       const k = (i / (HUES - 1)) * 2, j = Math.min(1, Math.floor(k)), f = k - j;
       return stops[j].map((c, n) => Math.round(c + (stops[j + 1][n] - c) * f));

@@ -13,7 +13,7 @@ import type { BdShot, Breakdown, SeriesSnapshot } from "@/components/series/type
 
 const ANGLES = ["eye level", "low angle", "high angle", "overhead"];
 const EMOTIONS = ["neutral", "happy", "excited", "angry", "sad", "scared", "surprised", "sarcastic", "worried", "shout", "whisper", "laugh"];
-const small = "rounded-lg border border-border bg-background px-2 py-1 text-xs text-foreground";
+const small = "border border-border bg-background px-2 py-1 text-xs text-foreground";
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
 export const eventsText = (s: BdShot) => s.events.map((e) => `${e.t.toFixed(1)} ${e.who ? `${e.who}: ` : ""}${e.action}`).join("\n");
@@ -64,12 +64,12 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
   const names = useMemo(() => (bd?.characters ?? []).map((c) => c.name), [bd]);
 
   if (!src || src.status === "analyzing") return (
-    <p className="flex items-center gap-2 rounded-xl border border-border p-4 text-sm text-muted-foreground" data-testid="breakdown-working">
+    <p className="flex items-center gap-2 border border-border p-4 text-sm text-muted-foreground" data-testid="breakdown-working">
       <Loader2 className="h-4 w-4 animate-spin text-amber-500" />Reading your prompt: story, characters, world, timed shots, camera, sound…
     </p>
   );
   if (src.status === "error" || !bd) return (
-    <div className="space-y-2 rounded-xl border border-red-500/40 bg-red-500/5 p-4">
+    <div className="space-y-2 border border-red-500/40 bg-red-500/5 p-4">
       <p className="text-sm text-red-700 dark:text-red-300">{src.error || "The prompt couldn't be read."}</p>
       <textarea className={`${field} min-h-32 font-mono text-xs`} value={prompt} onChange={(e) => setPrompt(e.target.value)} />
       <Button size="sm" onClick={() => act("reanalyze", () => seriesApi.redoBreakdown(sid, note, prompt))}><RefreshCw />Read it again</Button>
@@ -90,13 +90,13 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
           [d.shots > 0, `${d.shots} timed shots · ${d.seconds}s`], [d.camera > 0, `${d.camera} camera directions`], [d.dialogue > 0, `${d.dialogue} lines`],
           [d.sounds > 0, `${d.sounds} sounds`], [d.music, "music"], [d.rules > 0, `${d.rules} continuity rules`],
         ].map(([ok, label]) => (
-          <span key={String(label)} className={`rounded-md px-2 py-0.5 text-[11px] ${ok ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-muted text-muted-foreground"}`}>{ok ? "✓" : "–"} {label}</span>
+          <span key={String(label)} className={`px-2 py-0.5 text-[11px] ${ok ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-muted text-muted-foreground"}`}>{ok ? "✓" : "–"} {label}</span>
         ))}
         <span className="grow" />
         {approved && <Button size="sm" variant="ghost" onClick={() => setOpen(!open)} data-testid="breakdown-toggle">{open ? "Hide" : "Show / edit"} the breakdown</Button>}
       </div>
 
-      <div className="flex h-8 overflow-hidden rounded-lg border border-border" data-testid="breakdown-bar" title="The film's shots in time">
+      <div className="flex h-8 overflow-hidden border border-border" data-testid="breakdown-bar" title="The film's shots in time">
         {bd.shots.map((x, i) => (
           <div key={x.id} className={`flex items-center overflow-hidden whitespace-nowrap border-r border-black/30 px-1 text-[10px] ${i % 2 ? "bg-amber-500/60" : "bg-amber-500/35"}`} style={{ width: `${(100 * (x.end - x.start)) / total}%` }}
             title={`${x.start}–${x.end}s · ${x.title}`}>{String(i + 1).padStart(2, "0")} {x.title}</div>
@@ -109,7 +109,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
             <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-amber-500" />Characters: their identity is locked from this</h3>
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {bd.characters.map((c, i) => (
-                <div key={i} className="space-y-1.5 rounded-xl border border-border bg-card/40 p-3" data-testid={`bd-char-${i}`}>
+                <div key={i} className="space-y-1.5 border border-border bg-card/40 p-3" data-testid={`bd-char-${i}`}>
                   <div className="flex gap-2">
                     <input className={`${field} font-semibold`} value={c.name} onChange={(e) => set({ ...bd, characters: bd.characters.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)) })} />
                     <button className="px-1 text-muted-foreground hover:text-red-500" title="Remove" onClick={() => set({ ...bd, characters: bd.characters.filter((_, k) => k !== i) })}><Trash2 className="h-4 w-4" /></button>
@@ -126,7 +126,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
                   )}
                 </div>
               ))}
-              <button className="rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground hover:border-amber-500"
+              <button className="border border-dashed border-border p-3 text-sm text-muted-foreground hover:border-amber-500"
                 onClick={() => set({ ...bd, characters: [...bd.characters, { name: `Character ${bd.characters.length + 1}`, look: "", outfit: "", props: "", personality: "", voice: "", gender: "other", age: "", actions: [] }] })}>
                 <Plus className="mr-1 inline h-4 w-4" />Add a character
               </button>
@@ -151,10 +151,10 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
             <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground"><Clock className="h-4 w-4 text-amber-500" />Shots ({bd.shots.length} · {total.toFixed(1)}s)</h3>
             <div className="space-y-2" data-testid="bd-shots">
               {bd.shots.map((x, i) => (
-                <div key={x.id + i} className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-card/30 p-3 lg:grid-cols-[11rem_1fr_1fr]" data-testid={`bd-shot-${i}`}>
+                <div key={x.id + i} className="grid grid-cols-1 gap-2 border border-border bg-card/30 p-3 lg:grid-cols-[11rem_1fr_1fr]" data-testid={`bd-shot-${i}`}>
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1">
-                      <b className="rounded bg-amber-500 px-1.5 text-xs text-black">{String(i + 1).padStart(2, "0")}</b>
+                      <b className="bg-amber-500 px-1.5 text-xs text-black">{String(i + 1).padStart(2, "0")}</b>
                       <span className="text-xs text-muted-foreground">{x.start.toFixed(1)}–{x.end.toFixed(1)}s</span>
                       <span className="grow" />
                       <button className="text-muted-foreground hover:text-red-500" title="Remove the shot" onClick={() => set({ ...bd, shots: bd.shots.filter((_, k) => k !== i) })}><Trash2 className="h-3.5 w-3.5" /></button>
@@ -178,7 +178,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
                     <textarea className={`${field} min-h-9 text-xs`} value={x.picture} placeholder="The first frame (what the storyboard frame shows)" onChange={(e) => shot(i, { picture: e.target.value })} />
                     <div className="flex flex-wrap gap-1">
                       {names.map((n) => (
-                        <button key={n} className={`rounded-md px-2 py-0.5 text-[11px] ${x.characters.includes(n) ? "bg-amber-500 text-black" : "bg-muted text-muted-foreground"}`}
+                        <button key={n} className={`px-2 py-0.5 text-[11px] ${x.characters.includes(n) ? "bg-amber-500 text-black" : "bg-muted text-muted-foreground"}`}
                           onClick={() => shot(i, { characters: x.characters.includes(n) ? x.characters.filter((c) => c !== n) : [...x.characters, n] })}>{n}</button>
                       ))}
                     </div>
@@ -198,7 +198,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
                   </div>
                 </div>
               ))}
-              <button className="w-full rounded-xl border border-dashed border-border p-2 text-sm text-muted-foreground hover:border-amber-500" data-testid="bd-add-shot"
+              <button className="w-full border border-dashed border-border p-2 text-sm text-muted-foreground hover:border-amber-500" data-testid="bd-add-shot"
                 onClick={() => { const last = bd.shots[bd.shots.length - 1]; const st = last ? last.end : 0;
                   set({ ...bd, shots: [...bd.shots, { id: `sh${bd.shots.length + 1}`, start: st, end: st + 2, title: `Shot ${bd.shots.length + 1}`, location: bd.locations[0]?.name ?? "", framing: "medium", angle: "eye level", camera: "static", characters: [], picture: "", action: "", events: [], dialogue: [], sfx: [], transition: "cut" }] }); }}>
                 <Plus className="mr-1 inline h-4 w-4" />Add a shot
@@ -233,7 +233,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
         <Button size="sm" variant="ghost" onClick={() => setShowPrompt(!showPrompt)}><Wand2 />Prompt</Button>
       </div>
       {showPrompt && (
-        <div className="space-y-2 rounded-xl border border-border p-3">
+        <div className="space-y-2 border border-border p-3">
           <textarea className={`${field} min-h-40 font-mono text-xs`} value={prompt} onChange={(e) => setPrompt(e.target.value)} data-testid="bd-prompt" />
           <input className={field} value={note} onChange={(e) => setNote(e.target.value)} placeholder="A note for the analyst: e.g. split shot 5 into a wide and a close-up" data-testid="bd-note" />
           <Button size="sm" variant="outline" disabled={snap.busy} onClick={() => { void act("reanalyze", () => seriesApi.redoBreakdown(sid, note, prompt !== s.prompt ? prompt : undefined)); setNote(""); }} data-testid="bd-reanalyze">

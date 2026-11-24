@@ -39,3 +39,25 @@ def reference_video() -> Path:
                         "-filter_complex", "[2:v]trim=duration=3[m];[0:v][1:v][m]concat=n=3:v=1:a=0[v]",
                         "-map", "[v]", "-map", "3:a", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-shortest", str(out)], check=True)
     return out
+
+
+@pytest.fixture(autouse=True)
+def _no_web_research(monkeypatch):
+    """The packaging team's web searches never run in tests (test_research.py fakes them itself)."""
+    try:
+        from studio.autoclip import research
+    except Exception:  # noqa: BLE001
+        return
+    monkeypatch.setattr(research, "_api_search", lambda q, n: None)
+    monkeypatch.setattr(research, "_ytdlp_search", lambda q, n: [])
+    monkeypatch.setattr(research, "_details", lambda ids: {})
+
+
+@pytest.fixture(autouse=True)
+def _no_web_comments(monkeypatch):
+    """Comment downloads never run in tests."""
+    try:
+        from studio.autoclip import signals
+    except Exception:  # noqa: BLE001
+        return
+    monkeypatch.setattr(signals, "comments", lambda url, dest, cancel=None, limit=400: [])

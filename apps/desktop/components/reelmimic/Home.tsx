@@ -10,6 +10,8 @@ import { api, agentLabel, findAgent } from "./api";
 import { getLang, onLang, say, translate } from "./i18n";
 import { I, Seg, AutoText, ago, RoundsEditor, useNow, useOutside } from "./ui";
 import type { IconName, RoundValues } from "./ui";
+import { ListChecks, Palette, ShieldCheck } from "lucide-react";
+import { Lit, PageHero } from "@/components/brand/PageHero";
 import { Status } from "./Project";
 import { AGENTS_KEY, useAgentsInfo, useCrew } from "./Shell";
 import { OpenModelsSettings } from "./OpenModels";
@@ -36,19 +38,18 @@ export function Home() {
   const stats: [IconName, string, number, string][] = [
     ["film", say("全部專案", "Total projects"), items.length, "from-amber-500 to-orange-500"],
     ["spark", say("製作中", "In progress"), working, "from-blue-500 to-cyan-500"],
-    ["bubble", say("等你回覆", "Waiting for you"), waiting, "from-purple-500 to-pink-500"],
+    ["bubble", say("等你回覆", "Waiting for you"), waiting, "from-lime-700 to-amber-500"],
     ["check", say("已完成", "Completed"), done, "from-emerald-500 to-green-600"],
   ];
   return (
     <main className="mx-auto max-w-7xl space-y-8 p-4 md:p-8" data-testid="animations-home">
-      <div>
-        <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">{say("動畫", "Animations")}</h1>
-        <p className="text-muted-foreground">{say("丟一支喜歡的影片，做出同樣風格的新動畫：拆解風格、企劃、你核准後才製作，每一段都檢查過才交件。",
-          "Give it a video you love and get a new animation in the same style: it studies the style, plans with you, renders only after you approve, and checks every part before delivering.")}</p>
-      </div>
+      <PageHero eyebrow={say("動畫", "Animations")} title={<>{say("借用風格，", "Steal the style. ")}<Lit>{say("做出你的故事。", "Make it yours.")}</Lit></>}
+        blurb={say("丟一支喜歡的影片，做出同樣風格的新動畫：拆解風格、企劃、你核准後才製作，每一段都檢查過才交件。",
+          "Give it a video you love and get a new animation in the same style: it studies the style, plans with you, renders only after you approve, and checks every part before delivering.")}
+        steps={[{ icon: Palette, t: say("拆解風格", "Study the style"), d: say("看懂參考影片", "Learns the look of your reference.") }, { icon: ListChecks, t: say("企劃並核准", "Plan and approve"), d: say("你核准後才製作", "Nothing renders until you say so.") }, { icon: ShieldCheck, t: say("製作並檢查", "Render and check"), d: say("每一段都檢查", "Every part is checked before delivery.") }]} />
 
       <Link href="/animations/films" className="flex flex-wrap items-center gap-4 rounded-xl border border-amber-500/50 bg-accent p-4 transition hover:border-amber-500 md:p-5" data-testid="films-link">
-        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary hover:bg-[#8873be] text-white"><I n="film" s={2} /></span>
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary hover:bg-[#dcff7a] text-white"><I n="film" s={2} /></span>
         <span className="min-w-0 flex-1">
           <b className="block text-foreground">{say("短片：提示詞 → 動畫（推薦）", "Films: prompt → animation (recommended)")}</b>
           <span className="text-sm text-muted-foreground">{say("貼上提示詞（可含時間碼或 JSON）：拆解、鎖定角色與世界、分鏡你核准後才逐格動畫，再配音效與音樂，最後輸出所有專案檔。",
@@ -58,7 +59,7 @@ export function Home() {
       </Link>
 
       <Link href="/animations/series" className="flex flex-wrap items-center gap-4 rounded-xl border border-amber-500/40 bg-accent p-4 transition hover:border-amber-500 md:p-5" data-testid="series-link">
-        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary hover:bg-[#8873be] text-white"><I n="layers" s={2} /></span>
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary hover:bg-[#dcff7a] text-white"><I n="layers" s={2} /></span>
         <span className="min-w-0 flex-1">
           <b className="block text-foreground">{say("系列動畫", "Series")}</b>
           <span className="text-sm text-muted-foreground">{say("你核准每個角色（外型和聲音），劇集分段製作：先 1 分鐘，再每段 3 分鐘，每段你看過核准才繼續。",

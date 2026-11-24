@@ -15,10 +15,10 @@ function Row({ s, onList }: { s: Skill; onList: (l: Skill[], msg?: string) => vo
   const improve = useMutation({ mutationFn: () => explainer.improveSkill(s.id), onSuccess: (r) => { setMsg(r.message ?? ""); onList(r.skills); }, onError: (e) => setMsg((e as Error).message) });
   const runs = s.ok + s.fail;
   return (
-    <article className={`rounded-xl border border-border bg-card/50 p-4 md:p-5 ${s.on ? "" : "opacity-60"}`} data-testid={`skill-${s.id}`}>
+    <article className={`border border-border bg-card/50 p-4 md:p-5 ${s.on ? "" : "opacity-60"}`} data-testid={`skill-${s.id}`}>
       <header className="flex flex-wrap items-center gap-2">
         <h2 className="text-base font-semibold">{s.name}</h2>
-        <span className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">{STAGE[s.stage]}</span>
+        <span className="border border-border px-2 py-0.5 text-xs text-muted-foreground">{STAGE[s.stage]}</span>
         <span className={`ml-auto inline-flex items-center gap-1 text-xs ${s.ready ? "text-emerald-600" : "text-muted-foreground"}`}>
           {s.ready ? <CheckCircle2 className="h-3.5 w-3.5" /> : <TriangleAlert className="h-3.5 w-3.5" />}{s.ready_note}</span>
       </header>
@@ -31,11 +31,11 @@ function Row({ s, onList }: { s: Skill; onList: (l: Skill[], msg?: string) => vo
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {s.optional && (
-          <button type="button" disabled={toggle.isPending} onClick={() => toggle.mutate()} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-accent" aria-pressed={s.on}>
+          <button type="button" disabled={toggle.isPending} onClick={() => toggle.mutate()} className="border border-border px-3 py-1.5 text-sm hover:bg-accent" aria-pressed={s.on}>
             {s.on ? "Switch off" : "Switch on"}</button>
         )}
         {s.prompts.length > 0 && (
-          <button type="button" disabled={improve.isPending} onClick={() => improve.mutate()} className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-accent">
+          <button type="button" disabled={improve.isPending} onClick={() => improve.mutate()} className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-sm hover:bg-accent">
             {improve.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}Improve now</button>
         )}
       </div>
@@ -54,8 +54,8 @@ export default function SkillsPage() {
         <Link href="/explainer" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />Explainer Studio</Link>
         <h1 className="text-2xl">One skill for every part of the line</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">Autopilot runs these in order. Your approvals and redos, the picture checks and your ratings teach each skill&apos;s prompts, so the next video starts stronger. Switch off any optional skill you don&apos;t want.</p>
-        {q.isLoading && <div className="h-40 animate-pulse rounded-xl bg-muted" />}
-        {q.isError && <p className="rounded-xl border border-red-500/40 p-3 text-sm" role="alert">{(q.error as Error).message}</p>}
+        {q.isLoading && <div className="h-40 animate-pulse bg-muted" />}
+        {q.isError && <p className="border border-red-500/40 p-3 text-sm" role="alert">{(q.error as Error).message}</p>}
         {q.data?.skills.map((s) => <Row key={s.id} s={s} onList={put} />)}
       </div>
     </AppShell>

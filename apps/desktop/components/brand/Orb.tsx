@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 const LAT = 4, LON = 7, GAP = 0.10, STEPS = 6, TILT = -0.42;
 const SKIP = new Set([2, 9, 17, 24]);
-const HUES = ["#8f7bff", "#ff8fd2", "#7fe3ff", "#b9acff", "#5b3df5", "#ffd1f0"];
+const HUES = ["#c8ff3a", "#7dffb0", "#36e0c8", "#f4ffd6", "#3d9a14", "#e8ffa8"];
 
 type Tile = { d: string; z: number; key: number; hue: string; front: boolean };
 
@@ -74,12 +74,12 @@ export function Orb({ size = 220, className = "" }: { size?: number; className?:
             <linearGradient key={h} id={`orb-g${i}`} x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
               <stop offset="0.45" stopColor={h} />
-              <stop offset="1" stopColor="#2a1f8a" />
+              <stop offset="1" stopColor="#1f3a0b" />
             </linearGradient>
           ))}
           <radialGradient id="orb-core" cx="0.42" cy="0.38" r="0.7">
-            <stop offset="0" stopColor="#3a2bb0" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#05030f" stopOpacity="0.9" />
+            <stop offset="0" stopColor="#2f4a12" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#06100a" stopOpacity="0.9" />
           </radialGradient>
           <radialGradient id="orb-spec" cx="0.32" cy="0.26" r="0.45">
             <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
@@ -91,7 +91,7 @@ export function Orb({ size = 220, className = "" }: { size?: number; className?:
           <path key={t.key} d={t.d}
             fill={t.front ? `url(#orb-g${HUES.indexOf(t.hue)})` : t.hue}
             fillOpacity={t.front ? 0.35 + t.z * 0.6 : 0.10}
-            stroke={t.front ? "rgba(255,255,255,0.85)" : "rgba(200,190,255,0.25)"}
+            stroke={t.front ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.25)"}
             strokeWidth={t.front ? 0.6 + t.z * 0.9 : 0.4}
             strokeLinejoin="round" />
         ))}

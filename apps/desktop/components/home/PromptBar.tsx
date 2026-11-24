@@ -43,10 +43,10 @@ export function PromptBar() {
       <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="What to make">
         {KINDS.map(([k, l]) => (
           <button key={k} type="button" role="tab" aria-selected={kind === k} onClick={() => setKind(k)} data-testid={`make-${k}`}
-            className={`rounded-full px-4 py-1.5 text-sm transition-colors ${kind === k ? "bg-[rgba(124,92,255,0.22)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+            className={`rounded-full px-4 py-1.5 text-sm transition-colors ${kind === k ? "bg-[rgba(200,255,58,0.22)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
         ))}
       </div>
-      <form className="prompt-box mt-3 rounded-[1.75rem] border border-[rgba(170,150,255,0.22)] bg-[rgba(8,6,22,0.94)] p-3"
+      <form className="prompt-box mt-3 rounded-[1.75rem] border border-[rgba(200,255,58,0.22)] bg-[rgba(8,6,22,0.94)] p-3"
         onSubmit={(e) => { e.preventDefault(); if (ready && !go.isPending) go.mutate(); }}>
         <label htmlFor="home-idea" className="sr-only">Your idea</label>
         <textarea id="home-idea" value={text} onChange={(e) => setText(e.target.value)} rows={3} placeholder={placeholder} data-testid="home-idea"
@@ -69,10 +69,10 @@ export function PromptBar() {
                 <option value="16:9">Wide 16:9</option>
                 <option value="1:1">Square 1:1</option>
               </select>
-              <div className="inline-flex h-9 items-center rounded-full border border-[rgba(150,130,255,0.3)] p-0.5 text-sm" role="radiogroup" aria-label="How it runs">
+              <div className="inline-flex h-9 items-center rounded-full border border-[rgba(200,255,58,0.3)] p-0.5 text-sm" role="radiogroup" aria-label="How it runs">
                 {([[false, "Ask me"], [true, "Automatic"]] as const).map(([v, l]) => (
                   <button key={l} type="button" role="radio" aria-checked={auto === v} onClick={() => setAuto(v)} data-testid={`home-auto-${v ? "on" : "off"}`}
-                    className={`h-8 rounded-full px-3 transition-colors ${auto === v ? "bg-[rgba(124,92,255,0.28)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+                    className={`h-8 rounded-full px-3 transition-colors ${auto === v ? "bg-[rgba(200,255,58,0.28)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
                 ))}
               </div>
             </>

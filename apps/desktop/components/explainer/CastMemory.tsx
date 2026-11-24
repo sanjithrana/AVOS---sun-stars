@@ -19,7 +19,7 @@ export function CastMemory() {
       </div>
       <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6">
         {cast.map((m) => (
-          <li key={m.id} className="group overflow-hidden rounded-2xl border border-border bg-card">
+          <li key={m.id} className="group overflow-hidden border border-border bg-card">
             <div className="aspect-[3/4] bg-muted">
               {m.portrait && /* eslint-disable-next-line @next/next/no-img-element */ <img src={explainer.memoryFile(m.id, m.portrait, m.updated)} alt={`${m.name} portrait`} className="h-full w-full object-cover" />}
             </div>
@@ -29,7 +29,7 @@ export function CastMemory() {
               <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>{m.projects.length} {m.projects.length === 1 ? "video" : "videos"}{m.approved ? "" : " · not approved yet"}</span>
                 <button type="button" onClick={() => { if (window.confirm(`Forget ${m.name}? The next video draws a new character.`)) forget.mutate(m.id); }}
-                  className="rounded-full p-1.5 hover:bg-secondary" aria-label={`Forget ${m.name}`}><Trash2 className="h-3.5 w-3.5" /></button>
+                  className="p-1.5 hover:bg-secondary" aria-label={`Forget ${m.name}`}><Trash2 className="h-3.5 w-3.5" /></button>
               </div>
             </div>
           </li>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, Clapperboard, Cpu, Home, Landmark, Settings2, Sparkles, Wand2 } from "lucide-react";
+import { Boxes, Clapperboard, Cpu, Home, Landmark, Library, PieChart, Scissors, Settings2, Sparkles, Wand2, Send, Plug } from "lucide-react";
 import type { ReactNode } from "react";
 import { Mark } from "@/components/layout/Mark";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -40,11 +40,39 @@ const NAV = [
     match: (p: string) => p.startsWith("/animations"),
   },
   {
+    href: "/autoclip",
+    label: "Auto Clip",
+    hint: "Long video to Shorts",
+    icon: Scissors,
+    match: (p: string) => p.startsWith("/autoclip"),
+  },
+  {
+    href: "/youtube",
+    label: "YouTube",
+    hint: "Post, schedule, monitor",
+    icon: Send,
+    match: (p: string) => p.startsWith("/youtube"),
+  },
+  {
+    href: "/connections",
+    label: "Connections",
+    hint: "YouTube, Instagram, TikTok",
+    icon: Plug,
+    match: (p: string) => p.startsWith("/connections"),
+  },
+  {
     href: "/skills",
     label: "Skills",
     hint: "One-subject skills, e.g. toys",
     icon: Wand2,
     match: (p: string) => p.startsWith("/skills"),
+  },
+  {
+    href: "/library",
+    label: "Library",
+    hint: "Everything you have made",
+    icon: Library,
+    match: (p: string) => p.startsWith("/library"),
   },
   {
     href: "/models",
@@ -59,6 +87,13 @@ const NAV = [
     hint: "Workers, router, runs",
     icon: Cpu,
     match: (p: string) => p.startsWith("/gpu"),
+  },
+  {
+    href: "/analytics",
+    label: "Analytics",
+    hint: "Models, usage, cost",
+    icon: PieChart,
+    match: (p: string) => p.startsWith("/analytics"),
   },
   {
     href: "/settings",
@@ -76,7 +111,7 @@ interface AppShellProps {
 
 const ring = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
-/** Sidebar + header frame shared by every page: frosted glass over the indigo scene, the current page lit in violet. */
+/** Sidebar + header frame shared by every page: olive board, the current page lit in yellow. */
 export function AppShell({ children, header }: AppShellProps) {
   const pathname = usePathname();
 
@@ -98,13 +133,9 @@ export function AppShell({ children, header }: AppShellProps) {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-[46px] items-center gap-3 rounded-2xl px-3.5 py-2 text-[13px] font-medium transition-all ${ring} ${
-                  active
-                    ? "border border-[rgba(150,130,255,0.35)] bg-[rgba(124,92,255,0.10)] text-foreground"
-                    : "border border-transparent text-muted-foreground hover:bg-[rgba(124,92,255,0.10)] hover:text-foreground hover:shadow-[0_0_22px_-2px_rgba(124,92,255,0.9)] hover:border-[rgba(185,172,255,0.4)]"
-                }`}
+                className={`flex min-h-[46px] items-center gap-3 px-3.5 py-2 text-[13px] font-medium transition-all ${ring} ${ active ?"border border-[rgba(200,255,58,0.35)] bg-[rgba(200,255,58,0.10)] text-foreground" :"border border-transparent text-muted-foreground hover:bg-[rgba(200,255,58,0.10)] hover:text-foreground hover:shadow-[0_0_22px_-2px_rgba(200,255,58,0.9)] hover:border-[rgba(200,255,58,0.4)]" }`}
               >
-                <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-[var(--signal)]" : ""}`} strokeWidth={1.5} />
+                <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ?"text-[var(--signal)]" :""}`} strokeWidth={1.5} />
                 <span className="flex flex-col leading-tight">
                   {item.label}
                   <span className="text-[11px] font-normal text-muted-foreground">{item.hint}</span>
@@ -123,9 +154,7 @@ export function AppShell({ children, header }: AppShellProps) {
               key={item.href}
               href={item.href}
               aria-current={item.match(pathname) ? "page" : undefined}
-              className={`flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm ${ring} ${
-                item.match(pathname) ? "bg-[rgba(109,76,255,0.22)] text-foreground" : "text-muted-foreground"
-              }`}
+              className={`flex shrink-0 items-center gap-2 px-3.5 py-2 text-sm ${ring} ${ item.match(pathname) ?"bg-[rgba(109,76,255,0.22)] text-foreground" :"text-muted-foreground" }`}
             >
               <item.icon className="h-4 w-4" strokeWidth={1.5} />
               {item.label}

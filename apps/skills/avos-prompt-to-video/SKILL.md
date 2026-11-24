@@ -73,8 +73,24 @@ A reference is worth more than a paragraph of description. When the step can pas
 
 The picture is **frame one**. The clip prompt's whole job is to say what changes from it - nothing else.
 
-**Open by naming the still.** *"Animate this exact photograph as a 5-second shot. Keep the frame, the lighting and every object
-exactly as they are."* Without that line the model redraws the scene and the cut jumps.
+**Open by naming the still.** *"Animate this exact picture as the next moment of the same film. Keep the frame, the lighting and
+every object exactly as they are."* Without that line the model redraws the scene and the cut jumps.
+
+**Write it as labelled lines, not a paragraph.** A video model reads a clip prompt as a spec sheet. One line each:
+
+```
+Animate this exact picture as the next moment of the same film. Style: <the look block, trimmed>
+Action:      one thing happens - <the single movement>. Nothing else moves on its own.
+Camera:      <size>, locked off or an extremely slow push. No handheld, no shake, no whip pan, no orbit, no speed ramp.
+Motion:      <how this look moves>
+Physics:     gravity and inertia respected, mass has real weight, contact shadows stay put, nothing floats.
+Continuity:  the look, the palette, the light and everything already in frame stay exactly as they are.
+             No new objects, no new characters, no identity drift, no cuts.
+Audio:       <what is heard>. No voice-over, no narration, no subtitles.
+```
+
+This is what `film_style.motion_prompt()` emits. A paragraph saying the same things scores worse, because a line the model can
+find is a line it can obey.
 
 **One action per clip.** Stacked actions multiply drift. One thing happens; everything else holds.
 
@@ -84,8 +100,13 @@ transitions, no morphing, no object replacement."
 **Say the physics.** What the material actually does: paper bends and settles, liquid falls and splashes, steam rises, cloth
 flutters, metal locks with weight. This is what separates a moving photograph from a shot.
 
-**Length.** Ask for 4 to 15 seconds; a video model is given a whole number of seconds in that range and anything outside it is
-clamped. Pace it: *"the action lands in the first third, the rest settles."*
+**Length and shape are not prompt text.** This is the most common way to waste a prompt. The duration and the aspect ratio are
+**parameters**, passed to the model beside the prompt — `video.clip(prompt, [img], None, seconds, aspect)`. Writing "5 seconds"
+or "9:16" or "4K" into the words sets nothing at all, and every character of it is taken out of the budget the craft lines
+need. Set them on the call; keep them out of the sentence.
+
+What you *can* say about time is pacing, because that is direction rather than configuration:
+*"the action lands in the first third, the rest settles."*
 
 **Sound.** If the model makes its own audio, name the sound as the sound - *"loud oil sizzle tsssss"*, *"a dry paper tap"* - and
 say what must not be there: *"no music, no voice, no narration."* If it does not, the clip is silent and the sound is added later.
@@ -129,10 +150,26 @@ A look block names: the medium and finish, how objects are built, the lighting, 
 > A handcrafted paper-cut diorama: every object cut from layered cardstock with exposed edges, real paper thickness and deep
 > shadows between the layers, soft museum lighting from the top left, warm earth tones. NOT photographic, NOT 3D, NOT a painting.
 
+## The limits, measured
+
+Every one of these was found by a run failing, not by reading a spec sheet. They decide how a prompt has to be built.
+
+| Limit | What it means for the prompt |
+|---|---|
+| Pollinations cuts a picture prompt at **900 characters** | The look leads, but the shot is reserved first. Give the look the whole budget and the subject gets trimmed off the end — every shot of a film then comes out identical with nothing in it. |
+| FLUX is about **256 tokens** | Say it once. A restated rule is a rule paid for twice. |
+| Seedance clamps duration to **4-15 seconds** | Ask inside the range, as a parameter. |
+| Seedance takes **`images[:9]`** | The tenth reference is dropped silently. |
+| FLUX.2 klein takes **4 references, each under 512x512** | Beyond that, make one sheet and reference the sheet. |
+| A video reference file must be **under 8 MB** | |
+| A negative list is a separate field | Anything in both the prompt and `negative=` is paid for twice. Keep the prompt's "never" line to one short sentence. |
+
 ## Before you send a prompt
 
 1. Does it stand alone, with no reference to an earlier prompt?
 2. Is the look block the first thing in it, word for word?
+3. Is the subject still in it after the 900-character trim?
+4. Have you kept the aspect ratio, the resolution and the duration out of the words?
 3. One hero subject, one action?
 4. Under ~1,200 characters, with the hard rules in the tail?
 5. Is there a negative prompt?

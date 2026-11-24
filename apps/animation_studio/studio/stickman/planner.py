@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from .. import house
 from ..series import languages, writers
 from . import spec, styles
 
@@ -65,8 +66,11 @@ EXAMPLES = [
 WHY = "The Great Stink has a clear problem, a ticking clock, a turning point and a lasting result, and every beat is easy to draw."
 
 
-def _ask(s: dict, stage: str, system: str, prompt: str, log: Callable[[dict], None] | None, max_tokens: int, temperature: float = 0.6) -> Any:
-    data = writers.ask(s, "story", writers.system("avos-stickman-director", RULES) + "\n\n" + system, prompt, log, max_tokens=max_tokens, temperature=temperature)
+def _ask(s: dict, stage: str, system: str, prompt: str, log: Callable[[dict], None] | None, max_tokens: int, temperature: float = 0.6,
+         directed: bool = False) -> Any:
+    # the house rules (studio/house.py) go only to the stages that plan pictures: the story and each clip
+    head = (writers.directed if directed else writers.system)("avos-stickman-director", RULES)
+    data = writers.ask(s, "story", head + "\n\n" + system, prompt, log, max_tokens=max_tokens, temperature=temperature)
     if data is None:
         raise writers.WriterError(f"Stickman Studio needs an AI writer for the {stage} (pick Groq or another AI crew); the built-in crew can't write history responsibly.")
     return data
@@ -100,7 +104,12 @@ def story(s: dict, p: dict, log: Callable[[dict], None] | None = None, note: str
     prompt = (src + f"Event: {t['title']} ({t['date_place']}). Tone: {t['tone']}. Language: {languages.get(p['language']).name}.\nFacts to rely on: {facts}\n"
               f"Cause: {b['cause']} Turning point: {b['turning_point']} Outcome: {b['outcome']}\n" + (f"Change: {note}\n" if note else "") + "Write the clips.")
     system = STORY.format(n=n, lo=spec.NARRATION_WORDS[0], hi=spec.NARRATION_WORDS[1], arc=styles.ARC[styles.get(p.get("style"))["arc"]])
-    return spec.norm_story(_ask(s, "story", system, prompt, log, 2800, 0.7), n)
+    out = spec.norm_story(_ask(s, "story", system, prompt, log, 2800, 0.7, directed=True), n)
+    found = house.review([house.card(c["n"], c["purpose"], c["main_action"]) for c in out["clips"]])
+    out["house"] = {"found": [list(f) for f in found], "note": house.note_of(found)}
+    if log and found:
+        log({"type": "text", "who": "director", "text": out["house"]["note"]})
+    return out
 
 
 BIBLE = """Write the continuity bible for this film, like a director's proposal: what must stay identical in every clip.
@@ -161,4 +170,20 @@ def clip_plan(s: dict, p: dict, n: int, log: Callable[[dict], None] | None = Non
     rule = ("Each new clip opens in a different recognizable story location (name it); character, props and direction continue." if st["id"] == "a4-cozy"
             else "No unrelated locations or time jumps unless you mark a cut.")
     system = CLIP.format(n=n, total=len(p["story"]["clips"]), ids=", ".join(ids), look=st["look"], location_rule=rule)
-    return spec.norm_clip(_ask(s, f"clip {n} plan", system, prompt, log, 2200, 0.6), n, set(ids), prev)
+    clip = spec.norm_clip(_ask(s, f"clip {n} plan", system, prompt, log, 2200, 0.6, directed=True), n, set(ids), prev)
+    return unrepeat_clip(clip, p["clips"][-1] if p.get("clips") else None, log)
+
+
+def unrepeat_clip(clip: dict, before: dict | None, log: Callable[[dict], None] | None = None) -> dict:
+    """House rule 4: no two clips in a row framed the same. A ten-second clip is planned one at a time, so this compares
+    it with the clip before and, when the distance and the camera move both match, changes the move (never the story)."""
+    if not before:
+        return clip
+    moves, fixed = house.unrepeat_framing([before.get("framing", ""), clip["framing"]],
+                                          [before.get("camera_move", "static"), clip["camera_move"]], spec.CAMERA_MOVES)
+    if fixed:
+        clip["camera_move"] = moves[1]
+        clip["house"] = house.note_of([], fixed)
+        if log:
+            log({"type": "text", "who": "director", "text": f"Clip {clip['n']}: framed like clip {before.get('n')}, so the camera now does '{moves[1]}'."})
+    return clip

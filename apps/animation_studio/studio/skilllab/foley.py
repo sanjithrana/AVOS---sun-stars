@@ -161,9 +161,14 @@ def cue_for(text: str) -> str:
     return best or "stir"
 
 
-def _wav_bytes(x: np.ndarray) -> bytes:
+def _wav_bytes(x: np.ndarray, peak_to: float = 0.82) -> bytes:
+    """Normalised to `peak_to`, which is why every cue lands at the same level however it was built.
+
+    That is right for a chop or a sizzle and wrong for room tone: a bed meant to sit under a film was being pushed to
+    the same loudness as a knife hitting a board. Hence the argument.
+    """
     peak = float(np.abs(x).max()) or 1.0
-    x = (x / peak) * 0.82
+    x = (x / peak) * peak_to
     m = min(2048, x.size)
     if m:                                          # no clicks at the joins
         x[:m] *= np.linspace(0, 1, m, dtype=np.float32)
@@ -184,3 +189,77 @@ def wav(cue_text: str, seconds: float, seed: int = 0) -> bytes:
     name = cue_for(cue_text)
     room = _lowpass(_noise(int(secs * SR), seed + 99), 220) * 0.06      # a little kitchen air under everything
     return _wav_bytes(CUES[name](secs, seed + 1) * 0.9 + room)
+
+
+# ---------------------------------------------------------------- cutting: one hit per knife stroke
+# The guide asks for a different sound per object -- a soft wet chop for papaya, a dry scrape for soap, a crisp snap for
+# carrot -- so the texture is a few numbers rather than a separate recording.
+TEXTURES = {
+    "wet":   dict(lo=300,  hi=5200, decay=0.042, knock=165, split=1.00, thud=0.55),
+    "crisp": dict(lo=900,  hi=9500, decay=0.020, knock=210, split=1.25, thud=0.30),
+    "dry":   dict(lo=520,  hi=4200, decay=0.028, knock=150, split=0.80, thud=0.42),
+    "soft":  dict(lo=200,  hi=2600, decay=0.060, knock=120, split=0.70, thud=0.62),
+}
+TEXTURE_WORDS = (
+    ("crisp", r"carrot|apple|cucumber|celery|radish|cabbage|crisp|biscuit|cracker|ice|glass|chip"),
+    ("dry",   r"soap|chalk|clay|eraser|sponge|wood|bar\b|candle|wax|cork|foam|crayon"),
+    ("soft",  r"butter|cheese|tofu|cake|bread|dough|banana|avocado|marshmallow|halwa|barfi|sponge cake"),
+    ("wet",   r"papaya|melon|mango|tomato|orange|kiwi|peach|plum|guava|watermelon|cucumber|jelly|fruit"),
+)
+
+
+def texture_for(name: str) -> str:
+    t = (name or "").lower()
+    for key, rx in TEXTURE_WORDS:
+        if re.search(rx, t):
+            return key
+    return "wet"
+
+
+def cuts_wav(times: list[float], seconds: float, texture: str = "wet", seed: int = 0, tumble: float | None = None) -> bytes:
+    """One knife stroke on each of `times`, then the pieces going over at `tumble`, over a quiet room.
+
+    The hit lands exactly on the time given, so the sound sits on the frame where the blade meets the object rather
+    than near it -- that single alignment is most of what makes a cutting video feel real.
+    """
+    secs = max(0.5, float(seconds))
+    k = TEXTURES.get(texture) or TEXTURES["wet"]
+    r = RNG(seed + 11)
+    jitter = [float(x) for x in r.uniform(0.86, 1.14, max(1, len(times)))]
+
+    def one(i: int) -> np.ndarray:
+        m = int(0.26 * SR)
+        v = jitter[i % len(jitter)]
+        split = _band(_noise(m, seed + 31 + i), k["lo"] * v, k["hi"] * v) * _env(m, 0.0004, k["decay"] * v) * k["split"]
+        t = np.arange(m, dtype=np.float32) / SR
+        knock = np.sin(2 * np.pi * k["knock"] * v * t).astype(np.float32) * _env(m, 0.0003, 0.055) * k["thud"]
+        return (split + knock) * 1.35
+
+    out = _hits(secs, list(times), one)
+    if tumble is not None:
+        fall = sorted(float(x) for x in RNG(seed + 3).uniform(tumble, tumble + 0.85, 7))
+
+        def soft(i: int) -> np.ndarray:
+            m = int(0.20 * SR)
+            t = np.arange(m, dtype=np.float32) / SR
+            body = np.sin(2 * np.pi * (130 + 40 * ((i * 7) % 5)) * t).astype(np.float32) * _env(m, 0.0006, 0.06)
+            return (body * 0.5 + _band(_noise(m, seed + 71 + i), 350, 3200) * _env(m, 0.001, 0.035) * 0.45) * 0.8
+
+        out = out + _hits(secs, fall, soft)
+    room = _lowpass(_noise(int(secs * SR), seed + 97), 200) * 0.05
+    return _wav_bytes(out + room)
+
+
+def room(seconds: float, seed: int = 0) -> bytes:
+    """Quiet room tone: a clear track, not silence and not a fake.
+
+    Used when a look asks for a score. AVOS has no music model, and the honest answer to that is a near-silent bed
+    that leaves room for one, rather than whatever this synthesiser's nearest kitchen noise happens to be. Digital
+    silence is avoided because some players and editors treat an all-zero track as no track at all.
+    """
+    secs = max(0.2, float(seconds))
+    n = int(secs * SR)
+    bed = _lowpass(_noise(n, seed + 404), 160) * 0.006   # about -45 dBFS: present on a meter, inaudible as noise
+    t = np.arange(n, dtype=np.float32) / SR
+    drift = (1.0 + 0.25 * np.sin(2 * np.pi * 0.07 * t)).astype(np.float32)   # a room is never perfectly steady
+    return _wav_bytes(bed * drift, peak_to=0.02)

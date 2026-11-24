@@ -7,6 +7,8 @@ import { Composer } from "@/components/explainer/Composer";
 import { ProjectCard } from "@/components/explainer/ProjectCard";
 import { CastMemory } from "@/components/explainer/CastMemory";
 import { explainer } from "@/lib/explainer";
+import { FileText, Mic, Clapperboard } from "lucide-react";
+import { Lit, PageHero } from "@/components/brand/PageHero";
 
 export default function ExplainerHome() {
   const list = useQuery({ queryKey: ["explainer-list"], queryFn: explainer.list, refetchInterval: 4000, retry: false });
@@ -15,6 +17,9 @@ export default function ExplainerHome() {
       <span className="flex gap-2"><Link href="/explainer/skills" className="whitespace-nowrap rounded-lg border border-border px-3 py-1.5 text-xs transition hover:bg-accent sm:text-sm" data-testid="skills-link">Skills</Link>
       <Link href="/explainer/prompts" className="whitespace-nowrap rounded-lg border border-border px-3 py-1.5 text-xs transition hover:bg-accent sm:text-sm" data-testid="prompt-library-link"><span className="sm:hidden">Prompts</span><span className="hidden sm:inline">Prompt library</span></Link></span></div>}>
       <div className="w-full space-y-10 px-4 py-6 sm:py-8 md:px-10 2xl:px-16">
+        <PageHero eyebrow="Explainer Studio" title={<>One idea. <Lit>One finished video.</Lit></>}
+          blurb="Type an idea. The studio writes the script, designs the presenter and props, picks the best way to make each shot, then adds voice and captions."
+          steps={[{ icon: FileText, t: "Write the script", d: "Hook, scenes and narration from one line." }, { icon: Clapperboard, t: "Design every shot", d: "Characters, 3D, AI video or motion, chosen per shot." }, { icon: Mic, t: "Voice, music, captions", d: "Everything mixed and delivered as one video." }]} />
         <div className="mx-auto max-w-5xl">
         <Composer />
         </div>

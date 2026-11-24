@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any, Callable
 
-from .. import paper
+from .. import house, paper
 from ..creative import skills as SK
 from ..series import languages, writers
 from . import cinema, memory, prompts, research, spec
@@ -107,13 +107,29 @@ def plan(s: dict, log: Callable[[dict], None] | None = None, note: str = "") -> 
         prompt = (f"Idea: {s['brief']}\nLength: about {s['seconds']} seconds. Format: {s['aspect']}. Narration language: {lang.name}.\n"
                   + research.facts_block(s.get("research")) + memory.cast_block(s["brief"])
                   + (f"Change requested: {note}\n" if note else "") + rules + "Write the JSON plan.")
-    data = writers.ask(s, "story", writers.system("avos-explainer-director", SYSTEM), prompt, log, max_tokens=3600, temperature=0.7)
+    data = writers.ask(s, "story", writers.directed("avos-explainer-director", SYSTEM), prompt, log, max_tokens=3600, temperature=0.7)
     if data is None:
-        return spec.norm_plan(builtin(s["brief"], s["seconds"], s["aspect"]), s["seconds"], s["aspect"])
+        return directed(spec.norm_plan(builtin(s["brief"], s["seconds"], s["aspect"]), s["seconds"], s["aspect"]), log)
     try:
         out = spec.norm_plan(data, s["seconds"], s["aspect"])
         out["pk"] = used               # which prompt version wrote this plan (the library learns from how it turns out)
-        return out
+        return directed(out, log)
     except ValueError as e:
         writers.need(s, False, f"video plan ({e})")
-        return spec.norm_plan(builtin(s["brief"], s["seconds"], s["aspect"]), s["seconds"], s["aspect"])
+        return directed(spec.norm_plan(builtin(s["brief"], s["seconds"], s["aspect"]), s["seconds"], s["aspect"]), log)
+
+
+def directed(plan: dict, log: Callable[[dict], None] | None = None) -> dict:
+    """The house director's pass over a finished plan (studio/house.py): no AI call. It changes the camera move where
+    two shots in a row would be framed identically, and records what else a director would send back."""
+    shots = plan.get("shots") or []
+    sizes = [sh["camera"]["type"] for sh in shots]
+    moves, fixed = house.unrepeat_framing(sizes, [sh["camera"]["movement"] for sh in shots], spec.CAMERA_MOVES)
+    for sh, mv in zip(shots, moves):
+        sh["camera"]["movement"] = mv
+    cards = [house.card(i + 1, sh.get("scene_title"), sh.get("action"), sh["camera"]["type"], sh["camera"]["movement"]) for i, sh in enumerate(shots)]
+    found = house.review(cards)
+    plan["house"] = {"fixed": fixed, "found": [list(f) for f in found], "note": house.note_of(found, fixed)}
+    if log and (fixed or found):
+        log({"type": "text", "who": "director", "text": plan["house"]["note"]})
+    return plan

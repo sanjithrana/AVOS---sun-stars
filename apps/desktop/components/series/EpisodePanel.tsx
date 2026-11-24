@@ -1,4 +1,5 @@
 "use client";
+import { QueueVideo } from "@/components/youtube/QueueVideo";
 /* eslint-disable @next/next/no-img-element -- pictures come from the Animation Studio service */
 // One episode: outline approval, then part by part: script (edit / approve / rewrite) → render → watch (approve / redo
 // shots) → the next part; finally the joined episode.
@@ -61,6 +62,7 @@ export function EpisodePanel({ sid, snap, ep, act, pending }: { sid: string; sna
           <video controls className="aspect-video w-full rounded-xl bg-black" src={seriesApi.file(sid, ep.video, ep.seconds)} />
           <div className="flex flex-wrap gap-4">
             <a className="inline-flex items-center gap-1 text-sm text-amber-600 hover:underline" href={seriesApi.file(sid, ep.video)} download={`episode-${ep.number}.mp4`}><Download className="h-4 w-4" />Download the episode ({fmt(ep.seconds)})</a>
+            <QueueVideo url={seriesApi.file(sid, ep.video)} title={`episode-${ep.number}`} />
             <a className="inline-flex items-center gap-1 text-sm text-amber-600 hover:underline" href={seriesApi.exportUrl(sid, ep.id)} data-testid="export-project"><Download className="h-4 w-4" />Project files (.zip)</a>
           </div>
         </div>

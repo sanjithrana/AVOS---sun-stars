@@ -2,14 +2,17 @@
 keeps finished steps on Continue, and can make one step (and what follows) again.
 
 Mechanical Toy: design lock → three prompts → compact picture → transformed picture (from the compact one) → transformation clip.
-Company Story: see company_story.py.  ASMR Cooking: see asmr_cooking.py."""
+Company Story: see company_story.py.  ASMR Cooking: see asmr_cooking.py.  Motion Graphics: see motion_graphics.py.
+ASMR Cutting: see asmr_cutting.py.
+Film Style: see film_style.py -- 66 looks, one shared implementation, one Skills-tab entry each."""
 from __future__ import annotations
 
 import threading
 from typing import Any
 
 from ..series import media
-from . import asmr_cooking as AC, base, company_story as CS, mechanical_toy as MT
+from . import (asmr_cooking as AC, asmr_cutting as XC, base, company_story as CS, film_style as FS, ghibli_recipe as GR,
+               mechanical_toy as MT, motion_graphics as MG)
 from . import store
 from .base import SIZES, Stopped, sdict
 
@@ -96,12 +99,32 @@ def _mt_reset(p: dict, step: str, n: int | None = None) -> None:
     p["version"] = int(p.get("version", 1)) + 1
 
 
-SKILLS = {MT.ID: MT, CS.ID: CS, AC.ID: AC}
+SKILLS = {MT.ID: MT, CS.ID: CS, AC.ID: AC, MG.ID: MG, XC.ID: XC, GR.ID: GR}
+SKILLS.update(FS.skills())          # 66 film styles, one entry each, all sharing film_style's stages
 SPEC: dict[str, dict[str, Any]] = {
     MT.ID: {"stages": MT_STAGES, "labels": MT_LABELS, "run": MT_RUN, "last": lambda p: "design" if p.get("media") == "prompts" else "video", "reset": _mt_reset},
     CS.ID: {"stages": CS.STAGES, "labels": CS.LABELS, "run": CS.RUN, "last": CS.last_stage, "reset": CS.reset},
     AC.ID: {"stages": AC.STAGES, "labels": AC.LABELS, "run": AC.RUN, "last": AC.last_stage, "reset": AC.reset},
+    MG.ID: {"stages": MG.STAGES, "labels": MG.LABELS, "run": MG.RUN, "last": MG.last_stage, "reset": MG.reset},
+    XC.ID: {"stages": XC.STAGES, "labels": XC.LABELS, "run": XC.RUN, "last": XC.last_stage, "reset": XC.reset},
+    GR.ID: {"stages": GR.STAGES, "labels": GR.LABELS, "run": GR.RUN, "last": GR.last_stage, "reset": GR.reset},
 }
+SPEC.update({sid: {"stages": FS.STAGES, "labels": FS.LABELS, "run": FS.RUN, "last": FS.last_stage,
+                   "reset": FS.reset} for sid in FS.skills()})
+from ..kits import skill as KS          # noqa: E402 - 29 skills from the story / animation-style / 3D-style kits, one shared implementation
+SKILLS.update(KS.skills())
+SPEC.update({sid: {"stages": KS.STAGES, "labels": KS.LABELS, "run": KS.RUN, "last": KS.last_stage, "reset": KS.reset} for sid in KS.skills()})
+# Skills that run for minutes because they draw or film many shots (AI pictures, AI video, narration, joining). Kits are tagged in kits/skill.py.
+SLOW = {
+    "mechanical-toy": "Three AI pictures and an AI video clip: usually 5-15 minutes",
+    "company-story": "Research, a script, a cast, many scenes, narration and a joined film: 15-60 minutes depending on length",
+    "asmr-cooking": "A picture and a moving clip for every step of the recipe, then joined with sound: 10-40 minutes",
+    "ghibli-recipe-prompt": "The prompt is quick; the cooking scene (key frame plus clip) takes 5-15 minutes",
+}
+for _sid, _why in SLOW.items():
+    SKILLS[_sid].INFO["slow"], SKILLS[_sid].INFO["slow_label"] = _why, "slow · AI video"
+for _sid, _sk in FS.skills().items():          # all film styles: six shots, each a picture and a clip
+    SKILLS[_sid].INFO["slow"], SKILLS[_sid].INFO["slow_label"] = "Every shot is a picture and a clip, then the film is joined: 10-40 minutes", "slow · AI video"
 STAGES, LABELS = MT_STAGES, MT_LABELS          # kept for older callers
 
 

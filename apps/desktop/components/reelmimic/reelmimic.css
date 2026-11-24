@@ -9,7 +9,7 @@
   --mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
 
   --bg: #F2F2F5;
-  --bg-glow: rgba(120, 110, 255, .10);
+  --bg-glow: rgba(200,255,58, .10);
   --surface: #FFFFFF;
   --surface-2: #F7F7FA;
   --elevated: rgba(255, 255, 255, .78);
@@ -22,16 +22,16 @@
   --label-3: rgba(60, 60, 67, .42);
   --label-4: rgba(60, 60, 67, .22);
 
-  --accent: #5B57F0;
-  --accent-soft: rgba(91, 87, 240, .10);
-  --accent-ink: #4A45D8;
+  --accent: #4f7a08;
+  --accent-soft: rgba(200,255,58, .10);
+  --accent-ink: #3d6006;
   --green: #2FB457; --green-soft: rgba(47, 180, 87, .12);
   --orange: #F08A00; --orange-soft: rgba(255, 159, 10, .14);
   --red: #F0453A; --red-soft: rgba(255, 59, 48, .10);
   --teal: #1AA6B7;
 
-  --aurora-1: #7A6BFF; --aurora-2: #E86BD2; --aurora-3: #FF9D5C; --aurora-4: #49C6FF;
-  --aurora: #7663a8;
+  --aurora-1: #c8ff3a; --aurora-2: #36e0c8; --aurora-3: #ffb84d; --aurora-4: #9fb8d9;
+  --aurora: #3d5f10;
 
   --r-xl: 28px; --r-lg: 22px; --r: 16px; --r-sm: 12px; --r-xs: 9px;
   --shadow-1: 0 1px 2px rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .03);
@@ -42,12 +42,12 @@
   color-scheme: light;
 }
 .dark .rm {
-  --bg: #09090C; --bg-glow: rgba(120, 100, 255, .16);
-  --surface: #151519; --surface-2: #1C1C22; --elevated: rgba(28, 28, 34, .72);
+  --bg: #08080a; --bg-glow: rgba(200,255,58, .08);
+  --surface: #121216; --surface-2: #1a1a1f; --elevated: rgba(28, 28, 34, .72);
   --fill: rgba(120, 120, 128, .22); --fill-2: rgba(120, 120, 128, .12);
   --sep: rgba(255, 255, 255, .08); --sep-strong: rgba(255, 255, 255, .15);
   --label: #F4F4F6; --label-2: rgba(235, 235, 245, .64); --label-3: rgba(235, 235, 245, .38); --label-4: rgba(235, 235, 245, .18);
-  --accent: #7C78FF; --accent-soft: rgba(124, 120, 255, .16); --accent-ink: #A29FFF;
+  --accent: #c8ff3a; --accent-soft: rgba(200,255,58, .16); --accent-ink: #c8ff3a;
   --green: #3DD06A; --green-soft: rgba(61, 208, 106, .14); --orange: #FFA83A; --orange-soft: rgba(255, 168, 58, .14);
   --red: #FF6259; --red-soft: rgba(255, 98, 89, .13);
   --shadow-1: 0 0 0 1px rgba(255, 255, 255, .04); --shadow-2: 0 0 0 1px rgba(255, 255, 255, .05), 0 12px 30px -8px rgba(0, 0, 0, .6);
@@ -395,8 +395,8 @@
 .rm .m-ai .who .role { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 5px; background: var(--fill-2); color: var(--label-2); }
 .rm .avatar-ai { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; color: #fff; }
 .rm .avatar-ai.critic { background: linear-gradient(135deg, #1AA6B7, #3E7BFA); }
-.rm .avatar-ai.builder { background: linear-gradient(135deg, #FF9D5C, #F0453A); }
-.rm .avatar-ai.finish { background: linear-gradient(135deg, #8B5CF6, #EC4899); }
+.rm .avatar-ai.builder { background: linear-gradient(135deg, #ffb84d, #F0453A); }
+.rm .avatar-ai.finish { background: linear-gradient(135deg, #c8ff3a, #EC4899); }
 .rm .om-pick { margin-top: 8px; width: 100%; }
 .rm .om-fields { padding: 12px 14px; }
 .rm .m-sys { align-self: center; display: inline-flex; align-items: center; gap: 6px; max-width: 92%; font-size: 12.5px; color: var(--label-2); padding: 5px 12px; border-radius: 99px; background: var(--fill-2); text-align: center; }
@@ -750,10 +750,10 @@
   --label-2: var(--muted-foreground);
   --label-3: color-mix(in oklab, var(--muted-foreground) 72%, transparent);
   --label-4: color-mix(in oklab, var(--muted-foreground) 35%, transparent);
-  --accent: #8B5CF6;
-  --accent-soft: rgba(139, 92, 246, .13);
-  --aurora-1: #A78BFA; --aurora-2: #D946EF; --aurora-3: #8B5CF6; --aurora-4: #E879F9;
-  --aurora: #7663a8;
+  --accent: #c8ff3a;
+  --accent-soft: rgba(200,255,58, .14);
+  --aurora-1: #c8ff3a; --aurora-2: #36e0c8; --aurora-3: #c8ff3a; --aurora-4: #7dffb0;
+  --aurora: #3d5f10;
   --r-xl: 16px; --r-lg: 16px; --r: 12px; --r-sm: 10px; --r-xs: 8px;
   --shadow-1: 0 0 0 1px var(--border);
   --shadow-2: 0 0 0 1px var(--border);
@@ -767,31 +767,31 @@
 .rm .card, .rm .livebar, .rm .composer, .rm .pcard, .rm .how div { border: 1px solid var(--border); box-shadow: none; background: var(--surface); border-radius: 16px; }
 .rm .composer { padding: 16px; }
 .rm .composer::before { display: none; }
-.rm .composer:focus-within { border-color: rgba(139, 92, 246, .5); box-shadow: 0 0 0 3px rgba(139, 92, 246, .15); }
-.rm .composer.drag { border-color: #8B5CF6; transform: none; }
+.rm .composer:focus-within { border-color: rgba(200,255,58, .5); box-shadow: 0 0 0 3px rgba(200,255,58, .15); }
+.rm .composer.drag { border-color: #c8ff3a; transform: none; }
 .rm .composer textarea { margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--background); padding: 12px 14px; font-size: 15px; }
-.rm .composer textarea:focus { border-color: rgba(139, 92, 246, .5); }
+.rm .composer textarea:focus { border-color: rgba(200,255,58, .5); }
 .rm .comp-bar { padding-top: 12px; gap: 8px; }
 .rm .ref-empty { border-radius: 12px; border-color: var(--border); }
-.rm .ref-empty:hover { border-color: rgba(139, 92, 246, .6); background: rgba(139, 92, 246, .05); }
-.rm .ref-empty .big-ico { border-radius: 12px; background: #7663a8; color: #fff; }
+.rm .ref-empty:hover { border-color: rgba(200,255,58, .6); background: rgba(200,255,58, .05); }
+.rm .ref-empty .big-ico { border-radius: 12px; background: #c8ff3a; color: #0a0c04; }
 .rm .ref-slot, .rm .link-in { border-radius: 12px; }
 
 /* buttons: rounded-xl, primary = AVOS amber gradient */
 .rm .btn { border-radius: 999px; font-weight: 550; }
-.rm .btn.primary { background: #7663a8; color: #fff;  }
-.rm .btn.primary:hover:not(:disabled) { background: #8873be; }
-.rm .btn.plain:hover:not(:disabled) { background: rgba(139, 92, 246, .1); }
+.rm .btn.primary { background: #c8ff3a; color: #0a0c04;  }
+.rm .btn.primary:hover:not(:disabled) { background: #dcff7a; }
+.rm .btn.plain:hover:not(:disabled) { background: rgba(200,255,58, .1); }
 .rm .tool-chip { border-radius: 10px; border: 1px solid var(--border); height: 34px; }
-.rm .tool-chip.on { border-color: rgba(139, 92, 246, .4); }
-.rm .tool-chip .n { background: #8B5CF6; }
+.rm .tool-chip.on { border-color: rgba(200,255,58, .4); }
+.rm .tool-chip .n { background: #c8ff3a; }
 .rm .send { width: auto; height: 40px; padding: 0 18px; gap: 8px; display: inline-flex; align-items: center; border-radius: 999px; font-size: 14px; font-weight: 600;
-  background: #7663a8; color: #fff;  }
+  background: #c8ff3a; color: #0a0c04;  }
 .rm .send:disabled { background: var(--muted); color: var(--muted-foreground); box-shadow: none; }
-.rm .send:not(:disabled):hover { transform: none; background: #8873be; }
+.rm .send:not(:disabled):hover { transform: none; background: #dcff7a; }
 .rm .suggest { justify-content: flex-start; }
 .rm .suggest button { border-radius: 10px; border: 1px solid var(--border); box-shadow: none; background: transparent; }
-.rm .suggest button:hover { border-color: rgba(139, 92, 246, .4); box-shadow: none; transform: none; }
+.rm .suggest button:hover { border-color: rgba(200,255,58, .4); box-shadow: none; transform: none; }
 .rm .seg { border-radius: 10px; }
 
 /* header slot: matches the AVOS header */
@@ -803,14 +803,18 @@
 .rm .page { max-width: 80rem; padding: 32px; }
 .rm .p-head h1 { font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
 .rm .back { color: var(--muted-foreground); font-size: 14px; }
-.rm .back:hover { color: #8B5CF6; opacity: 1; }
-.rm .progress .bar i { background: #8B5CF6; }
+.rm .back:hover { color: #c8ff3a; opacity: 1; }
+.rm .progress .bar i { background: #c8ff3a; }
 .rm .sheet { border-radius: 16px; border: 1px solid var(--border); }
 .rm h1, .rm h2, .rm h3 { letter-spacing: -.01em; }
 .rm.rm-main { background: var(--background); background-image: none; }
 
 /* purple lights for the Animations area */
 .rm.rm-main { background: transparent; }
-.rm .btn.primary, .rm .send { box-shadow: 0 0 0 1px rgba(167,139,250,.35), 0 8px 28px -6px rgba(139,92,246,.7); }
+.rm .btn.primary, .rm .send { box-shadow: 0 0 0 1px rgba(200,255,58, .35), 0 8px 28px -6px rgba(200,255,58, .7); }
 .rm .card, .rm .composer, .rm .pcard {  }
-.dark .rm .card, .dark .rm .composer, .dark .rm .pcard { box-shadow: 0 18px 40px -24px rgba(124,58,237,.45); }
+.dark .rm .card, .dark .rm .composer, .dark .rm .pcard { box-shadow: 0 18px 40px -24px rgba(0, 0, 0, .45); }
+
+/* Studio look: Tailwind's bg-accent inside the Animations area is a faint lime tint, not the solid --accent (which would hide the text). */
+.rm .bg-accent, .rm .hover\:bg-accent:hover { background-color: rgba(200, 255, 58, .08) !important; }
+.rm .text-accent-foreground { color: var(--foreground) !important; }

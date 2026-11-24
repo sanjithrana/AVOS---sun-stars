@@ -1,0 +1,46 @@
+[debug] Command-line config: ['-v', '--cookies', '/data/autoclip/cookies.txt', '-F', 'https://youtu.be/kR8bhkVAgBY']
+[debug] Encodings: locale UTF-8, fs utf-8, pref UTF-8, out utf-8 (No ANSI), error utf-8 (No ANSI), screen utf-8 (No ANSI)
+[debug] yt-dlp version stable@2026.10.26 from yt-dlp/yt-dlp [c91f8de0b] (pip)
+[debug] Python 3.11.16 (CPython x86_64 64bit) - Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.41 (OpenSSL 3.5.6 7 Apr 2026, glibc 2.41)
+[debug] exe versions: ffmpeg 7.1.5-0 (setts), ffprobe 7.1.5-0
+[debug] Optional libraries: certifi-2026.10.23, requests-2.34.2, sqlite3-3.46.1, urllib3-2.8.0
+[debug] JS runtimes: deno-2.9.8
+[debug] Proxy map: {}
+[debug] Request Handlers: urllib, requests
+[debug] Plugin directories: none
+[debug] Loaded 1747 extractors
+[debug] [youtube] Found YouTube account cookies
+[debug] [youtube] [pot] PO Token Providers: none
+[debug] [youtube] [pot] PO Token Cache Providers: memory
+[debug] [youtube] [pot] PO Token Cache Spec Providers: webpo
+[youtube] Extracting URL: https://youtu.be/kR8bhkVAgBY
+[debug] [youtube] [jsc] JS Challenge Providers: bun (unavailable), deno, node (unavailable), quickjs (unavailable)
+[youtube] kR8bhkVAgBY: Downloading webpage
+[youtube] kR8bhkVAgBY: Downloading web embedded client config
+[debug] [youtube] Forcing "main" player JS variant for player 6b3d0364
+        original url = /s/player/6b3d0364/player_es6.vflset/en_US/base.js
+[debug] [youtube] kR8bhkVAgBY: Detected experiment to bind GVS PO Token to video ID for web_embedded client
+[youtube] kR8bhkVAgBY: Downloading player 6b3d0364-main
+[youtube] kR8bhkVAgBY: Downloading web embedded player API JSON
+[debug] [youtube] kR8bhkVAgBY: Detected a 15s ad skippable after 5s for web_embedded
+[youtube] kR8bhkVAgBY: Downloading tv samsung player API JSON
+[debug] [youtube] kR8bhkVAgBY: Detected a 6s ad for tv_samsung
+[debug] [youtube] kR8bhkVAgBY: Detected a 20s ad for web
+[debug] [youtube] kR8bhkVAgBY: Detected a 20s ad for web
+[youtube] [jsc:deno] Solving JS challenges using deno
+[debug] [youtube] [jsc:deno] Checking if npm packages are cached
+[debug] [youtube] [jsc:deno] Running deno: /usr/local/bin/deno run --ext=js --no-code-cache --no-prompt --no-remote --no-lock --node-modules-dir=none --no-config --cached-only -
+WARNING: [youtube] [jsc] Remote components challenge solver script (deno) and NPM package (deno) were skipped. These may be required to solve JS challenges. You can enable these downloads with  --remote-components ejs:github  (recommended) or  --remote-components ejs:npm , respectively. For more information and alternatives, refer to  https://github.com/yt-dlp/yt-dlp/wiki/EJS
+WARNING: [youtube] kR8bhkVAgBY: n challenge solving failed: Some formats may be missing. Ensure you have a supported JavaScript runtime and challenge solver script distribution installed. Review any warnings presented before this message. For more details, refer to  https://github.com/yt-dlp/yt-dlp/wiki/EJS
+[debug] [youtube] kR8bhkVAgBY: Detected experiment to bind GVS PO Token to video ID for web client
+[debug] [youtube] kR8bhkVAgBY: Some web client https formats have been skipped as they are missing a URL. YouTube is forcing SABR streaming for this client. See  https://github.com/yt-dlp/yt-dlp/issues/12482  for more details
+WARNING: Only images are available for download. use --list-formats to see them
+[debug] Sort order given by extractor: quality, res, fps, hdr:12, source, vcodec, channels, acodec, lang, proto
+[debug] Formats sorted by: hasvid, ie_pref, quality, res, fps, hdr:12(7), source, vcodec, channels, acodec, lang, proto, size, br, asr, vext, aext, hasaud, id
+[info] Available formats for kR8bhkVAgBY:
+ID  EXT   RESOLUTION FPS | PROTO | VCODEC MORE INFO
+----------------------------------------------------
+sb3 mhtml 48x27        0 | mhtml | images storyboard
+sb2 mhtml 80x45        0 | mhtml | images storyboard
+sb1 mhtml 160x90       0 | mhtml | images storyboard
+sb0 mhtml 320x180      0 | mhtml | images storyboard

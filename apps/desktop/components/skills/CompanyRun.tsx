@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { QueueVideo } from "@/components/youtube/QueueVideo";
 import { Download, ExternalLink, Loader2, RotateCcw, Square, TriangleAlert } from "lucide-react";
 import { skills, type Card, type Run, type Scene } from "@/lib/skills";
 import { StepTabs, type StepDef, type StepState } from "@/components/workspace/StepTabs";
@@ -20,19 +21,19 @@ const GROUPS: Record<StepId, { label: string; stages: string[] }> = {
 const ORDER: StepId[] = ["script", "scenes", "motion", "audio", "final"];
 
 const cardText = (c: Card) => c.type === "title" ? `${c.text} · ${c.years}` : c.type === "stat" ? `${c.value} ${c.unit ?? ""}` : c.type === "vs" ? `${c.left} vs ${c.right}` : c.type === "year" ? `${c.value}` : `${c.text}`;
-const box = "rounded-3xl border border-border p-4";
-const btn = "inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs disabled:opacity-50";
-const chip = (on: boolean) => `rounded-full border px-3 py-1.5 text-xs transition-colors ${on ? "border-[rgba(185,172,255,0.7)] bg-[rgba(124,92,255,0.18)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+const box =" border border-border p-4";
+const btn ="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] disabled:opacity-50";
+const chip = (on: boolean) => `border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] leading-none transition-colors ${on ? "border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
 
 function NarrationRow({ sc, busy, onSay }: { sc: Scene; busy: boolean; onSay: (n: number, text: string) => void }) {
   const [text, setText] = useState(sc.narration);                 // the row is re-created (key) when the saved narration changes
   return (
-    <li className="rounded-2xl border border-border p-3">
+    <li className="border border-border p-3">
       <p className="text-xs font-semibold">Scene {sc.n} <span className="font-normal text-muted-foreground">· {sc.purpose}</span></p>
-      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} aria-label={`Narration for scene ${sc.n}`} className="prompt-field mt-2 w-full resize-y rounded-xl border border-border p-2.5 text-sm leading-relaxed" />
+      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} aria-label={`Narration for scene ${sc.n}`} className="prompt-field mt-2 w-full resize-y border border-border p-2.5 text-sm leading-relaxed" />
       {sc.warning && <p className="mt-1 text-[11px] text-amber-300/90">{sc.warning}</p>}
       {sc.dropped > 0 && <p className="mt-1 text-[11px] text-muted-foreground">{sc.dropped} card(s) left out: their numbers weren&apos;t in the research.</p>}
-      {text !== sc.narration && <button type="button" disabled={busy} onClick={() => onSay(sc.n, text)} className="mt-2 rounded-full border border-[rgba(185,172,255,0.6)] px-3 py-1.5 text-xs disabled:opacity-50">Save and re-record</button>}
+      {text !== sc.narration && <button type="button" disabled={busy} onClick={() => onSay(sc.n, text)} className="mt-2 border border-[rgba(200,255,58,0.6)] px-3 py-1.5 text-xs disabled:opacity-50">Save and re-record</button>}
     </li>
   );
 }
@@ -124,7 +125,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
           <SaveState saving={saving} />
         </div>
         {(r.motion || r.characters?.founder) && <p className="mt-2 text-[11px] text-muted-foreground">2D · {motionNow === "poses" ? "paper puppet (free)" : "AI video"}{me ? ` · ${me.name}` : ""}</p>}
-        {r.status === "error" && <p className="mt-3 rounded-xl border border-red-500/40 bg-red-500/5 p-3 text-xs" role="alert">{r.error}</p>}
+        {r.status === "error" && <p className="mt-3 border border-red-500/40 bg-red-500/5 p-3 text-xs" role="alert">{r.error}</p>}
         {r.status === "error" && r.motion === "video" && /video/i.test(r.error ?? "") && <button type="button" disabled={toPoses.isPending} onClick={() => toPoses.mutate()} className={`${btn} mt-2`}>Use the free paper puppet instead</button>}
         {err && <p className="mt-3 text-xs text-red-400" role="alert">{(err as Error).message}</p>}
         <div className="mt-3 flex flex-wrap gap-2">
@@ -185,9 +186,9 @@ export function CompanyRun({ run: r }: { run: Run }) {
             <div className="mt-3 flex flex-wrap gap-2">
               {chars.map((c) => (
                 <button key={c.id} type="button" disabled={busy || saving} title={c.about} aria-pressed={c.id === cid} onClick={() => c.id !== cid && change.mutate({ character: c.id })}
-                  className={`flex w-24 flex-col items-center gap-1 rounded-2xl border p-1.5 text-[11px] disabled:opacity-60 ${c.id === cid ? "border-[rgba(185,172,255,0.8)] bg-[rgba(124,92,255,0.18)]" : "border-border"}`}>
+                  className={`flex w-24 flex-col items-center gap-1 border p-1.5 text-[11px] disabled:opacity-60 ${c.id === cid ?"border-[rgba(200,255,58,0.8)] bg-[rgba(200,255,58,0.18)]" :"border-border"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-24 w-full rounded-xl bg-muted object-contain" /><span className="text-center leading-tight">{c.name}</span>
+                  <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-24 w-full bg-muted object-contain" /><span className="text-center leading-tight">{c.name}</span>
                 </button>
               ))}
             </div>
@@ -195,7 +196,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
           <section className={box}>
             <h2 className="text-sm font-semibold">Scene pictures</h2>
             <ul className="mt-3 space-y-2">{scenes.map((sc) => (
-              <li key={sc.n} className="flex items-center gap-3 rounded-xl bg-muted/50 p-2.5 text-[12px]">
+              <li key={sc.n} className="flex items-center gap-3 bg-muted/50 p-2.5 text-[12px]">
                 <span className="min-w-0 flex-1"><b>{sc.n}. {sc.purpose}</b><span className="block truncate text-muted-foreground">{sc.place || sc.setting} · {sceneStatus(sc)}</span></span>
                 {!busy && r.media === "media" && sc.picture && <button type="button" onClick={() => redo.mutate({ step: "scenes", n: sc.n })} className={btn}><RotateCcw className="h-3.5 w-3.5" />New picture</button>}
               </li>))}</ul>
@@ -210,7 +211,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
             {(info.data?.skills.find((s) => s.id === "company-story")?.motions ?? []).map(([m, l]) => <button key={m} type="button" disabled={busy || saving} aria-pressed={motionNow === m} onClick={() => m !== motionNow && change.mutate({ motion: m as "video" | "poses" })} className={chip(motionNow === m)}>{l}</button>)}
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">{motionNow === "video" ? "Seedance makes one clip per scene and uses your fal.ai credit; the run stops with a message if there is none." : "Free: the paper-cut character sways and flips between three poses over a slowly pushing backdrop; cards and numbers animate."}</p>
-          <ul className="mt-3 space-y-1.5">{scenes.map((sc) => <li key={sc.n} className="flex justify-between rounded-xl bg-muted/50 px-3 py-2 text-[12px]"><span>Scene {sc.n} · camera {sc.move}</span><span className="text-muted-foreground">{sc.video ? "done" : r.steps?.animate?.status === "working" ? "making…" : "waiting"}</span></li>)}</ul>
+          <ul className="mt-3 space-y-1.5">{scenes.map((sc) => <li key={sc.n} className="flex justify-between bg-muted/50 px-3 py-2 text-[12px]"><span>Scene {sc.n} · camera {sc.move}</span><span className="text-muted-foreground">{sc.video ? "done" : r.steps?.animate?.status === "working" ? "making…" : "waiting"}</span></li>)}</ul>
           {r.steps?.animate?.note && <p className="mt-2 text-[11px] text-amber-300/90">{r.steps.animate.note}</p>}
         </section>
       )}
@@ -224,7 +225,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
           <p className="mt-2 text-[11px] text-muted-foreground">{planQ.data?.audio.narration_note ?? ""}. A light underscore plays under the voice, never louder than it.</p>
           {r.steps?.voice?.note && <p className="mt-1 text-[11px] text-amber-300/90">{r.steps.voice.note}</p>}
           <ul className="mt-3 space-y-2">{scenes.map((sc) => (
-            <li key={sc.n} className="rounded-xl bg-muted/50 p-2.5 text-[12px]"><b>Line {sc.n}</b> <span className="text-muted-foreground">{sc.voice_seconds ? `${sc.voice_seconds}s` : ""}</span>
+            <li key={sc.n} className="bg-muted/50 p-2.5 text-[12px]"><b>Line {sc.n}</b> <span className="text-muted-foreground">{sc.voice_seconds ? `${sc.voice_seconds}s` : ""}</span>
               {sc.voice ? <audio controls preload="none" src={skills.file(r.id, sc.voice, v)} className="mt-1 h-8 w-full" /> : <span className="block text-muted-foreground">not recorded yet</span>}</li>))}</ul>
         </section>
       )}
@@ -233,13 +234,14 @@ export function CompanyRun({ run: r }: { run: Run }) {
         <section className={box}>
           <h2 className="text-sm font-semibold">Final video</h2>
           {r.video ? <div className="mt-3 flex flex-wrap gap-2"><a href={skills.file(r.id, r.video, r.updatedAt)} download className={btn}><Download className="h-3.5 w-3.5" />Download MP4</a>
+            <QueueVideo url={skills.file(r.id, r.video, r.updatedAt)} title={r.title || "video"} />
             {!busy && <button type="button" onClick={() => redo.mutate({ step: "script" })} className={btn}><RotateCcw className="h-3.5 w-3.5" />New script</button>}</div>
             : <p className="mt-2 text-xs text-muted-foreground">Not made yet.</p>}
           {!!r.finalSeconds && <p className="mt-2 text-[11px] text-muted-foreground">{Math.round(r.finalSeconds)} seconds · {scenes.length} scenes</p>}
         </section>
       )}
 
-      <details className="rounded-3xl border border-border p-4 text-xs text-muted-foreground">
+      <details className="border border-border p-4 text-xs text-muted-foreground">
         <summary className="cursor-pointer text-sm text-foreground">Activity</summary>
         <ul className="mt-2 space-y-1">{r.log.slice(-20).map((l, i) => <li key={i} className={l.kind === "error" ? "text-red-400" : ""}>{l.text}</li>)}</ul>
       </details>
@@ -255,7 +257,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
           <h2 className="text-sm font-semibold">Preview{r.finalSeconds ? <span className="font-normal text-muted-foreground"> · {Math.round(r.finalSeconds)} s</span> : null}</h2>
           {r.video && <a href={skills.file(r.id, r.video, r.updatedAt)} download className={btn}><Download className="h-3.5 w-3.5" />Download</a>}
         </div>
-        <div className={`mx-auto mt-3 overflow-hidden rounded-2xl bg-muted ${aspectCls}`}>
+        <div className={`mx-auto mt-3 overflow-hidden bg-muted ${aspectCls}`}>
           {r.video ? <video ref={video} key={r.updatedAt} src={skills.file(r.id, r.video, r.updatedAt)} controls playsInline onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)} className="h-full w-full object-contain" />
             : <span className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">{busy ? <><Loader2 className="h-6 w-6 animate-spin" />{stageLabel}…</>
               : waiting ? "Review the plan on the left, then approve to make the video." : r.media === "prompts" ? "Research and script only. Press Make the video when you're happy with it." : "Not made yet"}</span>}
@@ -267,33 +269,33 @@ export function CompanyRun({ run: r }: { run: Run }) {
       {out === "storyboard" && (scenes.length ? (
         <ul className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {scenes.map((sc) => (
-            <li key={sc.n} className={`cursor-pointer rounded-3xl border p-3 transition-colors ${sel === sc.n ? "border-[rgba(185,172,255,0.8)]" : "border-border"}`} onClick={() => { setSel(sc.n); setOut("shots"); }}>
-              <div className={`overflow-hidden rounded-2xl bg-muted ${r.aspect === "9:16" ? "aspect-[9/16]" : r.aspect === "1:1" ? "aspect-square" : "aspect-video"}`}>
+            <li key={sc.n} className={`cursor-pointer border p-3 transition-colors ${sel === sc.n ?"border-[rgba(200,255,58,0.8)]" :"border-border"}`} onClick={() => { setSel(sc.n); setOut("shots"); }}>
+              <div className={`overflow-hidden bg-muted ${r.aspect ==="9:16" ?"aspect-[9/16]" : r.aspect ==="1:1" ?"aspect-square" :"aspect-video"}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 {sc.picture ? <img src={skills.file(r.id, sc.picture, `${sc.version ?? 1}-${r.updatedAt}`)} alt={`Scene ${sc.n}`} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-xs text-muted-foreground">{r.steps?.scenes?.status === "working" ? "Drawing…" : "Not drawn yet"}</span>}
               </div>
               <p className="mt-2 text-sm font-semibold">{sc.n}. {sc.purpose}</p>
               <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-muted-foreground">{sc.narration}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">{sc.cards.map((c, i) => <span key={i} className="rounded-full border border-border px-2 py-0.5 text-[10px]"><span className="text-muted-foreground">{c.type}</span> {cardText(c)}</span>)}</div>
+              <div className="mt-2 flex flex-wrap gap-1.5">{sc.cards.map((c, i) => <span key={i} className="border border-border px-2 py-0.5 text-[10px]"><span className="text-muted-foreground">{c.type}</span> {cardText(c)}</span>)}</div>
             </li>
           ))}
         </ul>
-      ) : <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">The storyboard appears here as soon as the script is written.</p>)}
+      ) : <p className="border border-dashed border-border p-10 text-center text-sm text-muted-foreground">The storyboard appears here as soon as the script is written.</p>)}
 
       {out === "shots" && (
         <ul className="space-y-3">
           {scenes.filter((sc) => sel === null || sc.n === sel).map((sc) => (
-            <li key={sc.n} className="rounded-3xl border border-border p-3">
+            <li key={sc.n} className="border border-border p-3">
               <div className="flex items-center justify-between gap-2"><p className="text-sm font-semibold">Shot {sc.n} <span className="font-normal text-muted-foreground">· {sc.purpose}</span></p>
                 <span className="text-[11px] text-muted-foreground">{sceneStatus(sc)}</span></div>
-              {sc.video ? <video src={skills.file(r.id, sc.video, `${sc.version ?? 1}-${r.updatedAt}`)} controls muted playsInline className="mt-2 w-full rounded-xl bg-black" />
+              {sc.video ? <video src={skills.file(r.id, sc.video, `${sc.version ?? 1}-${r.updatedAt}`)} controls muted playsInline className="mt-2 w-full bg-black" />
                 : !!sc.pose_pics?.length && <div className="mt-2 grid grid-cols-3 gap-1.5">{sc.pose_pics.map((f, i) => /* eslint-disable-next-line @next/next/no-img-element */
-                  <img key={f} src={skills.file(r.id, f, `${sc.version ?? 1}-${r.updatedAt}`)} alt={`Scene ${sc.n} pose ${i + 1}`} className="aspect-video w-full rounded-lg object-cover" />)}</div>}
+                  <img key={f} src={skills.file(r.id, f, `${sc.version ?? 1}-${r.updatedAt}`)} alt={`Scene ${sc.n} pose ${i + 1}`} className="aspect-video w-full object-cover" />)}</div>}
               <p className="mt-2 text-[12px] text-muted-foreground">Poses: {(sc.pose_names?.length ? sc.pose_names : sc.poses ?? []).join(" → ")} · camera: {sc.move}{sc.rival ? " · rivalry scene" : ""}</p>
             </li>
           ))}
           {sel !== null && <button type="button" onClick={() => setSel(null)} className={btn}>Show all shots</button>}
-          {!scenes.length && <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">Shots appear here once the script is written.</p>}
+          {!scenes.length && <p className="border border-dashed border-border p-10 text-center text-sm text-muted-foreground">Shots appear here once the script is written.</p>}
         </ul>
       )}
 
@@ -302,10 +304,10 @@ export function CompanyRun({ run: r }: { run: Run }) {
           {chars.map((c) => {
             const on = c.id === cid;
             return (
-              <section key={c.id} className={`rounded-3xl border p-4 ${on ? "border-[rgba(185,172,255,0.8)]" : "border-border opacity-70"}`}>
+              <section key={c.id} className={`border p-4 ${on ?"border-[rgba(200,255,58,0.8)]" :"border-border opacity-70"}`}>
                 <div className="flex gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-40 w-28 shrink-0 rounded-2xl bg-muted object-contain" />
+                  <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-40 w-28 shrink-0 bg-muted object-contain" />
                   <div className="min-w-0"><p className="text-sm font-semibold">{c.name}{on && <span className="ml-2 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-medium">in this video</span>}</p>
                     <p className="mt-1 text-[12px] text-muted-foreground">{c.about}</p>
                     {on && <p className="mt-2 text-[12px] text-muted-foreground">On screen in {scenes.length || "every"} scenes. A cartoon stand-in for the founder, never a real person&apos;s face.</p>}
@@ -317,7 +319,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
         </div>
       )}
 
-      {out === "timeline" && (scenes.length ? <Timeline duration={total} lanes={lanes} time={time} onSeek={seek} /> : <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">The timeline fills in as scenes are made. Card timings are approximate.</p>)}
+      {out === "timeline" && (scenes.length ? <Timeline duration={total} lanes={lanes} time={time} onSeek={seek} /> : <p className="border border-dashed border-border p-10 text-center text-sm text-muted-foreground">The timeline fills in as scenes are made. Card timings are approximate.</p>)}
     </div>
   );
 

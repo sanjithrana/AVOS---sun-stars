@@ -5,12 +5,14 @@ export const NO_CHOICE: ModelChoice = { models: {}, local_only: false };
 
 const PICTURES = [["auto", "Automatic"], ["z-image", "Z-Image"], ["qwen-image", "Qwen-Image"], ["flux-schnell", "FLUX schnell"], ["qwen-image-edit", "Qwen-Image-Edit"]];
 const VIDEO = [["auto", "Automatic"], ["ltx-2.3", "LTX-2.3"], ["wan-2.2", "Wan 2.2"], ["off", "No video clips (pictures + camera moves)"]];
+const COST = [["auto", "Automatic (paid if a key is set, else free)"], ["free", "Free only - never a paid service"], ["paid", "Paid - best quality, no free stand-in"]];
+const FOOTAGE = [["auto", "Made by the models"], ["stock", "Stock footage (Pexels, free) - Skills and Stickman"]];
 const TEXT = [["", "Automatic"], ["ollama", "Ollama (on this PC)"], ["groq", "Groq (cloud)"]];
 
 /** Choose a model for a step and ONLY that model is used. Automatic lets the studio pick (and fall back). */
 export function ModelPicker({ value, onChange }: { value: ModelChoice; onChange: (v: ModelChoice) => void }) {
   const set = (step: string, model: string) => onChange({ ...value, models: { ...value.models, [step]: { model } } });
-  const sel = "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm";
+  const sel = "w-full border border-border bg-background px-3 py-2 text-sm";
   const row = (label: string, step: string, opts: string[][]) => (
     <label className="block text-sm">
       <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
@@ -20,12 +22,14 @@ export function ModelPicker({ value, onChange }: { value: ModelChoice; onChange:
     </label>
   );
   return (
-    <details className="mt-6 rounded-xl border border-border p-4 text-sm">
+    <details className="mt-6 border border-border p-4 text-sm">
       <summary className="cursor-pointer font-medium">Models (optional)</summary>
-      <p className="mt-2 text-muted-foreground">Pick a model and only that model is used — no silent switch to fal.ai, Cloudflare or another model. If it can’t run, you’ll see exactly why.</p>
+      <p className="mt-2 text-muted-foreground">Cost decides what may be used: Free never touches a paid service (your GPU, Cloudflare and Pollinations only), Paid uses fal.ai and says so if it can’t. Pick a model and only that model is used — no silent switch. If it can’t run, you’ll see exactly why.</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        {row("Cost", "tier", COST)}
         {row("Pictures", "pictures", PICTURES)}
         {row("Video", "motion", VIDEO)}
+        {row("Footage", "footage", FOOTAGE)}
         <label className="block text-sm">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Script writer (text AI)</span>
           <select className={sel} value={value.crew ?? ""} onChange={(e) => onChange({ ...value, crew: e.target.value })} data-testid="model-crew">

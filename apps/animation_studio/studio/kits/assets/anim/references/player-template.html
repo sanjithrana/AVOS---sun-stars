@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animation</title>
+<!--
+  BEAT LIST (keep it up to date for later edits)
+  #  start-end  what we see
+  1  0.0-3.0    ...
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #eee; font: 14px system-ui, sans-serif; }
+  #wrap { position: fixed; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; }
+  #stage { background: #000; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; display: flex; gap: 10px; align-items: center; padding: 0 14px; background: #1b1b1f; box-sizing: border-box; }
+  #bar button { background: #2d2d34; color: #fff; border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 600; cursor: pointer; }
+  #bar button.go { background: #e8742b; }
+  #bar input[type=range] { flex: 1; }
+  #msg { min-width: 120px; opacity: .8; font-variant-numeric: tabular-nums; }
+  body.render #bar { display: none; }
+  body.render #wrap { inset: 0; display: block; }
+  body.render #stage { box-shadow: none; }
+</style>
+<!-- 3D styles only: <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
+</head>
+<body>
+<div id="wrap"><canvas id="stage"></canvas></div>
+<div id="bar">
+  <button id="play">Play</button>
+  <input id="scrub" type="range" min="0" max="1000" value="0">
+  <span id="msg">0.00 s</span>
+  <button id="export" class="go">Export video</button>
+</div>
+<script>
+/* ---------- 1. SETTINGS ---------- */
+const CONFIG = {
+  width: 1080, height: 1920,   // 9:16. 16:9 = 1920x1080, 1:1 = 1080x1080
+  fps: 30,
+  duration: 6,                 // seconds
+  background: "#101014",
+};
+
+/* ---------- 2. HELPERS (deterministic) ---------- */
+const W = CONFIG.width, H = CONFIG.height;
+const stage = document.getElementById("stage");
+stage.width = W; stage.height = H;
+const ctx = stage.getContext("2d");
+
+// seeded random: rand(seed) always gives the same number for the same seed
+function rand(seed) { let t = (seed * 2654435761 + 0x6D2B79F5) >>> 0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));          // 0..1 progress of t between a and b
+const ease = {
+  inOut: k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2,
+  out: k => 1 - Math.pow(1 - k, 3),
+  in: k => k * k * k,
+  back: k => 1 + 2.7 * Math.pow(k - 1, 3) + 1.7 * Math.pow(k - 1, 2),
+};
+// smooth value noise in 1D, for wobble and drift (stable for a given seed)
+function noise1(x, seed = 1) { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(rand(i * 13 + seed * 7919), rand((i + 1) * 13 + seed * 7919), u) * 2 - 1; }
+
+// 3D styles: an offscreen WebGL canvas for three.js. Render into it, then ctx.drawImage(gl.domElement, ...).
+function makeGL(w = W, h = H) {
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
+  r.setPixelRatio(1); r.setSize(w, h, false);
+  return r;
+}
+
+/* ---------- 3. THE ANIMATION ---------- */
+// Build anything expensive ONCE here (layouts, textures, meshes), using rand() for variety.
+async function setup() {
+  await document.fonts.ready;
+}
+
+// Draw the frame for time t (seconds). Same t → same picture, every time.
+function draw(t) {
+  ctx.fillStyle = CONFIG.background; ctx.fillRect(0, 0, W, H);
+  // demo: replace everything below with the real animation
+  const k = ease.back(seg(t, 0.2, 1.2));
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(k, k);
+  ctx.fillStyle = "#e8742b"; ctx.font = "800 120px system-ui"; ctx.textAlign = "center";
+  ctx.fillText("Hello", 0, 40); ctx.restore();
+}
+
+/* ---------- 4. PLAYER + EXPORT (keep as is) ---------- */
+const N = Math.round(CONFIG.duration * CONFIG.fps);
+window.renderAt = t => draw(clamp(t, 0, CONFIG.duration));
+window.renderFrame = f => draw(clamp(f, 0, N - 1) / CONFIG.fps);   // f = 0 .. N-1
+window.CONFIG = CONFIG;
+
+const RENDER = /[?&]render=1/.test(location.search);
+if (RENDER) document.body.classList.add("render");
+function fit() { if (RENDER) { stage.style.width = W + "px"; stage.style.height = H + "px"; return; } const s = Math.min(innerWidth / W, (innerHeight - 64) / H) * .94; stage.style.width = W * s + "px"; stage.style.height = H * s + "px"; }
+addEventListener("resize", fit); fit();
+
+let playing = false, t0 = 0, tNow = 0;
+const scrub = document.getElementById("scrub"), msg = document.getElementById("msg"), playBtn = document.getElementById("play");
+function show(t) { tNow = t; draw(t); scrub.value = Math.round(t / CONFIG.duration * 1000); msg.textContent = t.toFixed(2) + " s"; }
+function loop() { if (!playing) return; let t = (performance.now() - t0) / 1000; if (t >= CONFIG.duration) { t = 0; t0 = performance.now(); } show(t); requestAnimationFrame(loop); }
+playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; if (playing) { t0 = performance.now() - tNow * 1000; loop(); } };
+scrub.oninput = () => { playing = false; playBtn.textContent = "Play"; show(scrub.value / 1000 * CONFIG.duration); };
+
+// Export: records the canvas in real time while the animation plays once.
+document.getElementById("export").onclick = async () => {
+  const types = ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
+  const type = types.find(x => window.MediaRecorder && MediaRecorder.isTypeSupported(x));
+  if (!type) { msg.textContent = "This browser can't record. Open the file in Chrome."; return; }
+  playing = false; playBtn.textContent = "Play";
+  const stream = stage.captureStream(CONFIG.fps);
+  const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 16e6 });
+  const parts = []; rec.ondataavailable = e => e.data.size && parts.push(e.data);
+  const done = new Promise(r => rec.onstop = r);
+  show(0); rec.start();
+  const start = performance.now();
+  // a timer loop (not requestAnimationFrame, which stops completely in background tabs); keep this tab visible while it records
+  await new Promise(res => { (function step() { const t = (performance.now() - start) / 1000; if (t >= CONFIG.duration) return res(); show(t); msg.textContent = "Recording " + Math.round(t / CONFIG.duration * 100) + "% (keep this tab open)"; setTimeout(step, 1000 / CONFIG.fps); })(); });
+  show(CONFIG.duration - 1e-3); rec.stop(); await done;
+  const blob = new Blob(parts, { type }); const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "animation." + (type.includes("mp4") ? "mp4" : "webm");
+  document.body.appendChild(a); a.click(); a.remove();
+  msg.textContent = "Saved " + a.download + " (nothing downloaded? save this HTML file and open it in Chrome)";
+};
+
+setup().then(() => { show(0); window.ready = true; });
+</script>
+</body>
+</html>

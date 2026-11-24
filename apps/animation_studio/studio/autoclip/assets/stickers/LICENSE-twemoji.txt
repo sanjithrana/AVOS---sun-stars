@@ -1,0 +1,2 @@
+Emoji sticker graphics: Twemoji (https://github.com/jdecked/twemoji), copyright 2020 Twitter, Inc and other contributors,
+licensed CC-BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The graphics are used unchanged apart from scaling.

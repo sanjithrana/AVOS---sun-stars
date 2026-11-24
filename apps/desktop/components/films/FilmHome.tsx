@@ -13,7 +13,7 @@ import { modelLabel, seriesApi } from "@/components/series/api";
 import { LibraryPicker } from "@/components/series/Library";
 import type { SeriesSummary } from "@/components/series/types";
 
-const field = "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-amber-500/40";
+const field = "w-full border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-amber-500/40";
 const label = "mb-1 block text-xs font-medium text-muted-foreground";
 
 export const EXAMPLE = `Create a 15-second cinematic 3D animated comedy, Pixar style, vibrant colours, smooth 24fps.
@@ -60,20 +60,20 @@ export function FilmHome() {
         </p>
         <ol className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
           {["Breakdown", "Characters & world", "Storyboard", "Motion", "Prompts", "Render", "Edit bay"].map((x, i) => (
-            <li key={x} className="rounded-lg border border-border px-2 py-0.5"><b className="text-amber-600">{i + 1}</b> {x}</li>
+            <li key={x} className="border border-border px-2 py-0.5"><b className="text-amber-600">{i + 1}</b> {x}</li>
           ))}
         </ol>
       </div>
       <NewFilm />
       <section>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground"><Clapperboard className="h-5 w-5 text-amber-500" />Your films</h2>
-        {list.isError ? <p className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm" data-testid="films-offline">{(list.error as Error).message}</p> :
-          list.isLoading ? <div className="h-24 animate-pulse rounded-xl bg-muted/40" /> : films.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">No films yet. Paste a prompt above.</p>
+        {list.isError ? <p className="border border-amber-500/40 bg-amber-500/5 p-4 text-sm" data-testid="films-offline">{(list.error as Error).message}</p> :
+          list.isLoading ? <div className="h-24 animate-pulse bg-muted/40" /> : films.length === 0 ? (
+            <p className="border border-dashed border-border p-6 text-sm text-muted-foreground">No films yet. Paste a prompt above.</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="films-list">
               {films.map((f) => (
-                <Link key={f.id} href={`/animations/films/${f.id}`} className="overflow-hidden rounded-xl border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`film-${f.id}`}>
+                <Link key={f.id} href={`/animations/films/${f.id}`} className="overflow-hidden border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`film-${f.id}`}>
                   <div className="aspect-video bg-muted/40">{f.thumb ? <img src={seriesApi.file(f.id, f.thumb)} alt="" className="h-full w-full object-cover" /> :
                     <div className="flex h-full items-center justify-center text-muted-foreground"><Film className="h-8 w-8" /></div>}</div>
                   <div className="space-y-1 p-4">
@@ -131,14 +131,14 @@ function NewFilm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-xl border border-border bg-card/40 p-5 md:p-6" data-testid="new-film">
+    <form onSubmit={submit} className="space-y-4 border border-border bg-card/40 p-5 md:p-6" data-testid="new-film">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground"><Sparkles className="h-5 w-5 text-amber-500" />New film</h2>
         <span className="grow" />
         <Button type="button" size="sm" variant="ghost" onClick={() => setPrompt(EXAMPLE)} data-testid="film-example">Load an example prompt</Button>
       </div>
       <div>
-        <label className={label} htmlFor="f-prompt">Your prompt: story, setting, characters, then what happens when (“0–3 SECONDS: …”, “SHOT 4 (3.00–4.00s) – close-up: …”), audio, rules. Or paste JSON.</label>
+        <label className={label} htmlFor="f-prompt">Your story, setting, characters, then what happens when (“0–3 …”, “SHOT 4 (3.00–4.00s) – …”), audio, rules. Or paste JSON.</label>
         <textarea id="f-prompt" className={`${field} min-h-72 font-mono text-xs leading-relaxed`} value={prompt} onChange={(e) => setPrompt(e.target.value)} required data-testid="film-prompt"
           placeholder={"Create a 15-second cinematic 3D animated comedy…\n\nSETTING\n…\n\nCHARACTERS\n…\n\n0–3 SECONDS\n…"} />
         <p className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -169,8 +169,8 @@ function NewFilm() {
           <label className={label} htmlFor="f-style">Art style (optional: read from the prompt)</label>
           <input id="f-style" className={field} value={style} onChange={(e) => setStyle(e.target.value)} placeholder="3D Pixar-style, cinematic lighting" />
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            {previews.map((src, i) => <img key={src} src={src} alt={`style ${i + 1}`} className="h-12 w-20 rounded-lg border border-border object-cover" />)}
-            <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
+            {previews.map((src, i) => <img key={src} src={src} alt={`style ${i + 1}`} className="h-12 w-20 border border-border object-cover" />)}
+            <label className="inline-flex cursor-pointer items-center gap-1 border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
               <ImagePlus className="h-4 w-4" />Style pictures<input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => setRefs([...refs, ...Array.from(e.target.files ?? [])].slice(0, 3))} />
             </label>
           </div>
@@ -184,7 +184,7 @@ function NewFilm() {
         </div>
         <div>
           <span className={label}>Music (optional: else the prompt&apos;s music cue)</span>
-          <label className="flex cursor-pointer items-center gap-1 truncate rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
+          <label className="flex cursor-pointer items-center gap-1 truncate border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
             <Music2 className="h-4 w-4 shrink-0" /><span className="truncate">{theme ? theme.name : "Upload a track"}</span>
             <input type="file" accept="audio/*" className="hidden" onChange={(e) => setTheme(e.target.files?.[0] ?? null)} />
           </label>

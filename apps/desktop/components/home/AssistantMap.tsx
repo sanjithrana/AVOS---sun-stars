@@ -7,7 +7,7 @@ const RIGHT = ["Storyboard", "Pictures and clips", "Voice and music"];
 const W = 1000, H = 380, YS = [50, 190, 330], C = 190;
 const pct = (n: number, of: number) => `${(n / of) * 100}%`;
 
-const pill = "whitespace-nowrap rounded-lg border border-border bg-background/60  px-6 py-3.5 text-sm text-muted-foreground";
+const pill = "whitespace-nowrap border border-border bg-background/60 px-6 py-3.5 text-sm text-muted-foreground";
 const action = `${pill} transition-colors hover:border-foreground/40 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`;
 
 /** The production assistant as the reference shows it: inputs on the left, outputs on the right, one centre. */
@@ -30,7 +30,7 @@ export function AssistantMap() {
         {RIGHT.map((label, i) => (
           <span key={label} className={`absolute z-10 -translate-y-1/2 ${pill}`} style={{ left: "72%", top: pct(YS[i], H) }}>{label}</span>
         ))}
-        <Link href="/explainer" className="absolute left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-4 rounded-lg border border-[var(--signal)]/60 bg-card px-9 py-5 avos-glow transition-colors hover:border-[var(--signal)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        <Link href="/explainer" className="absolute left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-4 border border-[var(--signal)]/60 bg-card px-9 py-5 avos-glow transition-colors hover:border-[var(--signal)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           style={{ top: pct(C, H) }}>
           <Mark className="h-7 w-7" />
           <span className="display whitespace-nowrap text-3xl">Production Assistant</span>
@@ -43,7 +43,7 @@ export function AssistantMap() {
 
       {/* phones: the same things as a plain list */}
       <div className="md:hidden">
-        <Link href="/explainer" className="flex items-center gap-3 rounded-lg border border-border bg-card px-6 py-4">
+        <Link href="/explainer" className="flex items-center gap-3 border border-border bg-card px-6 py-4">
           <Mark className="h-6 w-6" />
           <span className="display text-2xl">Production Assistant</span>
         </Link>

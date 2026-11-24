@@ -46,7 +46,7 @@ export function Crew({ p, onPick }: { p: Project; onPick: (a: Agent) => void }) 
                   return (
                     <li key={a.id}>
                       <button type="button" onClick={() => onPick(a)} data-testid={`agent-${a.id}`} title={a.does}
-                        className={`agent w-full rounded-xl border px-3 py-2.5 text-left transition ${a.state === "working" ? "border-[rgba(185,172,255,0.55)] bg-[rgba(124,92,255,0.10)]" : "border-border"} ${a.state === "off" ? "opacity-55" : ""}`}>
+                        className={`agent w-full rounded-xl border px-3 py-2.5 text-left transition ${a.state === "working" ? "border-[rgba(200,255,58,0.55)] bg-[rgba(200,255,58,0.10)]" : "border-border"} ${a.state === "off" ? "opacity-55" : ""}`}>
                         <span className="flex items-center gap-2">
                           <I.el className={`h-4 w-4 shrink-0 ${I.tone}`} aria-label={I.word} />
                           <span className="truncate text-sm font-medium">{a.name}</span>

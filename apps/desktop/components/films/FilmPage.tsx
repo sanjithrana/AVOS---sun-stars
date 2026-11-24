@@ -1,9 +1,11 @@
 "use client";
+import { QueueVideo } from "@/components/youtube/QueueVideo";
 /* eslint-disable @next/next/no-img-element -- pictures come from the Animation Studio service */
 // One film, stage by stage: 1 breakdown → 2 characters & world (approve / redesign / from the library) →
 // 3 storyboard (approve before anything moves) → 4 motion timeline → 5 prompts → 6 render (redo any shot) →
 // 7 edit bay (the master, the sound, every project file).
 import Link from "next/link";
+import { BackLink } from "@/components/layout/BackLink";
 import { useState } from "react";
 import { CheckCircle2, Clapperboard, Download, FileJson, Film, Loader2, Play, RefreshCw, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,7 +31,7 @@ export function FilmPage({ id }: { id: string }) {
   const { act, err, pending } = useAct(id);
   const [openShot, setOpenShot] = useState<string | null>(null);
 
-  if (q.isError) return <main className="p-8"><Link href="/animations/films" className="text-sm hover:underline">← Films</Link><p className="mt-4 text-muted-foreground">{(q.error as Error).message}</p></main>;
+  if (q.isError) return <main className="p-8"><BackLink direct href="/animations/films" className="text-sm hover:underline">← Films</BackLink><p className="mt-4 text-muted-foreground">{(q.error as Error).message}</p></main>;
   if (!q.data) return <main className="space-y-4 p-8"><div className="h-10 w-80 animate-pulse rounded-xl bg-muted/40" /><div className="h-64 animate-pulse rounded-xl bg-muted/40" /></main>;
   const snap = q.data;
   const s = snap.series;
@@ -46,7 +48,7 @@ export function FilmPage({ id }: { id: string }) {
     <main className="mx-auto max-w-7xl space-y-6 p-4 md:p-8" data-testid="film-page">
       {opened && ep && part && <ShotTools sid={id} snap={snap} ep={ep} part={part} shot={opened} act={act} onClose={() => setOpenShot(null)} />}
       <div>
-        <Link href="/animations/films" className="text-xs text-muted-foreground hover:underline">← Films</Link>
+        <BackLink direct href="/animations/films" className="text-xs text-muted-foreground hover:underline">← Films</BackLink>
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
           <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{snap.language.name}</span>
@@ -167,6 +169,7 @@ export function FilmPage({ id }: { id: string }) {
             </div>
             <div className="flex flex-wrap gap-3">
               {ep.video && <a className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-accent" href={seriesApi.file(id, ep.video)} download={`${s.title}.mp4`}><Film className="h-4 w-4" />final_master.mp4 ({fmt(ep.seconds)})</a>}
+              {ep.video && <QueueVideo url={seriesApi.file(id, ep.video)} title={s.title || "film"} />}
               <a className="inline-flex items-center gap-1 rounded-lg border border-amber-500/60 px-3 py-1.5 text-sm text-amber-700 hover:bg-amber-500/10 dark:text-amber-300" href={seriesApi.exportUrl(id, ep.id)} data-testid="export-project">
                 <Download className="h-4 w-4" />Project files (.zip)</a>
             </div>

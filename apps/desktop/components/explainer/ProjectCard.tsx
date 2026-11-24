@@ -16,7 +16,7 @@ export function ProjectCard({ p }: { p: Summary }) {
   const st = STATE[p.status] ?? STATE.working;
   const Icon = st.icon;
   return (
-    <Link href={`/explainer/${p.id}`} className="group animate-in fade-in overflow-hidden rounded-xl border border-border bg-card/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-500/50 hover:shadow-lg">
+    <Link href={`/explainer/${p.id}`} className="group animate-in fade-in overflow-hidden border border-border bg-card/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-500/50 hover:shadow-lg">
       <div className="flex aspect-video items-center justify-center overflow-hidden bg-muted">
         {p.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={explainer.file(p.id, p.thumb)} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <Film className="h-8 w-8 text-muted-foreground" />}
       </div>

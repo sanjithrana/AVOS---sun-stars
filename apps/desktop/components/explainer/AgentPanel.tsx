@@ -74,7 +74,7 @@ export function AgentPanel({ p, gate, error, onStop, onContinue, onDirect, onRew
   return (
     <section className="agent-panel flex h-full min-h-0 flex-col rounded-3xl border border-border" aria-label="Agent" data-testid="agent-panel">
       <header onPointerDown={onGrab} className={`flex items-center gap-3 border-b border-border px-4 py-3 ${onGrab ? "cursor-grab touch-none select-none active:cursor-grabbing" : ""} ${compact ? "border-b-0" : ""}`}>
-        <span className={`h-2 w-2 shrink-0 rounded-full ${running ? "animate-pulse bg-[var(--signal)] shadow-[0_0_12px_rgba(150,120,255,0.9)]" : p.status === "error" ? "bg-[#e0657c]" : p.status === "waiting" ? "bg-[#d9a64e]" : "bg-[#52c79a]"}`} aria-hidden />
+        <span className={`h-2 w-2 shrink-0 rounded-full ${running ? "animate-pulse bg-[var(--signal)] shadow-[0_0_12px_rgba(200,255,58,0.9)]" : p.status === "error" ? "bg-[#e0657c]" : p.status === "waiting" ? "bg-[#d9a64e]" : "bg-[#52c79a]"}`} aria-hidden />
         <p className="min-w-0 flex-1 truncate text-sm font-medium">
           {running ? (working[0]?.name ? `${working[0].name} is working` : "Working") : p.status === "waiting" ? "Waiting for you" : p.status === "error" ? "Needs attention" : p.status === "stopped" ? "Stopped" : "Done"}
         </p>
@@ -105,7 +105,7 @@ export function AgentPanel({ p, gate, error, onStop, onContinue, onDirect, onRew
       </div>
 
       <div ref={feed} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4" aria-live="polite" data-testid="agent-feed">
-        <div className="rounded-2xl bg-[rgba(124,92,255,0.12)] px-3.5 py-2.5 text-sm">
+        <div className="rounded-2xl bg-[rgba(200,255,58,0.12)] px-3.5 py-2.5 text-sm">
           <p className="text-[11px] text-muted-foreground">You</p>
           <p className="mt-0.5 line-clamp-4 whitespace-pre-line">{p.brief}</p>
         </div>
@@ -132,7 +132,7 @@ export function AgentPanel({ p, gate, error, onStop, onContinue, onDirect, onRew
           </div>
         )}
         {gate && (
-          <div className="rounded-2xl border border-[rgba(185,172,255,0.5)] bg-[rgba(124,92,255,0.08)] px-3.5 py-3" data-testid="agent-gate">
+          <div className="rounded-2xl border border-[rgba(200,255,58,0.5)] bg-[rgba(200,255,58,0.08)] px-3.5 py-3" data-testid="agent-gate">
             <p className="text-sm font-medium">{gate.title}</p>
             <p className="mt-1 text-[13px] leading-snug text-muted-foreground">{gate.help}</p>
             <button type="button" disabled={gate.pending} onClick={gate.onApprove} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold disabled:opacity-60" data-testid="explainer-approve">

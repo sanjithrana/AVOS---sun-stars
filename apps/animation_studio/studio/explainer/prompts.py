@@ -223,7 +223,11 @@ FIX = {"too_dark": "brightly and evenly lit, clear exposure, visible details in 
        "too_bright": "balanced exposure, no blown-out highlights, soft contrast",
        "flat": "rich detail, strong tonal contrast, the subject clearly separated from the background",
        "duplicate": "a clearly different camera angle, framing and subject position from the previous shot",
-       "thin_plan": "Never leave camera_note, lighting or audio empty: write them for EVERY shot, each different from the others. "}
+       "thin_plan": "Never leave camera_note, lighting or audio empty: write them for EVERY shot, each different from the others. ",
+       # what the house director (studio/house.py) found in plans this prompt wrote
+       "house_two_actions": "Every shot's action is ONE movement; anything that happens next is the next shot. ",
+       "house_not_visible": "Write each action as what the camera sees (hands, objects, faces, movement), never a thought or a meaning. ",
+       "house_flat_opening": "Shot 1 must already be moving: a surprise, a question or an action in the first two seconds. "}
 NOTE_WORDS = [(r"hand|finger", "correct hands with five fingers each"), (r"blur|soft focus|out of focus", "sharp focus on the subject"),
               (r"text|letter|word|writing", "no text, no letters, no writing anywhere in the picture"), (r"face|eyes", "a clear, well-formed face"),
               (r"dark|dim", FIX["too_dark"]), (r"off.?model|different character|wrong character|not the same", "exactly the same character design as the reference"),

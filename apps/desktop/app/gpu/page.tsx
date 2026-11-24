@@ -23,7 +23,7 @@ const input =
   "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30";
 const btn = "inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-50";
 const primary =
-  "inline-flex items-center gap-1.5 rounded-xl bg-primary hover:bg-[#8873be] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-xl bg-primary hover:bg-[#dcff7a] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
 
 function Card({ icon, title, sub, children, id, right }: { icon: ReactNode; title: string; sub?: string; children: ReactNode; id: string; right?: ReactNode }) {
   return (
@@ -62,7 +62,7 @@ function VramBar({ w }: { w: GpuWorker }) {
   const used = Math.max(0, total - free, modelGb);
   const other = Math.max(0, used - modelGb);
   const pct = (gb: number) => `${Math.min(100, (gb / total) * 100)}%`;
-  const colors = ["bg-amber-500", "bg-orange-500", "bg-rose-500", "bg-violet-500"];
+  const colors = ["bg-amber-500", "bg-orange-500", "bg-rose-500", "bg-emerald-700"];
   return (
     <div>
       <div className="flex justify-between text-xs text-muted-foreground">

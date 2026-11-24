@@ -87,12 +87,12 @@ export function Timeline({ sid, snap, part, video, onOpen }: { sid: string; snap
   const ticks = Array.from({ length: Math.floor(total) + 1 }, (_, i) => i);
   return (
     <div className="space-y-2" data-testid="timeline">
-      {video && <video ref={vid} controls className="aspect-video w-full rounded-xl bg-black" src={video} onTimeUpdate={(e) => setT(e.currentTarget.currentTime)}
+      {video && <video ref={vid} controls className="aspect-video w-full bg-black" src={video} onTimeUpdate={(e) => setT(e.currentTarget.currentTime)}
         onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} data-testid="part-video" />}
-      <div className="overflow-x-auto rounded-xl border border-border bg-card/30 p-2">
+      <div className="overflow-x-auto border border-border bg-card/30 p-2">
         <div className="min-w-[720px]">
           <div className="flex items-center gap-2 pb-1">
-            <button className="flex h-7 w-24 shrink-0 items-center justify-center gap-1 rounded-lg border border-border text-xs hover:bg-accent" onClick={play} data-testid="timeline-play">
+            <button className="flex h-7 w-24 shrink-0 items-center justify-center gap-1 border border-border text-xs hover:bg-accent" onClick={play} data-testid="timeline-play">
               {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}{t.toFixed(1)}s
             </button>
             <div className="relative h-5 flex-1 cursor-pointer text-[10px] text-muted-foreground" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); seek((e.clientX - r.left) / r.width); }}>
@@ -102,17 +102,17 @@ export function Timeline({ sid, snap, part, video, onOpen }: { sid: string; snap
           <div className="relative">
             <Lane name="Shots">
               {shots.map((s, i) => (
-                <button key={s.id} className="absolute top-0 h-full overflow-hidden rounded border border-black/40 bg-muted" style={{ left: pct(t0[i]), width: pct(s.seconds) }}
+                <button key={s.id} className="absolute top-0 h-full overflow-hidden border border-black/40 bg-muted" style={{ left: pct(t0[i]), width: pct(s.seconds) }}
                   onClick={() => onOpen?.(s.id)} title={`${i + 1}. ${s.picture}`} data-testid={`tl-shot-${s.id}`}>
                   {s.files.key && <img src={seriesApi.file(sid, s.files.key, `${part.boardAt}-${s.takes?.picture}`)} alt="" className="h-full w-full object-cover" />}
-                  <span className="absolute left-0.5 top-0.5 rounded bg-black/60 px-1 text-[9px] text-white">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="absolute left-0.5 top-0.5 bg-black/60 px-1 text-[9px] text-white">{String(i + 1).padStart(2, "0")}</span>
                 </button>
               ))}
             </Lane>
             {lanes.map((l) => (
               <Lane key={l.name} name={l.name} small>
                 {l.items.map((it, k) => (
-                  <button key={k} className={`absolute top-0.5 h-[calc(100%-4px)] overflow-hidden whitespace-nowrap rounded px-1 text-left text-[10px] leading-5 ${TONE[it.tone ?? "a"]} ${it.dot ? "min-w-[6px]" : ""}`}
+                  <button key={k} className={`absolute top-0.5 h-[calc(100%-4px)] overflow-hidden whitespace-nowrap px-1 text-left text-[10px] leading-5 ${TONE[it.tone ?? "a"]} ${it.dot ? "min-w-[6px]" : ""}`}
                     style={{ left: pct(it.at), width: pct(it.len) }} title={`${it.at.toFixed(1)}s · ${it.label}`} onClick={() => it.shot && onOpen?.(it.shot)}>
                     {it.dot ? "●" : it.label}
                   </button>

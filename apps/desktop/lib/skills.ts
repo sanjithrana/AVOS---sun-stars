@@ -5,7 +5,10 @@ export type StepId = string;
 export interface SkillInfo {
   id: string; name: string; group: string; kind: string; made_for: string; about: string; input: string; outputs: string[];
   aspect: string; aspects?: string[]; seconds: number[]; lengths?: { seconds: number; scenes: number; each: number }[]; default_seconds: number; native_audio: boolean; examples: string[]; credit: string; make?: [string, string][];
-  styles?: [string, string][]; motions?: [string, string][]; characters?: { id: string; name: string; about: string }[]; default_cast?: { founder: string };
+  note?: string; engine?: boolean; slow?: string; slow_label?: string; cta?: [string, string]; free?: boolean; styles?: [string, string][]; motions?: [string, string][]; motions_label?: string; hands?: [string, string][]; hands_label?: string; characters?: { id: string; name: string; about: string }[]; default_cast?: { founder: string };
+}
+export interface RunOutput {
+  key: string; step: StepId; title: string; kind: "image" | "video"; prompt?: string | null; file?: string | null;
 }
 export interface Lock { subject: string; form: string; finish: string; palette: string; shell: string; hidden: string[]; anatomy: string; torso: string; sequence: string[]; reveal: string }
 export interface Source { title: string; url: string }
@@ -18,11 +21,13 @@ export interface Research {
   story_moments?: { year: string; title: string; what: string; kind: string; source?: Source | null }[];
 }
 export interface Run {
+  progress?: { pct: number | null; text: string } | null; createdAt?: string;
   id: string; skill: string; subject: string; title: string; aspect: string; seconds: number; media: "media" | "prompts"; status: RunStatus; stage: StepId;
   error?: string | null; lock?: Lock; prompts?: { compact: string; transformed: string; video: string }; compact?: string; transformed?: string; video?: string; engine?: string;
   steps: Partial<Record<string, { status: "working" | "done" | "error"; model?: string; note?: string }>>; log: { t: string; kind: string; text: string }[];
   style?: string; motion?: string; voice?: "male" | "female"; review?: boolean; plan_ok?: boolean; characters?: { founder?: string }; research?: Research; script?: { title: string; scenes: Scene[] }; cast?: Record<string, string>; finalSeconds?: number;
   busy: boolean; stages: { id: StepId; label: string }[]; version?: number; updatedAt: string; thumb?: string;
+  skillName?: string; outputs?: RunOutput[];
 }
 export interface Plan {
   characters: { id: string; name: string; about: string; chosen: boolean; poses: number; role: string }[];
@@ -49,9 +54,11 @@ const post = <T,>(path: string, body?: unknown) => call<T>(path, { method: "POST
 
 export const skills = {
   list: () => call<{ skills: SkillInfo[]; runs: RunSummary[] }>(""),
+  engine: () => call<{ ready: boolean; missing: string[]; fix: string; note: string; installing: boolean }>("/kits/engine"),
+  installEngine: () => post<{ started: boolean; installing: boolean }>("/kits/engine/install"),
   get: (id: string) => call<Run>(`/${id}`),
   create: (b: { skill: string; subject: string; media: "media" | "prompts"; aspect: string; seconds: number; voice?: "male" | "female"; style?: string; motion?: string; characters?: { founder: string }; review?: boolean; models?: Record<string, { model: string }>; local_only?: boolean; crew?: string }) => post<Run>("", b),
-  editPrompts: (id: string, prompts: Partial<Record<"compact" | "transformed" | "video", string>>) => call<Run>(`/${id}`, { method: "PATCH", body: JSON.stringify({ prompts }) }),
+  editPrompts: (id: string, prompts: Partial<Record<"compact" | "transformed" | "video" | "script", string>>) => call<Run>(`/${id}`, { method: "PATCH", body: JSON.stringify({ prompts }) }),
   redo: (id: string, step: StepId, n?: number) => post<Run>(`/${id}/redo`, { step, n }),
   editNarration: (id: string, narration: Record<string, string>) => call<Run>(`/${id}`, { method: "PATCH", body: JSON.stringify({ narration }) }),
   setMotion: (id: string, motion: "video" | "poses") => call<Run>(`/${id}`, { method: "PATCH", body: JSON.stringify({ motion }) }),

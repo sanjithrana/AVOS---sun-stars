@@ -1,53 +1,64 @@
-
-# ---- big downloads / installers (never commit) ----
-# ---- generated files ----
-# ---- OS / editor ----
-# ---- secrets and local data ----
-# ---- stray copies and update bundles ----
-# Dependencies / Packages
-# Environment variables
-# Machine Learning Models & Large Files
-*.7z
-*.bin
-*.db
-*.h5
-*.key
-*.log
-*.onnx
-*.pem
+# ---- big tools you can reinstall (never upload) ----
+ComfyUI_windows_portable/
+**/ComfyUI*/
+**/models/
+*.safetensors
+*.ckpt
 *.pt
 *.pth
+*.onnx
+*.gguf
+*.bin
+
+# ---- build output and installed packages ----
+node_modules/
+.next/
+out/
+dist/
+build/
+__pycache__/
 *.pyc
-*.sqlite
-*.sqlite3
-*.tsbuildinfo
+.venv/
+venv/
+.pytest_cache/
+
+# ---- videos, audio, zips, renders ----
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.avi
+*.wav
+*.mp3
+*.m4a
 *.zip
-.DS_Store
+*.7z
+*.tgz
+
+# ---- private: keys, logins, cookies, tokens ----
 .env
 .env.*
-.idea/
-.next/
-.pytest_cache/
-.venv/
-.vscode/
-__pycache__/
-apps/**/data/
-apps/apps/
-avos-all-updates/
-avos-architecture-updated*.zip
-avos-architecture-updated*/
-checkpoint/
-checkpoints/
-ComfyUI_portable.7z
-ComfyUI_windows_portable/
-env/
-ENV/
-models/
-music/
-node_modules/
-out/
-playwright-report/
-test-results/
-Thumbs.db
-venv/
 !.env.example
+*cookies*.txt
+*client_secret*.json
+*token*.json
+*.pem
+*.key
+secrets/
+
+# ---- app data (jobs, clips, channel logins) ----
+**/autoclip/jobs/
+**/autoclip/settings.json
+**/autoclip/youtube*.json
+**/projects/
+**/outputs/
+
+# ---- system junk ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# unzipped update packs
+avos-all-updates/
+avos-architecture-updated*/

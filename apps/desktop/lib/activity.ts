@@ -1,7 +1,7 @@
 // The top bar's feed (apps/animation_studio/studio/activity.py): what runs, what waits for you and what finished, across every studio.
 export type ActivityState = "running" | "waiting" | "error" | "done" | "stopped";
 export interface ActivityItem {
-  studio: string; kind: string; id: string; title: string; state: ActivityState; stage: string; updatedAt: string; href: string; thumb: string | null; needs: number; error: string;
+  studio: string; kind: string; id: string; title: string; state: ActivityState; stage: string; updatedAt: string; href: string; thumb: string | null; needs: number; error: string; video?: string | null; style?: string;
 }
 export interface Activity { jobs: ActivityItem[]; recent: ActivityItem[]; counts: { running: number; waiting: number; error: number } }
 export interface Capabilities { ai_video: boolean; blender: boolean; voice: boolean; music: boolean; hint: string | null }
@@ -29,4 +29,23 @@ export function ago(iso: string, now = Date.now()): string {
   if (s < 3600) return `${Math.max(1, Math.round(s / 60))} min ago`;
   if (s < 86400) return `${Math.round(s / 3600)} h ago`;
   return `${Math.round(s / 86400)} d ago`;
+}
+
+// ---- the Library: every output from every studio, in one list
+export interface LibraryItem {
+  studio: string; kind: string; id: string; title: string; state: string; stage: string;
+  updatedAt: string; href: string; thumb: string | null; needs: number; error: string;
+}
+export interface Library {
+  items: LibraryItem[]; total: number;
+  by_studio: { name: string; count: number }[];
+  by_state: { name: string; count: number }[];
+  by_kind: { name: string; count: number }[];
+  by_style?: { name: string; count: number }[];
+}
+
+export async function library(limit = 500): Promise<Library> {
+  const r = await fetch(`/studio-api/activity/all?limit=${limit}`, { cache: "no-store" });
+  if (!r.ok) throw new Error(`The library is not available (${r.status}). The studio may still be starting.`);
+  return r.json();
 }

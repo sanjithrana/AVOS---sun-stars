@@ -42,14 +42,14 @@ export function ShotTools({ sid, snap, ep, part, shot, act, onClose }: {
         </div>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="space-y-2">
-            {shot.files.key && <img src={seriesApi.file(sid, shot.files.key, v)} alt={shot.picture} className="w-full rounded-xl border border-border" data-testid="shot-key" />}
+            {shot.files.key && <img src={seriesApi.file(sid, shot.files.key, v)} alt={shot.picture} className="w-full border border-border" data-testid="shot-key" />}
             <p className="text-xs text-muted-foreground">Picture: {modelLabel(shot.models.key?.model)}{shot.models.key?.qaRetry ? " · redrawn after QA" : ""}
               {shot.keyOverride?.source === "upload" ? " · your picture" : shot.keyOverride?.history?.length ? ` · edited: ${shot.keyOverride.history.join(" → ")}` : ""}</p>
           </div>
           <div className="space-y-2">
-            {board && <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Storyboard frame: it is animated after you approve the storyboard.
+            {board && <p className="border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Storyboard frame: it is animated after you approve the storyboard.
               {shot.plan && <span className="mt-2 block text-xs">Motion model: {modelLabel(shot.plan.model)} · camera {shot.blueprint?.camera.move.replace(/_/g, " ")}</span>}</p>}
-            {shot.files.clip && <video controls loop className="w-full rounded-xl border border-border bg-black" src={seriesApi.file(sid, shot.files.clip, v)} data-testid="shot-clip" />}
+            {shot.files.clip && <video controls loop className="w-full border border-border bg-black" src={seriesApi.file(sid, shot.files.clip, v)} data-testid="shot-clip" />}
             <p className="text-xs text-muted-foreground">Motion: {modelLabel(shot.models.clip?.model)} · camera {shot.blueprint?.camera.move.replace(/_/g, " ") ?? shot.camera}
               {shot.driver ? " · driven by your video" : ""}{shot.models.clip?.qaRetry ? " · re-animated after QA" : ""}</p>
           </div>
@@ -58,7 +58,7 @@ export function ShotTools({ sid, snap, ep, part, shot, act, onClose }: {
         {(shot.qa?.key || shot.qa?.clip) && (
           <div className="flex flex-wrap gap-3 text-xs" data-testid="shot-qa">
             {(["key", "clip"] as const).map((k) => shot.qa?.[k] && (
-              <div key={k} className={`rounded-xl border px-3 py-2 ${shot.qa[k]!.pass ? "border-emerald-500/40" : "border-amber-500/50"}`}>
+              <div key={k} className={`border px-3 py-2 ${shot.qa[k]!.pass ? "border-emerald-500/40" : "border-amber-500/50"}`}>
                 <b className="mr-2">{k === "key" ? "Picture QA" : "Motion QA"}</b>
                 {shot.qa[k]!.pass ? <CheckCircle2 className="inline h-3.5 w-3.5 text-emerald-500" /> : <AlertTriangle className="inline h-3.5 w-3.5 text-amber-500" />}
                 {Object.entries(shot.qa[k]!.checks ?? {}).map(([c, r]) => <span key={c} className={`ml-2 ${r.ok ? "text-muted-foreground" : "text-amber-700 dark:text-amber-300"}`}>{c}{r.ok ? " ✓" : `: ${r.why}`}</span>)}
@@ -81,12 +81,12 @@ export function ShotTools({ sid, snap, ep, part, shot, act, onClose }: {
             </Tool>
             <Tool icon={<ImagePlus className="h-4 w-4" />} title={board ? "Use my picture for this frame" : "Animate my image"} text="Your own picture becomes this shot's first frame, animated with the shot's motion and your note.">
               <input className={field} value={motion} onChange={(e) => setMotion(e.target.value)} placeholder="Motion note (optional): she turns and waves" />
-              <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 text-sm hover:bg-accent" data-testid="animate-image">
+              <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 border border-border px-3 text-sm hover:bg-accent" data-testid="animate-image">
                 <ImagePlus className="h-4 w-4" />Choose a picture<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={upload("image")} />
               </label>
             </Tool>
             <Tool icon={<Video className="h-4 w-4" />} title="Motion from a video" text="Act it out on your phone (or any clip): the character copies the body movement (Wan 2.2 Animate).">
-              <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 text-sm hover:bg-accent" data-testid="motion-driver">
+              <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 border border-border px-3 text-sm hover:bg-accent" data-testid="motion-driver">
                 <Video className="h-4 w-4" />Choose a video<input type="file" accept="video/*" className="hidden" onChange={upload("driver")} />
               </label>
             </Tool>
@@ -98,7 +98,7 @@ export function ShotTools({ sid, snap, ep, part, shot, act, onClose }: {
           </div>
         )}
 
-        <details className="rounded-xl border border-border p-3 text-xs" data-testid="shot-prompts">
+        <details className="border border-border p-3 text-xs" data-testid="shot-prompts">
           <summary className="cursor-pointer font-semibold text-foreground">What the models were told (compiled from the scene graph, the motion blueprint and the Design DNA)</summary>
           {board && shot.plan && <div className="mt-2"><b>Motion (planned) · {modelLabel(shot.plan.model)}</b><p className="mt-1 whitespace-pre-wrap text-muted-foreground">{shot.plan.prompt}</p></div>}
           {(["key", "clip", "line", "sfx"] as const).map((k) => shot.models[k]?.prompt && (
@@ -113,7 +113,7 @@ export function ShotTools({ sid, snap, ep, part, shot, act, onClose }: {
 
 function Tool({ icon, title, text, children }: { icon: React.ReactNode; title: string; text: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-2 rounded-xl border border-border bg-card/40 p-3">
+    <div className="space-y-2 border border-border bg-card/40 p-3">
       <b className="flex items-center gap-2 text-sm text-foreground">{icon}{title}</b>
       <p className="text-xs text-muted-foreground">{text}</p>
       {children}

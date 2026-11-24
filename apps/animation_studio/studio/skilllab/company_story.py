@@ -30,7 +30,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
-from .. import paper
+from .. import house, paper
 from ..series import media, writers
 from . import base, cards, compose, store
 
@@ -608,7 +608,7 @@ ACT_SCENES = 8                              # scenes per writing pass: one answe
 def script(s: dict, r: dict, n: int, log: Callable[[dict], None] | None = None, secs: int = SCENE_SECONDS) -> dict:
     if not writers.uses_ai(s):
         raise writers.WriterError("Company Story needs an AI writer for the script (pick Groq or another AI crew in Models); the research is ready.")
-    system = writers.system("avos-company-story-writer", SCRIPT)
+    system = writers.directed("avos-company-story-writer", SCRIPT)
     lo, hi = words_for(secs)
     head = (f"Write a {n}-scene story about {r['name']}. Each scene is on screen for about {secs} seconds, so each narration is {lo}-{hi} spoken words.\n"
             f"Scene jobs in order: {beats_for(n)}.\n\nResearch (the only facts you may use):\n{facts_text(r)}\n\n"
@@ -695,12 +695,29 @@ def do_script(pid: str) -> None:
     base.step(pid, "script", status="working")
     total = float(p.get("seconds") or 60)
     sc = script(base.sdict(p), p["research"], scenes_for(total), base.logger(pid), secs=scene_seconds(total))
+    house_note = directed(sc)
     base.put(pid, script=sc, title=sc["title"])
     dropped = sum(x["dropped"] for x in sc["scenes"])
     fixed = sum(1 for x in sc["scenes"] if x["warning"])
     note = "; ".join(t for t in (f"{dropped} card(s) dropped: their numbers weren't in the research" if dropped else "",
-                                 f"{fixed} narration line(s) corrected or flagged" if fixed else "") if t)
+                                 f"{fixed} narration line(s) corrected or flagged" if fixed else "", house_note) if t)
     base.step(pid, "script", status="done", note=note)
+
+
+MOVES = ("slow push in", "slow pull out", "pan left", "pan right")
+
+
+def directed(sc: dict) -> str:
+    """The house director's pass (studio/house.py), no AI call: two scenes in a row in the same setting with the same
+    camera move read as one long shot, so the second one's move changes. Returns a note, or "" when nothing came up."""
+    scenes = sc["scenes"]
+    moves, fixed = house.unrepeat_framing([x["setting"] for x in scenes], [x["move"] for x in scenes], MOVES)
+    for x, mv in zip(scenes, moves):
+        x["move"] = mv
+    found = house.review([house.card(x["n"], x["place"], x["visual"]) for x in scenes])
+    found = [f for f in found if f[1] != "same_framing"]       # settings, not framings: handled by the moves above
+    sc["house"] = {"fixed": fixed, "found": [list(f) for f in found]}
+    return house.note_of(found, fixed) if fixed or found else ""
 
 
 def _w_h(p: dict) -> tuple[int, int]:
@@ -742,6 +759,7 @@ def _backdrop(pid: str, p: dict, sc: dict, s: dict, w: int, h: int, side: str) -
         try:
             ask = prompt if not attempt else prompt + " " + BRIGHTER
             bg, info = media.picture(ask, [], w, h, seed + attempt, f"{pid}-S{sc['n']}", s=s, negative=NEGATIVE)
+            bg = compose.fill(bg, w, h)        # bands off and the frame filled before the character is placed on it
             dull = compose.too_dull(bg)
             if dull and attempt == 0:
                 store.say(pid, f"Scene {sc['n']}: the backdrop {dull}, drawing it again brighter.", "warn")

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/*TITLE*/</title>
+<!-- Made with the Science Story Shorts kit (free from Anylancer.com). three.js r160, MIT licence. -->
+<style>
+  html, body { margin: 0; height: 100%; background: #16131a; color: #eee; font: 14px system-ui, sans-serif; }
+  #wrap { position: fixed; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; }
+  #stage { background: #000; box-shadow: 0 10px 40px rgba(0,0,0,.5); border-radius: 6px; }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; display: flex; gap: 10px; align-items: center; padding: 0 14px; background: #1f1b24; box-sizing: border-box; }
+  #bar button { background: #34303b; color: #fff; border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 600; cursor: pointer; }
+  #bar button.go { background: #ff8200; }
+  #bar input[type=range] { flex: 1; }
+  #msg { min-width: 130px; opacity: .8; font-variant-numeric: tabular-nums; }
+  body.render #bar { display: none; }
+  body.render #wrap { inset: 0; display: block; }
+  body.render #stage { box-shadow: none; border-radius: 0; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script>window.THREE || document.write('<script src="three.min.js"><\/script>');</script>
+</head>
+<body>
+<div id="wrap"><canvas id="stage"></canvas></div>
+<div id="bar">
+  <button id="play">Play</button>
+  <input id="scrub" type="range" min="0" max="1000" value="0">
+  <span id="msg">loading…</span>
+  <button id="voice">Load voice</button><input id="file" type="file" accept="audio/*" hidden>
+  <button id="export" class="go">Export video</button>
+</div>
+<!--FONTS-->
+<!--ENGINE-->
+<!--VOICE-->
+<!--STORY-->
+<!--PLAYER-->
+</body>
+</html>

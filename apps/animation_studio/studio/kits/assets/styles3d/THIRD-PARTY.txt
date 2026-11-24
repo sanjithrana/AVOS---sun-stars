@@ -1,0 +1,2 @@
+engine/three.min.js is three.js r160 (https://threejs.org), MIT License, Copyright 2010-2023 three.js authors.
+Everything else in this kit: free from Anylancer.com, free to use in your own projects, not for resale.

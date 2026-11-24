@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app/animation_studio
 COPY animation_studio/requirements.txt animation_studio/requirements-lyrics.txt ./
-RUN pip install --no-cache-dir -r requirements.txt \
-    && if [ "$WITH_LYRICS" = "1" ]; then pip install --no-cache-dir -r requirements-lyrics.txt; fi
+RUN pip install --no-cache-dir --default-timeout=180 --retries 10 -r requirements.txt \
+    && if [ "$WITH_LYRICS" = "1" ]; then pip install --no-cache-dir --default-timeout=180 --retries 10 -r requirements-lyrics.txt; fi
 COPY animation_studio/ ./
 # The shared model catalog (same list as the Facts tab; docker-compose also mounts the live file over it).
 COPY agentic_core/models/catalog.json ./catalog.json

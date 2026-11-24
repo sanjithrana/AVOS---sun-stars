@@ -58,7 +58,7 @@ export function Timeline({ p, shots, onPick }: { p: Project; shots: Shot[]; onPi
           ))}
         </div>
         <div className="mt-1 flex min-w-[640px] justify-between text-[10px] text-muted-foreground"><span>0s</span><span>{(total / 2).toFixed(0)}s</span><span>{total.toFixed(1)}s</span></div>
-        <div className="mt-2 flex h-6 min-w-[640px] items-center rounded-md bg-violet-500/20 px-2 text-[11px] text-violet-700 dark:text-violet-300">♪ voice and music</div>
+        <div className="mt-2 flex h-6 min-w-[640px] items-center rounded-md bg-amber-500/20 px-2 text-[11px] text-amber-700 dark:text-amber-300">♪ voice and music</div>
       </div>
     </div>
   );

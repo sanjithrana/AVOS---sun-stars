@@ -8,6 +8,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Composer } from "@/components/stickman/Composer";
 import { SkillsPanel } from "@/components/stickman/SkillsPanel";
 import { stickman } from "@/lib/stickman";
+import { Palette, PenLine, Film as FilmIcon } from "lucide-react";
+import { Lit, PageHero } from "@/components/brand/PageHero";
 
 const LABEL: Record<string, string> = { working: "Working", waiting: "Needs your OK", done: "Ready", error: "Stopped with an error", stopped: "Stopped" };
 const KEY = "avos.stickman.skill";
@@ -29,6 +31,9 @@ export default function StickmanHome() {
   return (
     <AppShell header={<span className="text-lg font-semibold">Stickman Studio</span>}>
       <div className="w-full space-y-10 px-4 py-6 md:px-8 2xl:px-12">
+        <PageHero eyebrow="Stickman Studio" title={<>Stick figures. <Lit>Real stories.</Lit></>}
+          blurb="Pick a look, describe the event, and get a finished stickman video with voice, captions and music."
+          steps={[{ icon: Palette, t: "Pick a look", d: "Thirteen looks, from chalkboard to comic." }, { icon: PenLine, t: "Describe the event", d: "A sentence or a full brief." }, { icon: FilmIcon, t: "Get the video", d: "Review, approve, download." }]} />
         <div className="lg:grid lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] lg:gap-6 2xl:grid-cols-[380px_minmax(0,1fr)]">
           <div className="mb-6 h-[60vh] lg:sticky lg:top-0 lg:mb-0 lg:h-[calc(100dvh-8.5rem)]">
             {styles.isError ? <p className="rounded-3xl border border-border p-4 text-sm text-muted-foreground">{(styles.error as Error).message}</p>
@@ -43,7 +48,7 @@ export default function StickmanHome() {
             : !list.data?.length ? <p className="text-sm text-muted-foreground">Nothing yet.</p>
             : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {list.data.map((p) => (
-                  <Link key={p.id} href={`/stickman/${p.id}`} className="overflow-hidden rounded-2xl border border-border bg-card hover:border-[rgba(185,172,255,0.5)]">
+                  <Link key={p.id} href={`/stickman/${p.id}`} className="overflow-hidden rounded-2xl border border-border bg-card hover:border-[rgba(200,255,58,0.5)]">
                     <div className="flex aspect-video items-center justify-center bg-muted">
                       {p.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={stickman.file(p.id, p.thumb)} alt="" className="h-full w-full object-cover" /> : <Film className="h-8 w-8 text-muted-foreground" />}
                     </div>

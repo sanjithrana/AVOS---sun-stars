@@ -1,0 +1,4 @@
+Caption fonts bundled with Auto Clip. All are free to use, embed and redistribute under the SIL Open Font License 1.1
+(https://openfontlicense.org), taken from Google Fonts via Fontsource:
+Anton, Archivo Black, Baloo 2, Bangers, Bebas Neue, Kanit, Lilita One, Luckiest Guy, Montserrat, Noto Sans Devanagari, Oswald,
+Permanent Marker, Playfair Display, Poppins.

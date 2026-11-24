@@ -1,0 +1,377 @@
+[
+{
+"text": "In",
+"start": 0.1,
+"end": 0.2
+},
+{
+"text": "nineteen",
+"start": 0.24,
+"end": 0.81
+},
+{
+"text": "thirty-two,",
+"start": 0.81,
+"end": 1.38
+},
+{
+"text": "Australia",
+"start": 1.78,
+"end": 2.46
+},
+{
+"text": "went",
+"start": 2.58,
+"end": 2.74
+},
+{
+"text": "to",
+"start": 2.78,
+"end": 2.92
+},
+{
+"text": "war\u2026",
+"start": 2.98,
+"end": 3.28
+},
+{
+"text": "with",
+"start": 4.04,
+"end": 4.16
+},
+{
+"text": "birds.",
+"start": 4.36,
+"end": 4.86
+},
+{
+"text": "Twenty",
+"start": 5.52,
+"end": 5.96
+},
+{
+"text": "thousand",
+"start": 5.96,
+"end": 6.4
+},
+{
+"text": "emus",
+"start": 6.48,
+"end": 6.86
+},
+{
+"text": "were",
+"start": 6.92,
+"end": 7.04
+},
+{
+"text": "trampling",
+"start": 7.12,
+"end": 7.56
+},
+{
+"text": "wheat",
+"start": 7.68,
+"end": 7.84
+},
+{
+"text": "farms",
+"start": 7.94,
+"end": 8.24
+},
+{
+"text": "in",
+"start": 8.28,
+"end": 8.34
+},
+{
+"text": "the",
+"start": 8.38,
+"end": 8.46
+},
+{
+"text": "west.",
+"start": 8.5,
+"end": 8.9
+},
+{
+"text": "So",
+"start": 9.3,
+"end": 9.68
+},
+{
+"text": "the",
+"start": 9.72,
+"end": 9.84
+},
+{
+"text": "army",
+"start": 9.9,
+"end": 10.14
+},
+{
+"text": "sent",
+"start": 10.18,
+"end": 10.34
+},
+{
+"text": "a",
+"start": 10.4,
+"end": 10.46
+},
+{
+"text": "major,",
+"start": 10.52,
+"end": 10.86
+},
+{
+"text": "two",
+"start": 11.3,
+"end": 11.42
+},
+{
+"text": "soldiers\u2026",
+"start": 11.52,
+"end": 12.04
+},
+{
+"text": "and",
+"start": 12.38,
+"end": 12.58
+},
+{
+"text": "two",
+"start": 12.7,
+"end": 12.82
+},
+{
+"text": "machine",
+"start": 12.88,
+"end": 13.24
+},
+{
+"text": "guns.",
+"start": 13.32,
+"end": 13.68
+},
+{
+"text": "Easy,",
+"start": 14.04,
+"end": 14.36
+},
+{
+"text": "right?",
+"start": 14.52,
+"end": 14.76
+},
+{
+"text": "The",
+"start": 15.86,
+"end": 15.94
+},
+{
+"text": "emus",
+"start": 16.059,
+"end": 16.4
+},
+{
+"text": "split",
+"start": 16.48,
+"end": 16.74
+},
+{
+"text": "up.",
+"start": 16.86,
+"end": 17.0
+},
+{
+"text": "Ran",
+"start": 17.52,
+"end": 17.7
+},
+{
+"text": "at",
+"start": 17.72,
+"end": 17.94
+},
+{
+"text": "thirty",
+"start": 18.0,
+"end": 18.24
+},
+{
+"text": "miles",
+"start": 18.34,
+"end": 18.6
+},
+{
+"text": "an",
+"start": 18.64,
+"end": 18.72
+},
+{
+"text": "hour.",
+"start": 18.82,
+"end": 19.06
+},
+{
+"text": "Dodged",
+"start": 19.46,
+"end": 19.94
+},
+{
+"text": "everything.",
+"start": 20.04,
+"end": 20.6
+},
+{
+"text": "The",
+"start": 21.0,
+"end": 21.06
+},
+{
+"text": "major",
+"start": 21.1,
+"end": 21.36
+},
+{
+"text": "said",
+"start": 21.48,
+"end": 21.68
+},
+{
+"text": "they",
+"start": 21.7,
+"end": 21.8
+},
+{
+"text": "could",
+"start": 21.82,
+"end": 21.94
+},
+{
+"text": "take",
+"start": 21.98,
+"end": 22.24
+},
+{
+"text": "bullets",
+"start": 22.28,
+"end": 22.58
+},
+{
+"text": "like",
+"start": 22.64,
+"end": 22.84
+},
+{
+"text": "tanks.",
+"start": 22.94,
+"end": 23.36
+},
+{
+"text": "After",
+"start": 23.84,
+"end": 24.04
+},
+{
+"text": "a",
+"start": 24.08,
+"end": 24.14
+},
+{
+"text": "month,",
+"start": 24.2,
+"end": 24.46
+},
+{
+"text": "the",
+"start": 24.76,
+"end": 24.84
+},
+{
+"text": "army",
+"start": 24.9,
+"end": 25.1
+},
+{
+"text": "packed",
+"start": 25.22,
+"end": 25.46
+},
+{
+"text": "up\u2026",
+"start": 25.56,
+"end": 25.68
+},
+{
+"text": "and",
+"start": 26.04,
+"end": 26.14
+},
+{
+"text": "went",
+"start": 26.18,
+"end": 26.34
+},
+{
+"text": "home.",
+"start": 26.38,
+"end": 26.7
+},
+{
+"text": "The",
+"start": 27.08,
+"end": 27.16
+},
+{
+"text": "emus",
+"start": 27.24,
+"end": 27.7
+},
+{
+"text": "kept",
+"start": 27.74,
+"end": 27.94
+},
+{
+"text": "the",
+"start": 27.98,
+"end": 28.06
+},
+{
+"text": "wheat.",
+"start": 28.1,
+"end": 28.36
+},
+{
+"text": "Australia",
+"start": 28.84,
+"end": 29.58
+},
+{
+"text": "lost",
+"start": 29.66,
+"end": 29.96
+},
+{
+"text": "a",
+"start": 30.02,
+"end": 30.1
+},
+{
+"text": "war\u2026",
+"start": 30.18,
+"end": 30.52
+},
+{
+"text": "to",
+"start": 31.16,
+"end": 31.36
+},
+{
+"text": "birds.",
+"start": 31.4,
+"end": 31.9
+}
+]

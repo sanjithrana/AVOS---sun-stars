@@ -92,7 +92,10 @@ def do_plan(pid: str, note: str = "") -> None:
     if plan.get("pk"):                                       # judge the script by how complete its film fields are
         full = sum(1 for sh in plan["shots"] if sh.get("cam_note") and sh.get("lighting") and sh.get("audio"))
         thin = full < 0.7 * len(plan["shots"])
-        prompts.record_all(plan["pk"], "flag" if thin else "ok", ["thin_plan"] if thin else [], prompt=p["brief"][:200])
+        # what the house director sent back counts too, so the prompt library learns which rules this prompt breaks
+        kinds = sorted({f[1] for f in (plan.get("house") or {}).get("found", []) if f[1] != "same_framing"})
+        flags = (["thin_plan"] if thin else []) + [f"house_{k}" for k in kinds]
+        prompts.record_all(plan["pk"], "flag" if flags else "ok", flags, prompt=p["brief"][:200])
     known = memory.apply(plan)                               # characters the studio built before keep their exact look and seed
     if known:
         store.say(pid, f"Cast memory: recognised {', '.join(known)}; their look is locked from earlier videos.")

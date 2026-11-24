@@ -11,7 +11,7 @@ import { useAgentsInfo, useCrew } from "@/components/reelmimic/Shell";
 import { modelLabel, seriesApi } from "./api";
 import type { SeriesSummary } from "./types";
 
-const field = "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-amber-500/40";
+const field = "w-full border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-amber-500/40";
 const label = "mb-1 block text-xs font-medium text-muted-foreground";
 
 export function SeriesHome() {
@@ -34,13 +34,13 @@ export function SeriesHome() {
 
       <section>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground"><Clapperboard className="h-5 w-5 text-amber-500" />Your series</h2>
-        {list.isError ? <p className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-800 dark:text-amber-200" data-testid="series-offline">{(list.error as Error).message}</p> :
-          list.isLoading ? <div className="h-24 animate-pulse rounded-xl bg-muted/40" /> : items.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">No series yet. Create one above.</p>
+        {list.isError ? <p className="border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-800 dark:text-amber-200" data-testid="series-offline">{(list.error as Error).message}</p> :
+          list.isLoading ? <div className="h-24 animate-pulse bg-muted/40" /> : items.length === 0 ? (
+          <p className="border border-dashed border-border p-6 text-sm text-muted-foreground">No series yet. Create one above.</p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="series-list">
             {items.map((s) => (
-              <Link key={s.id} href={`/animations/series/${s.id}`} className="group overflow-hidden rounded-xl border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`series-${s.id}`}>
+              <Link key={s.id} href={`/animations/series/${s.id}`} className="group overflow-hidden border border-border bg-card/40 transition hover:border-amber-500/60" data-testid={`series-${s.id}`}>
                 <div className="aspect-video bg-muted/40">
                   {s.thumb ? <img src={seriesApi.file(s.id, s.thumb)} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-muted-foreground"><Users className="h-8 w-8" /></div>}
                 </div>
@@ -104,7 +104,7 @@ function NewSeries() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5 rounded-xl border border-border bg-card/40 p-5 md:p-6" data-testid="new-series">
+    <form onSubmit={submit} className="space-y-5 border border-border bg-card/40 p-5 md:p-6" data-testid="new-series">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground"><Sparkles className="h-5 w-5 text-amber-500" />New series</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2">
@@ -140,8 +140,8 @@ function NewSeries() {
           <textarea id="s-style" className={`${field} min-h-16`} value={style} onChange={(e) => setStyle(e.target.value)} data-testid="series-style"
             placeholder="Flat 2D, thick dark outlines, warm saturated colours, big expressive eyes" />
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            {previews.map((src, i) => <img key={src} src={src} alt={`style ${i + 1}`} className="h-14 w-24 rounded-lg border border-border object-cover" />)}
-            <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
+            {previews.map((src, i) => <img key={src} src={src} alt={`style ${i + 1}`} className="h-14 w-24 border border-border object-cover" />)}
+            <label className="inline-flex cursor-pointer items-center gap-1 border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
               <ImagePlus className="h-4 w-4" /> Style pictures
               <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" data-testid="series-refs"
                 onChange={(e) => setRefs([...refs, ...Array.from(e.target.files ?? [])].slice(0, 3))} />
@@ -174,7 +174,7 @@ function NewSeries() {
         </div>
         <div>
           <span className={label}>Theme music (optional)</span>
-          <label className="flex cursor-pointer items-center gap-1 truncate rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
+          <label className="flex cursor-pointer items-center gap-1 truncate border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">
             <Music2 className="h-4 w-4 shrink-0" /> <span className="truncate">{theme ? theme.name : "Upload a track"}</span>
             <input type="file" accept="audio/*" className="hidden" onChange={(e) => setTheme(e.target.files?.[0] ?? null)} />
           </label>

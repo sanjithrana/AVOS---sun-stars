@@ -29,7 +29,7 @@ export function RunsTable({ jobs, compact = false }: { jobs: GpuJobRow[]; compac
                     : (
                       <span className="block w-28">
                         <span className="text-amber-600 dark:text-amber-400">{j.step || j.status}</span>
-                        <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-amber-500" style={{ width: `${Math.round((j.progress || 0) * 100)}%` }} /></span>
+                        <span className="mt-1 block h-1.5 overflow-hidden bg-muted"><span className="block h-full bg-amber-500" style={{ width: `${Math.round((j.progress || 0) * 100)}%` }} /></span>
                       </span>
                     )}
                 {j.status === "error" && j.error && <span className="block max-w-[260px] text-xs text-muted-foreground [overflow-wrap:anywhere]">{j.error}</span>}

@@ -286,9 +286,9 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
           <b className="text-lg text-foreground">Director · Part {part.index} · {shot.id}</b>
           <span className="text-sm text-muted-foreground">{shot.kind === "dialogue" ? `${names[shot.speaker ?? ""] ?? ""}: “${shot.text}”` : shot.motion}</span>
           <span className="grow" />
-          <div className="inline-flex rounded-xl border border-border p-0.5 text-sm">
-            <button className={`rounded-lg px-3 py-1 ${view === "camera" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => switchView("camera")} data-testid="view-camera"><Camera className="mr-1 inline h-3.5 w-3.5" />Camera</button>
-            <button className={`rounded-lg px-3 py-1 ${view === "top" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => switchView("top")} data-testid="view-top">Overhead (drag people)</button>
+          <div className="inline-flex border border-border p-0.5 text-sm">
+            <button className={`px-3 py-1 ${view === "camera" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => switchView("camera")} data-testid="view-camera"><Camera className="mr-1 inline h-3.5 w-3.5" />Camera</button>
+            <button className={`px-3 py-1 ${view === "top" ? "bg-amber-500 text-white" : "text-muted-foreground"}`} onClick={() => switchView("top")} data-testid="view-top">Overhead (drag people)</button>
           </div>
           <Button size="sm" onClick={save} disabled={!dirty} data-testid="director-save"><Save />Save and redo this shot</Button>
           <Button size="sm" variant="ghost" onClick={onClose} data-testid="director-close"><X />Close</Button>
@@ -296,13 +296,13 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_340px]">
           <div className="space-y-2">
-            <div ref={mount} className="w-full overflow-hidden rounded-xl border border-border bg-black" style={{ aspectRatio: String(aspect) }}
+            <div ref={mount} className="w-full overflow-hidden border border-border bg-black" style={{ aspectRatio: String(aspect) }}
               onPointerDown={(e) => onPointer(e, "down")} onPointerMove={(e) => onPointer(e, "move")} onPointerUp={(e) => onPointer(e, "up")} onPointerLeave={(e) => onPointer(e, "up")}>
               {!gl && <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground" data-testid="director-no-webgl">
                 The 3D preview needs WebGL (turn on hardware acceleration in the browser). You can still edit the camera, the people and the timeline and save.</div>}
             </div>
             {/* the timeline */}
-            <div className="space-y-2 rounded-xl border border-border bg-card/40 p-3" data-testid="director-timeline">
+            <div className="space-y-2 border border-border bg-card/40 p-3" data-testid="director-timeline">
               <div className="flex items-center gap-3">
                 <Button size="sm" variant="outline" onClick={play} data-testid="director-play">{playing ? <Pause /> : <Play />}{playing ? "Pause" : "Play"}</Button>
                 <input type="range" min={0} max={bp.duration} step={0.01} value={t} className="flex-1 accent-amber-500" data-testid="director-scrub"
@@ -340,7 +340,7 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
             </Panel>
             <Panel title="People">
               <div className="flex flex-wrap gap-1">{stage.actors.map((a) => (
-                <button key={a.id} onClick={() => setSel(a.id)} className={`rounded-md px-2 py-0.5 text-xs ${sel === a.id ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground"}`}>{names[a.id] ?? a.id}{a.speaking ? " 🗣" : ""}</button>))}</div>
+                <button key={a.id} onClick={() => setSel(a.id)} className={`px-2 py-0.5 text-xs ${sel === a.id ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground"}`}>{names[a.id] ?? a.id}{a.speaking ? " 🗣" : ""}</button>))}</div>
               {selActor && (
                 <div className="space-y-2" data-testid="director-actor">
                   <Slider label="Left / right" min={-6} max={6} step={0.05} value={selActor.x} testid="director-actor-x"
@@ -355,9 +355,9 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
                     <div className="text-xs font-semibold text-muted-foreground">Timed actions</div>
                     {(track?.keys ?? []).map((k, i) => (
                       <div key={i} className="flex items-center gap-1">
-                        <input type="number" min={0} max={bp.duration} step={0.1} className="w-16 rounded-lg border border-border bg-background px-1 py-1 text-xs" value={k.t}
+                        <input type="number" min={0} max={bp.duration} step={0.1} className="w-16 border border-border bg-background px-1 py-1 text-xs" value={k.t}
                           onChange={(e) => setKeys((track?.keys ?? []).map((x, j) => (j === i ? { ...x, t: Math.max(0, Math.min(bp.duration, Number(e.target.value))) } : x)))} />
-                        <input className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2 py-1 text-xs" value={k.action}
+                        <input className="min-w-0 flex-1 border border-border bg-background px-2 py-1 text-xs" value={k.action}
                           onChange={(e) => setKeys((track?.keys ?? []).map((x, j) => (j === i ? { ...x, action: e.target.value } : x)))} data-testid="director-key-action" />
                         <button className="text-muted-foreground hover:text-red-500" title="Remove" onClick={() => setKeys((track?.keys ?? []).filter((_, j) => j !== i))}><Trash2 className="h-3.5 w-3.5" /></button>
                       </div>
@@ -377,7 +377,7 @@ export function Director({ sid, snap, ep, part, shot, act, onClose }: {
 }
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
-  return <div className="space-y-2 rounded-xl border border-border bg-card/40 p-3"><b className="text-foreground">{title}</b>{children}</div>;
+  return <div className="space-y-2 border border-border bg-card/40 p-3"><b className="text-foreground">{title}</b>{children}</div>;
 }
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block text-xs text-muted-foreground">{label}<div className="mt-0.5">{children}</div></label>;
@@ -394,9 +394,9 @@ function Lane({ label, duration, t, keys, bar, active, onClick }: { label: strin
   return (
     <div className={`flex items-center gap-2 ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
       <span className={`w-28 shrink-0 truncate text-xs ${active ? "font-semibold text-amber-600" : "text-muted-foreground"}`} title={label}>{label}</span>
-      <div className="relative h-6 flex-1 rounded bg-muted/60">
-        {bar && <div className="absolute inset-y-2 left-0 right-0 rounded bg-amber-500/40" />}
-        {keys.map((k, i) => <span key={i} title={`${k.t.toFixed(1)}s · ${k.label}`} className="absolute top-1 h-4 w-1.5 -translate-x-1/2 rounded bg-amber-500" style={{ left: `${(100 * k.t) / Math.max(0.01, duration)}%` }} />)}
+      <div className="relative h-6 flex-1 bg-muted/60">
+        {bar && <div className="absolute inset-y-2 left-0 right-0 bg-amber-500/40" />}
+        {keys.map((k, i) => <span key={i} title={`${k.t.toFixed(1)}s · ${k.label}`} className="absolute top-1 h-4 w-1.5 -translate-x-1/2 bg-amber-500" style={{ left: `${(100 * k.t) / Math.max(0.01, duration)}%` }} />)}
         <span className="absolute inset-y-0 w-px bg-foreground/70" style={{ left: `${(100 * t) / Math.max(0.01, duration)}%` }} />
       </div>
     </div>

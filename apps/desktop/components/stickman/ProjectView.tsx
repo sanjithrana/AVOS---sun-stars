@@ -1,8 +1,10 @@
 "use client";
+import { QueueVideo } from "@/components/youtube/QueueVideo";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BackLink } from "@/components/layout/BackLink";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ArrowLeft, Check, CheckCircle2, Copy, Download, Loader2, OctagonX, Play, RefreshCw, Trash2, TriangleAlert } from "lucide-react";
 import { stickman, type Clip, type Project } from "@/lib/stickman";
@@ -113,7 +115,7 @@ export function ProjectView({ id }: { id: string }) {
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-8 md:px-8">
       <div>
-        <Link href="/stickman" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All videos</Link>
+        <BackLink direct href="/stickman" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All videos</BackLink>
         <div className="mt-2 flex flex-wrap items-start gap-3">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl font-bold" data-testid="stickman-title">{p.title}</h1>
@@ -148,7 +150,7 @@ export function ProjectView({ id }: { id: string }) {
                 <p className="mt-2 text-xs text-muted-foreground"><b>First 2 seconds:</b> {t.opening_visual}</p>
                 <p className="mt-1 text-xs text-muted-foreground"><b>Conflict:</b> {t.conflict}</p>
                 <p className="mt-1 text-xs text-muted-foreground"><b>Ending:</b> {t.ending}</p>
-                <button type="button" onClick={() => act.mutate(() => stickman.pick(id, i))} className="mt-4 self-start rounded-lg bg-primary hover:bg-[#8873be] px-4 py-2 text-sm font-semibold text-white" data-testid={`pick-${i}`}>Make this one</button>
+                <button type="button" onClick={() => act.mutate(() => stickman.pick(id, i))} className="mt-4 self-start rounded-lg bg-primary hover:bg-[#dcff7a] px-4 py-2 text-sm font-semibold text-white" data-testid={`pick-${i}`}>Make this one</button>
               </article>
             ))}
           </div>
@@ -175,7 +177,7 @@ export function ProjectView({ id }: { id: string }) {
           <p className="font-semibold">Check the character sheets before any scene is made</p>
           <p className="mt-1 text-sm text-muted-foreground">Compare each sheet with its identity paragraph below. If a design is off, fix the wording in the package or approve anyway; scenes and video are the paid steps. You can also edit the narration here.</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" disabled={approve.isPending} onClick={() => approve.mutate()} className="inline-flex items-center gap-1.5 rounded-lg bg-primary hover:bg-[#8873be] px-5 py-2.5 font-semibold text-white disabled:opacity-60" data-testid="stickman-approve">
+            <button type="button" disabled={approve.isPending} onClick={() => approve.mutate()} className="inline-flex items-center gap-1.5 rounded-lg bg-primary hover:bg-[#dcff7a] px-5 py-2.5 font-semibold text-white disabled:opacity-60" data-testid="stickman-approve">
               {approve.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}Approve and make the video</button>
             {Object.keys(draft).length > 0 && <button type="button" onClick={() => saveNarr.mutate()} className="rounded-lg border border-border px-4 py-2.5 text-sm hover:bg-accent">Save narration changes</button>}
           </div>
@@ -214,6 +216,7 @@ export function ProjectView({ id }: { id: string }) {
             <div className="space-y-2 text-sm">
               <p className="text-muted-foreground">{p.finalSeconds}s, with voice and word-by-word captions.</p>
               <a href={stickman.file(id, p.final)} download className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-4 py-2 font-semibold text-white"><Download className="h-4 w-4" />Download MP4</a>
+              <QueueVideo url={stickman.file(id, p.final)} title={p.title || "video"} />
             </div>
           </div>
         </section>

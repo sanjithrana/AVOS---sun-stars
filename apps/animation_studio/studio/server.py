@@ -23,6 +23,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response, StreamingRes
 from . import config, jobs as J
 from .config import CONFIG, PROJECTS
 from .llm import agent_kinds, agent_status, agents_info, pull_model, save_agent_settings
+from .usage import router as usage_router
 from .series import pipeline as series_pipeline
 from .series.routes import router as series_router
 from .explainer import pipeline as explainer_pipeline
@@ -32,6 +33,8 @@ from .stickman.routes import router as stickman_router
 from .skilllab import pipeline as skill_pipeline
 from .skilllab.routes import router as skill_router
 from .activity import router as activity_router
+from .autoclip import autopilot as autoclip_autopilot, pipeline as autoclip_pipeline
+from .autoclip.routes import router as autoclip_router
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -40,7 +43,10 @@ async def lifespan(_: FastAPI):
     explainer_pipeline.recover()
     stickman_pipeline.recover()
     skill_pipeline.recover()
+    autoclip_pipeline.recover()
+    autoclip_autopilot.start_loop()
     yield
+    autoclip_autopilot.stop_loop()
     J.stop_all()
     for sid in list(series_pipeline._threads):
         series_pipeline.cancel(sid)
@@ -56,7 +62,9 @@ app.include_router(series_router)
 app.include_router(explainer_router)
 app.include_router(stickman_router)
 app.include_router(skill_router)
+app.include_router(autoclip_router)
 app.include_router(activity_router)
+app.include_router(usage_router)
 PROJECTS.mkdir(parents=True, exist_ok=True)
 LANGS = ("zh-TW", "en", "zh-CN")
 

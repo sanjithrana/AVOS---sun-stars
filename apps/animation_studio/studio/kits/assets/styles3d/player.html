@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 3D Styles player</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0d12; color: #e8ecf3; font: 500 14px/1.3 system-ui, -apple-system, Segoe UI, sans-serif; overflow: hidden; }
+  #wrap { position: absolute; inset: 0 0 56px 0; display: flex; align-items: center; justify-content: center; }
+  canvas { max-width: 100%; max-height: 100%; box-shadow: 0 10px 50px #0008; border-radius: 6px; background: #000; }
+  #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; gap: 10px; align-items: center; padding: 0 14px; background: #151922; }
+  #bar button { background: #262c39; color: #fff; border: 0; border-radius: 8px; padding: 8px 12px; font: inherit; cursor: pointer; }
+  #bar button:hover { background: #333b4c; }
+  #scrub { flex: 1; accent-color: #ff8200; }
+  #time { font-variant-numeric: tabular-nums; min-width: 92px; text-align: right; opacity: .8; }
+  body.render #bar { display: none; } body.render #wrap { inset: 0; display: block; } body.render canvas { max-width: none; max-height: none; border-radius: 0; box-shadow: none; }
+</style>
+<script src="engine/three.min.js"></script>
+<script src="engine/stage.js"></script>
+<script src="engine/sound.js"></script>
+</head>
+<body>
+<div id="wrap"><canvas id="c"></canvas></div>
+<div id="bar"><button id="play">Pause</button><input id="scrub" type="range" min="0" max="1000" value="0"><span id="time">0.00 / 0.00</span><button id="snd">Sound on</button><button id="q">Quality: live</button></div>
+<script>
+(async () => {
+  const Q = new URLSearchParams(location.search), render = Q.has("render");
+  if (render) document.body.classList.add("render");
+  const name = Q.get("style") || "toy-diorama";
+  await new Promise((ok, no) => { const s = document.createElement("script"); s.src = "styles/" + name + ".js"; s.onload = ok; s.onerror = () => no(new Error("style not found: " + name)); document.head.appendChild(s); });
+  const style = window.STYLES[name];
+  const canvas = document.getElementById("c");
+  const S = await K.run(canvas, style, { format: Q.get("fmt") || style.format || "16:9", nopins: Q.has("nopins") });
+  const fps = S.fps, DUR = style.duration, FULL = +(Q.get("samples") || style.samples || 16);
+  window.DURATION = DUR;
+  window.CONFIG = { width: S.W, height: S.H, fps, duration: DUR };
+  window.seek = (t) => S.seek(t);
+  window.renderFrame = (f) => { S.seek(f / fps, FULL); };
+  window.frameJPEG = (f, q = 0.94) => { S.seek(f / fps, FULL); return canvas.toDataURL("image/jpeg", q).split(",")[1]; };
+  window.renderAudio = async () => { const buf = await SOUND.renderOffline((k) => { if (Q.has("nomusic")) k.chords = () => k; style.sound && style.sound(k); }, DUR, 48000, { voiceover: Q.has("vo") }); const ab = SOUND.wav(buf); let s = "", b = new Uint8Array(ab); for (let i = 0; i < b.length; i += 32768) s += String.fromCharCode.apply(null, b.subarray(i, i + 32768)); return btoa(s); };
+  if (render) { S.seek(0, 1); window.ready = true; return; }
+
+  // live player
+  let t = 0, playing = true, last = performance.now(), sound = false, stopSound = null, live = 2;
+  const scrub = document.getElementById("scrub"), timeEl = document.getElementById("time"), playBtn = document.getElementById("play"), sndBtn = document.getElementById("snd"), qBtn = document.getElementById("q");
+  const restartSound = () => { if (stopSound) { stopSound(); stopSound = null; } if (sound && playing && style.sound) stopSound = SOUND.live((k) => style.sound(k), t, { voiceover: false }); };
+  sndBtn.textContent = "Sound off";
+  sndBtn.onclick = () => { sound = !sound; sndBtn.textContent = sound ? "Sound on" : "Sound off"; restartSound(); };
+  playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; last = performance.now(); restartSound(); };
+  scrub.oninput = () => { t = (scrub.value / 1000) * DUR; S.seek(t, FULL > 4 ? 4 : FULL); restartSound(); };
+  qBtn.onclick = () => { live = live === 2 ? 0 : 2; qBtn.textContent = live ? "Quality: live" : "Quality: full (paused)"; if (!live) { playing = false; playBtn.textContent = "Play"; restartSound(); S.seek(t, FULL); } };
+  const loop = (now) => {
+    if (playing) { t += (now - last) / 1000; if (t >= DUR) { t = 0; restartSound(); } S.seek(t, live || 2); scrub.value = (t / DUR) * 1000; }
+    last = now; timeEl.textContent = t.toFixed(2) + " / " + DUR.toFixed(2); requestAnimationFrame(loop);
+  };
+  S.seek(0, 2); requestAnimationFrame(loop);
+})().catch((e) => { window.__err = String(e); document.body.insertAdjacentHTML("beforeend", "<pre style='position:absolute;top:10px;left:10px;color:#f66'>" + e.stack + "</pre>"); console.error(e); });
+</script>
+</body>
+</html>

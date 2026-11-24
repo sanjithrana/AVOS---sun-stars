@@ -41,18 +41,18 @@ export function VoicePicker({ value, onChange }: { value: Voice | null; onChange
     a.onerror = () => { setLoading(null); setPlaying(null); setErr("Couldn't play a sample. Voices need an internet connection."); };
   };
   const star = (id: string) => { const n = favs.includes(id) ? favs.filter((x) => x !== id) : [...favs, id]; setFavs(n); saveFavs(n); };
-  const sel = "rounded-xl border border-border bg-background px-3 py-2 text-sm";
+  const sel = "border border-border bg-background px-3 py-2 text-sm";
 
   return (
     <div className="mt-6 text-sm">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Narrator voice</p>
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} data-testid="voice-toggle"
-        className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 transition hover:bg-accent">
+        className="inline-flex items-center gap-2 border border-border px-3 py-2 transition hover:bg-accent">
         {value ? <><Check className="h-4 w-4 text-emerald-600" />{value.name} · {value.language} ({value.dialect}) · {value.gender}</> : "Automatic (default voice) — choose one…"}
       </button>
       {value && <button type="button" onClick={() => onChange(null)} className="ml-2 text-xs text-muted-foreground underline">Use default</button>}
       {open && (
-        <div className="mt-3 animate-in fade-in slide-in-from-top-1 rounded-xl border border-border p-4 duration-300">
+        <div className="mt-3 animate-in fade-in slide-in-from-top-1 border border-border p-4 duration-300">
           {all.isLoading && <p className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Loading voices…</p>}
           {all.isError && <p className="text-red-600" role="alert">{(all.error as Error).message}</p>}
           {all.data && (
@@ -70,14 +70,14 @@ export function VoicePicker({ value, onChange }: { value: Voice | null; onChange
                 <input className={sel} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a voice" aria-label="Search" />
               </div>
               <button type="button" onClick={() => setFavOnly(!favOnly)} aria-pressed={favOnly}
-                className={`mt-2 rounded-md border px-3 py-1 text-xs ${favOnly ? "border-amber-500 bg-amber-500/15" : "border-border hover:bg-accent"}`}>Favourites ({favs.length})</button>
+                className={`mt-2 border px-3 py-1 text-xs ${favOnly ? "border-amber-500 bg-amber-500/15" : "border-border hover:bg-accent"}`}>Favourites ({favs.length})</button>
               {err && <p className="mt-2 text-xs text-red-600" role="alert">{err}</p>}
               <ul className="mt-3 grid max-h-72 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3" data-testid="voice-list">
                 {shown.map((v) => {
                   const on = value?.id === v.id;
                   return (
-                    <li key={v.id} className={`flex items-center gap-2 rounded-xl border p-2 transition-colors ${on ? "border-amber-500 bg-amber-500/10" : "border-border hover:bg-accent/50"}`}>
-                      <button type="button" onClick={() => play(v)} aria-label={`Preview ${v.name}`} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted transition hover:bg-amber-500/20">
+                    <li key={v.id} className={`flex items-center gap-2 border p-2 transition-colors ${on ? "border-amber-500 bg-amber-500/10" : "border-border hover:bg-accent/50"}`}>
+                      <button type="button" onClick={() => play(v)} aria-label={`Preview ${v.name}`} className="flex h-8 w-8 shrink-0 items-center justify-center bg-muted transition hover:bg-amber-500/20">
                         {loading === v.id ? <Loader2 className="h-4 w-4 animate-spin" /> : playing === v.id ? <Square className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                       </button>
                       <button type="button" onClick={() => { onChange(v); setOpen(false); }} className="min-w-0 flex-1 text-left" data-testid={`voice-${v.id}`}>
