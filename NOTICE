@@ -1,0 +1,26 @@
+AVOS Studio
+Copyright 2026 sanjithrana and the AVOS Studio contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It includes or adapts third-party work under its own licence. The full notices sit next to the code that uses it:
+
+  AutoClip (github.com/zhouxiaoka/autoclip)             MIT, (c) 2024 AutoClip Team
+      apps/animation_studio/studio/autoclip/finder.py, boundaries.py
+  NeonClipping, commit c0edf73 (github.com/iamajmeena/neonclipping)
+                                                         MIT, (c) 2026 Ajay K Meena and NeonClipping contributors
+      apps/animation_studio/studio/autoclip/neonsig.py (later NeonClipping versions are AGPL-3.0; none of that code is used)
+      -> apps/animation_studio/studio/autoclip/THIRD_PARTY_NOTICES.md
+  ReelMimic                                              MIT, (c) 2026 ReelMimic contributors
+      apps/reelmimic/LICENSE, apps/reelmimic/THIRD_PARTY_NOTICES.md, apps/animation_studio/reelmimic_assets/
+  Ootto claude-content-skills (incl. blader/humanizer)  MIT, (c) 2026 Ootto     apps/skills/content-growth/LICENSE
+  animation-skills                                       MIT, (c) 2026 Artem Novitckii   apps/skills/animation-skills/LICENSE
+  lemo-opuscar                                           MIT, (c) 2026 LemoLab   apps/skills/lemo-opuscar/LICENSE
+  Stickman Video Director style references              MIT    apps/animation_studio/studio/stickman/style_refs/
+  three.js                                               MIT    LICENSE-three.txt next to each copy
+  Twemoji graphics                                       CC BY 4.0   apps/animation_studio/studio/autoclip/assets/stickers/
+  Caption fonts (incl. Poppins)                          SIL OFL 1.1 apps/animation_studio/studio/autoclip/assets/fonts/
+  YuNet face detector (OpenCV Zoo)                       MIT    apps/animation_studio/studio/autoclip/assets/face_yunet.onnx
+
+Libraries installed with pip or npm (FastAPI, Next.js, yt-dlp, youtube-transcript-api, OpenCV, faster-whisper, and others)
+keep their own licences and are not redistributed in this repository.

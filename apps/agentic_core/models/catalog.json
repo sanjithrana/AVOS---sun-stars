@@ -1,0 +1,933 @@
+{
+ "about": "AVOS model catalog: which open model does which job, where it can run, and its licence. Used by the Facts pipeline (agentic_core), the Animations studio (animation_studio) and the Models page. Facts checked October 2026 against each model's own page and fal.ai's API docs; re-check licences before commercial use.",
+ "backends": {
+  "gpu": {
+   "label": "Your GPU workers (Model Fabric)",
+   "needs": "Settings → GPU workers",
+   "how": "Run the AVOS GPU worker (apps/gpu_worker) on any NVIDIA GPU machine (your PC, RunPod, Vast.ai, a cloud VM) with ComfyUI, Wan2GP or Diffusers behind it, and add its address under Settings → GPU workers. The Model Router then picks the worker, backend and precision per shot."
+  },
+  "fal": {
+   "label": "fal.ai (hosted, pay per use)",
+   "needs": "FAL_KEY",
+   "how": "Create a key at fal.ai/dashboard/keys and set FAL_KEY in apps/.env (or paste it in the Animations AI settings)."
+  },
+  "comfyui": {
+   "label": "Your GPU server (ComfyUI)",
+   "needs": "COMFYUI_URL",
+   "how": "Run ComfyUI on a GPU (RunPod / Vast.ai / your own), set COMFYUI_URL, and export each model's workflow to apps/comfyui_workflows/<model id>.json (see that folder's README)."
+  },
+  "cloudflare": {
+   "label": "Cloudflare Workers AI (free tier)",
+   "needs": "CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN",
+   "how": "Already used by the free image chain."
+  }
+ },
+ "tasks": {
+  "image": {
+   "label": "Image generation",
+   "auto": "Qwen-Image when the picture must show readable text (posters, diagrams, labels, charts); Z-Image for everything else; FLUX.1 schnell when speed matters."
+  },
+  "video": {
+   "label": "Video generation",
+   "auto": "Wan 2.2 I2V for each shot; LTX-2.3 when the clip should follow the narration audio or run long; Wan VACE for continuity and repairs."
+  },
+  "avatar": {
+   "label": "Character / avatar",
+   "auto": "LongCat Avatar for a presenter speaking short scenes; InfiniteTalk for long lessons and dialogue; Wan 2.2 Animate when a whole body should copy a driving performance."
+  },
+  "control": {
+   "label": "Control and finishing",
+   "auto": "Used for specific jobs: re-styling a render while keeping its motion, re-shooting with a new camera."
+  },
+  "reference": {
+   "label": "Pictures from references (Series)",
+   "auto": "Qwen-Image-Edit 2511 draws every Series keyframe from the approved character sheets and the location picture, so faces, outfits and rooms stay the same from shot to shot."
+  },
+  "speech": {
+   "label": "Voices (Series)",
+   "auto": "Indic Parler-TTS designs each character's voice from a description (you approve the sample); every line is then cloned from that sample: Chatterbox for its 23 languages (Hindi, English, …), IndicF5 for other Indian languages (Tamil, Telugu, Bengali, …). Edge voices (free, online) when no GPU voice is set up."
+  },
+  "sound": {
+   "label": "Sound effects and music (Series)",
+   "auto": "HunyuanVideo-Foley watches each action clip and adds matching sound; ACE-Step 1.5 writes the background score (or use your own theme music)."
+  }
+ },
+ "models": [
+  {
+   "id": "z-image",
+   "name": "Z-Image Turbo",
+   "maker": "Alibaba Tongyi-MAI",
+   "task": "image",
+   "rank": 1,
+   "role": "default",
+   "best_for": "Characters, scenes, props, concept art, backgrounds",
+   "why": "6B model, 8 steps, strong photoreal and illustration quality; ControlNet and LoRA variants exist.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://github.com/Tongyi-MAI/Z-Image",
+   "inputs": [
+    "prompt"
+   ],
+   "size": "6B, runs in ~16-24 GB VRAM",
+   "fal": {
+    "endpoint": "fal-ai/z-image/turbo",
+    "price": "$0.005 per megapixel"
+   },
+   "comfyui": {
+    "workflow": "z-image.json",
+    "template": "Image → Z-Image Turbo (text to image)"
+   },
+   "used_in": [
+    "facts-image",
+    "studio-backgrounds",
+    "studio-finish-character",
+    "facts-presenter"
+   ],
+   "fabric": {
+    "quality": 0.88,
+    "vram_gb": {
+     "bf16": 14,
+     "fp8": 9,
+     "int8": 9,
+     "int4": 6,
+     "fp4": 6
+    },
+    "min_vram_gb": 5,
+    "speed": 3,
+    "load_seconds": 25,
+    "strengths": [
+     "general",
+     "photo"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp",
+     "diffusers"
+    ],
+    "hf": "Tongyi-MAI/Z-Image-Turbo",
+    "fal_usd": 0.005,
+    "hosted_seconds": 6
+   }
+  },
+  {
+   "id": "qwen-image",
+   "name": "Qwen-Image",
+   "maker": "Alibaba Qwen",
+   "task": "image",
+   "rank": 2,
+   "role": "text",
+   "best_for": "Pictures with readable text: posters, diagrams, labels, educational graphics",
+   "why": "Best open model at rendering text inside images (English and Chinese).",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/Qwen/Qwen-Image",
+   "inputs": [
+    "prompt"
+   ],
+   "size": "20B, ~40 GB VRAM (fp8 ~24 GB)",
+   "fal": {
+    "endpoint": "fal-ai/qwen-image",
+    "price": "$0.02 per megapixel"
+   },
+   "comfyui": {
+    "workflow": "qwen-image.json",
+    "template": "Image → Qwen-Image (text to image)"
+   },
+   "used_in": [
+    "facts-image",
+    "studio-backgrounds"
+   ],
+   "fabric": {
+    "quality": 0.86,
+    "vram_gb": {
+     "bf16": 42,
+     "fp8": 22,
+     "int8": 22,
+     "int4": 13,
+     "fp4": 13
+    },
+    "min_vram_gb": 12,
+    "speed": 25,
+    "load_seconds": 60,
+    "strengths": [
+     "text",
+     "general"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp",
+     "diffusers"
+    ],
+    "hf": "Qwen/Qwen-Image",
+    "nunchaku": true,
+    "fal_usd": 0.02,
+    "hosted_seconds": 12
+   }
+  },
+  {
+   "id": "flux-schnell",
+   "name": "FLUX.1 schnell",
+   "maker": "Black Forest Labs",
+   "task": "image",
+   "rank": 3,
+   "role": "fast",
+   "best_for": "Fast drafts and previews (1-4 steps)",
+   "why": "Fastest good open model; also free through Cloudflare Workers AI.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+   "inputs": [
+    "prompt"
+   ],
+   "size": "12B, ~24 GB VRAM (fp8 ~12 GB)",
+   "fal": {
+    "endpoint": "fal-ai/flux/schnell",
+    "price": "$0.003 per megapixel"
+   },
+   "cloudflare": {
+    "model": "@cf/black-forest-labs/flux-1-schnell"
+   },
+   "comfyui": {
+    "workflow": "flux-schnell.json",
+    "template": "Image → Flux Schnell"
+   },
+   "used_in": [
+    "facts-image",
+    "studio-backgrounds"
+   ],
+   "fabric": {
+    "quality": 0.78,
+    "vram_gb": {
+     "bf16": 26,
+     "fp8": 14,
+     "int8": 14,
+     "int4": 8,
+     "fp4": 8
+    },
+    "min_vram_gb": 6,
+    "speed": 2.5,
+    "load_seconds": 35,
+    "strengths": [
+     "fast"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp",
+     "diffusers"
+    ],
+    "hf": "black-forest-labs/FLUX.1-schnell",
+    "nunchaku": true,
+    "fal_usd": 0.003,
+    "hosted_seconds": 3
+   }
+  },
+  {
+   "id": "wan-2.2",
+   "name": "Wan 2.2 I2V A14B",
+   "maker": "Alibaba Wan",
+   "task": "video",
+   "rank": 1,
+   "role": "default",
+   "best_for": "Animating each shot from its picture (general image-to-video)",
+   "why": "Production backbone for open image-to-video: coherent motion, 480p-720p, 5 s clips.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_note": "Apache-2.0 for the Wan 2.2 A14B/5B checkpoints; check any third-party fine-tune separately.",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B",
+   "inputs": [
+    "prompt",
+    "image"
+   ],
+   "size": "14B MoE, ~24-80 GB VRAM",
+   "fal": {
+    "endpoint": "fal-ai/wan/v2.2-a14b/image-to-video",
+    "price": "$0.08 per video second (720p)"
+   },
+   "comfyui": {
+    "workflow": "wan-2.2.json",
+    "template": "Video → Wan 2.2 14B Image to Video"
+   },
+   "used_in": [
+    "facts-video"
+   ],
+   "fabric": {
+    "quality": 0.9,
+    "vram_gb": {
+     "bf16": 28,
+     "fp8": 16,
+     "int8": 16,
+     "int4": 9,
+     "fp4": 9
+    },
+    "min_vram_gb": 8,
+    "speed": 120,
+    "load_seconds": 90,
+    "strengths": [
+     "general",
+     "i2v"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp",
+     "diffusers"
+    ],
+    "hf": "Wan-AI/Wan2.2-I2V-A14B-Diffusers",
+    "fal_usd_per_second": 0.08,
+    "hosted_seconds": 90
+   }
+  },
+  {
+   "id": "ltx-2.3",
+   "name": "LTX-2.3 22B",
+   "maker": "Lightricks",
+   "task": "video",
+   "rank": 2,
+   "role": "audio",
+   "best_for": "Clips that follow the narration audio, and longer shots (up to ~20 s per call)",
+   "why": "Audio-video model: audio-to-video and image-to-video, camera LoRAs, distilled 8-step variant.",
+   "license": "LTX-2 Community License",
+   "commercial": "conditional",
+   "license_note": "Free for commercial use only for entities under $10M annual revenue, and not in a product that directly competes with Lightricks' own products (an AI video platform may count). Larger companies need a paid licence.",
+   "license_url": "https://github.com/Lightricks/LTX-2/blob/main/LICENSE",
+   "inputs": [
+    "prompt",
+    "image",
+    "audio"
+   ],
+   "size": "22B, ~32-80 GB VRAM (distilled/fp8 less)",
+   "fal": {
+    "endpoint": "fal-ai/ltx-2.3/image-to-video",
+    "audio_endpoint": "fal-ai/ltx-2.3-22b/audio-to-video",
+    "price": "$0.08 per second (1080p image-to-video); audio-to-video ~$0.0016 per megapixel of video"
+   },
+   "comfyui": {
+    "workflow": "ltx-2.3.json",
+    "template": "Video → LTX-2.3 Image/Audio to Video (LTXVideo nodes)"
+   },
+   "used_in": [
+    "facts-video",
+    "studio-finish-scene"
+   ],
+   "fabric": {
+    "quality": 0.85,
+    "vram_gb": {
+     "bf16": 46,
+     "fp8": 26,
+     "int8": 26,
+     "int4": 15,
+     "fp4": 15
+    },
+    "min_vram_gb": 14,
+    "speed": 15,
+    "load_seconds": 90,
+    "strengths": [
+     "audio",
+     "long",
+     "fast"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp"
+    ],
+    "fal_usd_per_second": 0.08,
+    "hosted_seconds": 60
+   }
+  },
+  {
+   "id": "wan-vace",
+   "name": "Wan VACE 14B",
+   "maker": "Alibaba Wan",
+   "task": "control",
+   "rank": 1,
+   "role": "continuity",
+   "best_for": "Continuity between shots, repairs, re-styling a render while keeping its motion (depth/pose control)",
+   "why": "One model for reference-guided generation, inpaint/outpaint, depth and pose control.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.1-VACE-14B",
+   "inputs": [
+    "prompt",
+    "image",
+    "video"
+   ],
+   "size": "14B, ~24-80 GB VRAM",
+   "fal": {
+    "endpoint": "fal-ai/wan-vace-14b",
+    "price": "$0.08 per video second (720p)"
+   },
+   "comfyui": {
+    "workflow": "wan-vace.json",
+    "template": "Video → Wan VACE (reference / control to video)"
+   },
+   "used_in": [
+    "facts-video",
+    "studio-finish-scene"
+   ],
+   "fabric": {
+    "quality": 0.85,
+    "vram_gb": {
+     "bf16": 32,
+     "fp8": 17,
+     "int8": 17,
+     "int4": 10,
+     "fp4": 10
+    },
+    "min_vram_gb": 9,
+    "speed": 140,
+    "load_seconds": 90,
+    "strengths": [
+     "continuity",
+     "repair",
+     "control"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp",
+     "diffusers"
+    ],
+    "hf": "Wan-AI/Wan2.1-VACE-14B-diffusers",
+    "fal_usd_per_second": 0.08,
+    "hosted_seconds": 100
+   }
+  },
+  {
+   "id": "longcat-avatar",
+   "name": "LongCat Avatar 1.5",
+   "maker": "Meituan LongCat",
+   "task": "avatar",
+   "rank": 1,
+   "role": "presenter",
+   "best_for": "A presenter, teacher or narrator talking to camera, scene by scene",
+   "why": "8-step distilled audio-driven avatar, long videos through segments, single and multi-character.",
+   "license": "MIT",
+   "commercial": "yes",
+   "license_note": "Weights are MIT. fal.ai hosts LongCat Single Avatar; it doesn't say whether that is version 1.0 or 1.5 (your GPU server runs 1.5).",
+   "license_url": "https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5",
+   "inputs": [
+    "prompt",
+    "image",
+    "audio"
+   ],
+   "size": "~13.6B, 48-80 GB VRAM (INT8 option)",
+   "fal": {
+    "endpoint": "fal-ai/longcat-single-avatar/image-audio-to-video",
+    "price": "$0.15 per second (480p), $0.30 (720p)"
+   },
+   "comfyui": {
+    "workflow": "longcat-avatar.json",
+    "template": "LongCat-Video-Avatar custom nodes (community)"
+   },
+   "used_in": [
+    "facts-avatar"
+   ],
+   "fabric": {
+    "quality": 0.88,
+    "vram_gb": {
+     "bf16": 36,
+     "fp8": 20,
+     "int8": 20
+    },
+    "min_vram_gb": 14,
+    "speed": 200,
+    "load_seconds": 120,
+    "strengths": [
+     "presenter",
+     "lipsync"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp"
+    ],
+    "fal_usd_per_second": 0.15,
+    "hosted_seconds": 120
+   }
+  },
+  {
+   "id": "infinitetalk",
+   "name": "InfiniteTalk",
+   "maker": "MeiGen-AI",
+   "task": "avatar",
+   "rank": 2,
+   "role": "long",
+   "best_for": "Long lessons, interviews and dialogue (unlimited length, multi-speaker)",
+   "why": "Built for unlimited-length audio-driven video on top of Wan 2.1 I2V 14B; keeps identity over long takes.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://github.com/MeiGen-AI/InfiniteTalk",
+   "inputs": [
+    "prompt",
+    "image",
+    "audio"
+   ],
+   "size": "14B (Wan 2.1 based), 24-80 GB VRAM (fp8 less)",
+   "fal": {
+    "endpoint": "fal-ai/infinitalk",
+    "price": "$0.20 per second"
+   },
+   "comfyui": {
+    "workflow": "infinitetalk.json",
+    "template": "WanVideoWrapper → InfiniteTalk (kijai)"
+   },
+   "used_in": [
+    "facts-avatar"
+   ],
+   "fabric": {
+    "quality": 0.85,
+    "vram_gb": {
+     "bf16": 32,
+     "fp8": 17,
+     "int8": 17
+    },
+    "min_vram_gb": 10,
+    "speed": 150,
+    "load_seconds": 100,
+    "strengths": [
+     "presenter",
+     "lipsync",
+     "long",
+     "multi_speaker"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp"
+    ],
+    "fal_usd_per_second": 0.2,
+    "hosted_seconds": 120
+   }
+  },
+  {
+   "id": "wan-2.2-animate",
+   "name": "Wan 2.2 Animate 14B",
+   "maker": "Alibaba Wan",
+   "task": "avatar",
+   "rank": 3,
+   "role": "motion",
+   "best_for": "Full-body performance: a character picture copies the motion of a driving video",
+   "why": "Character animation and replacement from a driving video (move / replace modes).",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B",
+   "inputs": [
+    "image",
+    "video"
+   ],
+   "size": "14B, 24-80 GB VRAM",
+   "fal": {
+    "endpoint": "fal-ai/wan/v2.2-14b/animate/move",
+    "price": "$0.08 per video second (720p)"
+   },
+   "comfyui": {
+    "workflow": "wan-2.2-animate.json",
+    "template": "Video → Wan 2.2 Animate"
+   },
+   "used_in": [
+    "studio-finish-character"
+   ],
+   "fabric": {
+    "quality": 0.82,
+    "vram_gb": {
+     "bf16": 32,
+     "fp8": 17,
+     "int8": 17
+    },
+    "min_vram_gb": 10,
+    "speed": 140,
+    "load_seconds": 90,
+    "strengths": [
+     "motion_transfer"
+    ],
+    "adapters": [
+     "comfyui",
+     "wan2gp"
+    ],
+    "fal_usd_per_second": 0.08,
+    "hosted_seconds": 100
+   }
+  },
+  {
+   "id": "scail-2",
+   "name": "SCAIL-2",
+   "maker": "Zhipu (zai-org)",
+   "task": "avatar",
+   "rank": 4,
+   "role": "motion",
+   "best_for": "Character animation and multi-character replacement from a driving video, no pose skeleton needed",
+   "why": "End-to-end controlled character animation (512p/704p); a strong alternative to Wan Animate.",
+   "license": "MIT",
+   "commercial": "yes",
+   "license_note": "No hosted API yet: runs only on your GPU server.",
+   "license_url": "https://huggingface.co/zai-org/SCAIL-2",
+   "inputs": [
+    "image",
+    "video"
+   ],
+   "size": "Wan-based, 24-80 GB VRAM",
+   "comfyui": {
+    "workflow": "scail-2.json",
+    "template": "SCAIL-2 custom nodes (ComfyUI)"
+   },
+   "used_in": [
+    "studio-finish-character"
+   ],
+   "fabric": {
+    "quality": 0.82,
+    "vram_gb": {
+     "bf16": 32,
+     "fp8": 18,
+     "int8": 18
+    },
+    "min_vram_gb": 12,
+    "speed": 150,
+    "load_seconds": 90,
+    "strengths": [
+     "motion_transfer"
+    ],
+    "adapters": [
+     "comfyui"
+    ]
+   }
+  },
+  {
+   "id": "vista4d",
+   "name": "Vista4D",
+   "maker": "Eyeline Labs",
+   "task": "control",
+   "rank": 2,
+   "role": "camera",
+   "best_for": "Re-shooting a finished video from a new camera path (4D point clouds)",
+   "why": "Re-shoot a scene from new angles; useful as a camera-movement reference.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_note": "No hosted API and no ComfyUI nodes yet: research code on your GPU server. Listed for reference; not wired into a button.",
+   "license_url": "https://huggingface.co/Eyeline-Labs/Vista4D",
+   "inputs": [
+    "video"
+   ],
+   "size": "Wan 2.1 T2V 14B based, 80 GB class GPU",
+   "selfhost": {
+    "repo": "https://github.com/Eyeline-Labs/Vista4D"
+   },
+   "used_in": []
+  },
+  {
+   "id": "qwen-image-edit",
+   "name": "Qwen-Image-Edit 2511",
+   "maker": "Alibaba Qwen",
+   "task": "reference",
+   "rank": 1,
+   "role": "keyframe",
+   "best_for": "Series keyframes and character sheets: draws each shot from the approved character sheets and the location (up to 3 reference pictures)",
+   "why": "The open model best at keeping several characters consistent across pictures (the 2511 release improved multi-person consistency); follows instructions like 'Raju and Amma argue in the kitchen, Raju on the left'.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511",
+   "inputs": [
+    "prompt",
+    "image",
+    "image2",
+    "image3"
+   ],
+   "size": "20B, ~41 GB bf16 (fp8 ~21 GB; Lightning LoRA: 4 steps)",
+   "comfyui": {
+    "workflow": "qwen-image-edit.json",
+    "template": "Image → Qwen Image Edit 2511 (image_qwen_image_edit_2511)"
+   },
+   "used_in": [
+    "series-characters",
+    "series-keyframes"
+   ],
+   "fabric": {
+    "quality": 0.9,
+    "vram_gb": {
+     "bf16": 42,
+     "fp8": 22,
+     "int8": 22
+    },
+    "min_vram_gb": 12,
+    "speed": 30,
+    "load_seconds": 60,
+    "strengths": [
+     "characters",
+     "consistency",
+     "reference"
+    ],
+    "adapters": [
+     "comfyui",
+     "diffusers"
+    ],
+    "hf": "Qwen/Qwen-Image-Edit-2511"
+   }
+  },
+  {
+   "id": "chatterbox",
+   "name": "Chatterbox Multilingual",
+   "maker": "Resemble AI",
+   "task": "speech",
+   "rank": 1,
+   "role": "lines",
+   "best_for": "Every line of dialogue in the character's approved voice, with an emotion level per line (23 languages incl. Hindi and English)",
+   "why": "Zero-shot voice cloning from a short sample plus an 'exaggeration' control for anger, excitement or calm; MIT licence. Its audio carries Resemble's inaudible watermark.",
+   "license": "MIT",
+   "commercial": "yes",
+   "license_url": "https://github.com/resemble-ai/chatterbox",
+   "inputs": [
+    "text",
+    "audio"
+   ],
+   "size": "0.5B, ~5 GB VRAM",
+   "languages": [
+    "ar",
+    "da",
+    "de",
+    "el",
+    "en",
+    "es",
+    "fi",
+    "fr",
+    "he",
+    "hi",
+    "it",
+    "ja",
+    "ko",
+    "ms",
+    "nl",
+    "no",
+    "pl",
+    "pt",
+    "ru",
+    "sv",
+    "sw",
+    "tr",
+    "zh"
+   ],
+   "used_in": [
+    "series-voices"
+   ],
+   "fabric": {
+    "quality": 0.86,
+    "vram_gb": {
+     "bf16": 5
+    },
+    "min_vram_gb": 4,
+    "speed": 4,
+    "load_seconds": 20,
+    "strengths": [
+     "voice_clone",
+     "emotion"
+    ],
+    "adapters": [
+     "speech"
+    ],
+    "hf": "ResembleAI/chatterbox"
+   },
+   "selfhost": {
+    "repo": "https://github.com/resemble-ai/chatterbox"
+   }
+  },
+  {
+   "id": "indicf5",
+   "name": "IndicF5",
+   "maker": "AI4Bharat",
+   "task": "speech",
+   "rank": 2,
+   "role": "indic",
+   "best_for": "Lines in Indian languages Chatterbox doesn't speak: Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese (and Hindi)",
+   "why": "Trained on ~1,400 hours of Indian speech; clones the character's voice sample with its transcript.",
+   "license": "MIT",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/ai4bharat/IndicF5",
+   "inputs": [
+    "text",
+    "audio"
+   ],
+   "size": "0.4B, ~4 GB VRAM",
+   "languages": [
+    "as",
+    "bn",
+    "gu",
+    "hi",
+    "kn",
+    "ml",
+    "mr",
+    "or",
+    "pa",
+    "ta",
+    "te"
+   ],
+   "used_in": [
+    "series-voices"
+   ],
+   "fabric": {
+    "quality": 0.82,
+    "vram_gb": {
+     "bf16": 4
+    },
+    "min_vram_gb": 3,
+    "speed": 5,
+    "load_seconds": 20,
+    "strengths": [
+     "voice_clone",
+     "indic"
+    ],
+    "adapters": [
+     "speech"
+    ],
+    "hf": "ai4bharat/IndicF5"
+   },
+   "license_note": "Gated on Hugging Face: accept the terms on the model page and set HF_TOKEN on the GPU worker.",
+   "selfhost": {
+    "repo": "https://github.com/AI4Bharat/IndicF5"
+   }
+  },
+  {
+   "id": "indic-parler-tts",
+   "name": "Indic Parler-TTS",
+   "maker": "AI4Bharat · Hugging Face",
+   "task": "speech",
+   "rank": 3,
+   "role": "designer",
+   "best_for": "Designing each character's voice from a description ('an old man, deep and slow, a little hoarse'), in 21 languages incl. English",
+   "why": "Voices come from a text description, so every character gets a distinct voice without recordings; you approve the sample and the lines are cloned from it.",
+   "license": "Apache-2.0",
+   "commercial": "yes",
+   "license_url": "https://huggingface.co/ai4bharat/indic-parler-tts",
+   "inputs": [
+    "text",
+    "description"
+   ],
+   "size": "0.9B, ~4 GB VRAM",
+   "languages": [
+    "as",
+    "bn",
+    "brx",
+    "doi",
+    "en",
+    "gu",
+    "hi",
+    "kn",
+    "kok",
+    "mai",
+    "ml",
+    "mni",
+    "mr",
+    "ne",
+    "or",
+    "sa",
+    "sat",
+    "sd",
+    "ta",
+    "te",
+    "ur"
+   ],
+   "used_in": [
+    "series-voices"
+   ],
+   "fabric": {
+    "quality": 0.8,
+    "vram_gb": {
+     "bf16": 4
+    },
+    "min_vram_gb": 3,
+    "speed": 6,
+    "load_seconds": 25,
+    "strengths": [
+     "voice_design",
+     "indic"
+    ],
+    "adapters": [
+     "speech"
+    ],
+    "hf": "ai4bharat/indic-parler-tts"
+   },
+   "license_note": "Gated on Hugging Face: accept the terms on the model page and set HF_TOKEN on the GPU worker.",
+   "selfhost": {
+    "repo": "https://huggingface.co/ai4bharat/indic-parler-tts"
+   }
+  },
+  {
+   "id": "hunyuan-foley",
+   "name": "HunyuanVideo-Foley",
+   "maker": "Tencent Hunyuan",
+   "task": "sound",
+   "rank": 1,
+   "role": "sfx",
+   "best_for": "Sound effects that match each action clip: footsteps, doors, slaps, cooking, traffic, room tone (48 kHz)",
+   "why": "Watches the clip and syncs the sound to what happens on screen, guided by a short description.",
+   "license": "Tencent Hunyuan Community",
+   "commercial": "conditional",
+   "license_url": "https://huggingface.co/tencent/HunyuanVideo-Foley/blob/main/LICENSE",
+   "inputs": [
+    "video",
+    "prompt"
+   ],
+   "size": "XL ~16 GB VRAM (8 GB with offload) · XXL ~20 GB (12 GB with offload)",
+   "used_in": [
+    "series-sound"
+   ],
+   "fabric": {
+    "quality": 0.85,
+    "vram_gb": {
+     "bf16": 16
+    },
+    "min_vram_gb": 8,
+    "speed": 40,
+    "load_seconds": 40,
+    "strengths": [
+     "sfx",
+     "sync"
+    ],
+    "adapters": [
+     "foley",
+     "comfyui"
+    ],
+    "hf": "tencent/HunyuanVideo-Foley"
+   },
+   "license_note": "Commercial use allowed; the licence doesn't cover the EU, UK or South Korea, and products with over 100M monthly users need Tencent's permission.",
+   "selfhost": {
+    "repo": "https://github.com/Tencent-Hunyuan/HunyuanVideo-Foley"
+   }
+  },
+  {
+   "id": "ace-step",
+   "name": "ACE-Step 1.5",
+   "maker": "ACE Studio · StepFun",
+   "task": "sound",
+   "rank": 2,
+   "role": "music",
+   "best_for": "Background score per part: a theme in the series' mood (instrumental or with lyrics, 50+ languages)",
+   "why": "Fast open music model (a full song in seconds on an RTX 4090/5090), runs natively in ComfyUI.",
+   "license": "MIT",
+   "commercial": "yes",
+   "license_url": "https://github.com/ace-step/ACE-Step-1.5",
+   "inputs": [
+    "prompt",
+    "lyrics"
+   ],
+   "size": "~10 GB checkpoint, 8 GB+ VRAM",
+   "comfyui": {
+    "workflow": "ace-step.json",
+    "template": "Audio → ACE-Step 1.5 (audio_ace_step_1_5_checkpoint)"
+   },
+   "used_in": [
+    "series-sound"
+   ],
+   "fabric": {
+    "quality": 0.84,
+    "vram_gb": {
+     "bf16": 10
+    },
+    "min_vram_gb": 6,
+    "speed": 8,
+    "load_seconds": 20,
+    "strengths": [
+     "music"
+    ],
+    "adapters": [
+     "comfyui"
+    ],
+    "hf": "ACE-Step/Ace-Step1.5"
+   }
+  }
+ ],
+ "fabric_about": "fabric: what the Model Router needs. quality 0-1; vram_gb = VRAM to keep the model's diffusion transformer on the GPU per precision (Wan 2.2 A14B: one expert at a time; text encoders offloaded); min_vram_gb = smallest GPU it runs on with CPU offload (slow); speed = GPU seconds per output second (video) or per ~1 MP image on an RTX 4090 at fp8 with SageAttention (estimates: replaced by measured times after a few real runs); load_seconds = cold load; adapters = GPU worker backends that can run it; fal_usd / fal_usd_per_second = hosted price; hosted_seconds = typical hosted wait."
+}

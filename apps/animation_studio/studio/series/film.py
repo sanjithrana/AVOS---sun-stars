@@ -248,7 +248,7 @@ def builtin_breakdown(prompt: str, sk: dict | None = None) -> dict:
 def _style_from(text: str) -> str:
     t = text.lower()
     bits = []
-    for w, say in (("pixar", "3D Pixar-style animated film"), ("3d", "3D animated film" if "pixar" not in t else ""), ("2d", "2D animation"), ("anime", "anime style"),
+    for w, say in (("pixar", "3D animated feature-film style"), ("3d", "3D animated film" if "pixar" not in t else ""), ("2d", "2D animation"), ("anime", "anime style"),
                    ("claymation", "claymation"), ("stop-motion", "stop-motion"), ("cinematic", "cinematic lighting"),
                    ("watercolor", "watercolour look"), ("cartoon", "cartoon")):
         if say and w in t and say not in bits:

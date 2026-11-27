@@ -55,6 +55,14 @@ async def put_keys(request: Request) -> dict[str, Any]:
     return _view()
 
 
+@router.post("/keys/{name}/test")
+async def test_key(name: str) -> dict[str, Any]:
+    """One free, read-only call to the provider (or the local address) with the key the studio would use."""
+    from src.routes import keycheck
+    settings_store.apply()
+    return await keycheck.check(name)
+
+
 class GpuBody(BaseModel):
     comfyui_url: str | None = None
     model_backend: str | None = None

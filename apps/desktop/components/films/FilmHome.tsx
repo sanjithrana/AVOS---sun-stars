@@ -16,7 +16,7 @@ import type { SeriesSummary } from "@/components/series/types";
 const field = "w-full border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-amber-500/40";
 const label = "mb-1 block text-xs font-medium text-muted-foreground";
 
-export const EXAMPLE = `Create a 15-second cinematic 3D animated comedy, Pixar style, vibrant colours, smooth 24fps.
+export const EXAMPLE = `Create a 15-second cinematic 3D animated comedy, vibrant colours, smooth 24fps.
 
 SETTING
 A lush forest road after rain: wet asphalt, big reflective puddles, tall green trees, soft mist, golden sunlight.
@@ -167,7 +167,7 @@ function NewFilm() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div>
           <label className={label} htmlFor="f-style">Art style (optional: read from the prompt)</label>
-          <input id="f-style" className={field} value={style} onChange={(e) => setStyle(e.target.value)} placeholder="3D Pixar-style, cinematic lighting" />
+          <input id="f-style" className={field} value={style} onChange={(e) => setStyle(e.target.value)} placeholder="3D animated, cinematic lighting" />
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {previews.map((src, i) => <img key={src} src={src} alt={`style ${i + 1}`} className="h-12 w-20 border border-border object-cover" />)}
             <label className="inline-flex cursor-pointer items-center gap-1 border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-amber-500">

@@ -54,7 +54,7 @@ def blender_url() -> str:
     return (os.environ.get("BLENDER_RENDER_URL") or "").rstrip("/")
 
 
-STYLE = "3D animated look, glossy Pixar-like render, soft studio lighting, saturated colours, shallow depth of field, clean background"
+STYLE = "3D animated look, glossy animated-feature render, soft studio lighting, saturated colours, shallow depth of field, clean background"
 
 
 def look(p: dict) -> str:

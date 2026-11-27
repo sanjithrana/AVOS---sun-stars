@@ -142,7 +142,7 @@ export function BreakdownPanel({ sid, snap, act, pending }: { sid: string; snap:
               </div>
             ))}
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-              <input className={field} value={bd.style} placeholder="Style: 3D Pixar-style, cinematic lighting…" onChange={(e) => set({ ...bd, style: e.target.value })} />
+              <input className={field} value={bd.style} placeholder="Style: 3D animated, cinematic lighting…" onChange={(e) => set({ ...bd, style: e.target.value })} />
               <input className={field} value={bd.tone} placeholder="Tone" onChange={(e) => set({ ...bd, tone: e.target.value })} />
             </div>
           </section>

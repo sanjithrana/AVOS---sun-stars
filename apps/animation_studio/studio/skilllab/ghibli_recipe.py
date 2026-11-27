@@ -1,4 +1,4 @@
-"""Ghibli Recipe Prompt: paste a recipe link (or the recipe), get ONE video prompt for a warm, dreamy Studio Ghibli style anime kitchen.
+"""Anime Kitchen Recipe Prompt: paste a recipe link (or the recipe), get ONE video prompt for a warm, dreamy hand-painted anime kitchen.
 
 The prompt is one continuous 15-second scene: the dish being made step by step, with the ingredients, the hands and their motion, the
 steam and the light, and the camera moves. With media on it also draws a key frame from the prompt and makes the clip.
@@ -7,7 +7,7 @@ steam and the light, and the camera moves. With media on it also draws a key fra
   prompt   your writer crew writes the one prompt; with no crew, a built-in template builds it from the same recipe
   video    a key frame from the prompt, then the clip (Seedance, or an open model on your GPU, as the Cost setting allows)
 
-"Studio Ghibli style" names a look, not a franchise to copy: the prompt asks for that kind of soft hand-painted anime kitchen and never
+The prompt describes a look in plain words, a soft hand-painted anime kitchen, and never names a studio or copies
 a character, logo or scene from any film.
 """
 from __future__ import annotations
@@ -27,20 +27,20 @@ from . import base, store
 
 ID = "ghibli-recipe-prompt"
 INFO = {
-    "id": ID, "name": "Ghibli Recipe Prompt", "group": "Food and ASMR", "kind": "recipe",
-    "made_for": "Turn any recipe link into one video prompt: the dish being made in a warm, dreamy Ghibli-style anime kitchen",
+    "id": ID, "name": "Anime Kitchen Recipe Prompt", "group": "Food and ASMR", "kind": "recipe",
+    "made_for": "Turn any recipe link into one video prompt: the dish being made in a warm, dreamy hand-painted anime kitchen",
     "about": "Reads the recipe, then writes ONE prompt for a single continuous scene: ingredients, hands and motion, steam and light, camera moves, "
              "timed to the length you pick. Prompt only, or it draws a key frame and makes the clip too.",
     "input": "Paste a recipe link (or the recipe itself), e.g. https://example.com/paneer-butter-masala",
     "outputs": ["The prompt", "The cooking scene"],
     "aspect": "16:9", "seconds": [10, 15], "default_seconds": 15, "native_audio": True,
     "examples": ["https://example.com/recipes/tomato-soup", "Masala chai: ginger, cardamom, tea, milk, jaggery", "Pancakes: flour, egg, milk, butter, maple syrup"],
-    "credit": "Prompt brief from the 'Ghibli cooking video prompt writer' template.",
+    "credit": "Prompt brief from an anime cooking-video prompt template.",
 }
 
 MAX_PAGE = 1_500_000
 UA = "Mozilla/5.0 (compatible; AVOS-Studio recipe reader)"
-STYLE = ("warm, dreamy Studio Ghibli style anime kitchen: soft hand-painted backgrounds, gentle watercolour light, a cosy wooden kitchen, "
+STYLE = ("warm, dreamy hand-painted anime kitchen: soft hand-painted backgrounds, gentle watercolour light, a cosy wooden kitchen, "
          "dust motes in a sunbeam, lovingly detailed food")
 
 WRITER = f"""You are a prompt writer for an anime-style cooking video. You are given a recipe (title, ingredients, steps). Write ONE detailed video prompt that
@@ -48,7 +48,7 @@ animates the dish being made step by step in a {STYLE}.
 Describe the ingredients, the hands and their motion, the steam and the lighting, and the camera moves. It is a single continuous scene of exactly
 the requested length: no cuts, no scene changes, no on-screen text. Spread the recipe's key steps across the seconds, in order, with a time range
 for each (for example "0-3s", "3-7s"). End on the finished dish, plated, with steam rising.
-Rules: describe a look in the Ghibli tradition, but never name a film, a character, or copy a known scene. No logos, no text, no watermarks.
+Rules: describe a soft hand-painted anime look, but never name a film, a character, or copy a known scene. No logos, no text, no watermarks.
 Hands only; no face. Use the real ingredients from the recipe; invent none.
 Answer with ONE JSON object: {{"prompt":"the single paragraph prompt, plain text, no markdown"}}"""
 

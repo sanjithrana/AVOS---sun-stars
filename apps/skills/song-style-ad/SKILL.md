@@ -5,7 +5,7 @@ description: "Activate when the user wants their product sung — a song ad, mus
 
 # How to make song-style ads
 
-A song-style ad plays like a micro music video: an original song carries the product story over animated (usually Pixar-style) visuals.
+A song-style ad plays like a micro music video: an original song carries the product story over animated (usually stylized 3D) visuals.
 
 It wins when the song is a _real song people would actually hear out_ (not a jingle) whose hook lands the product's angle in the first five seconds.
 

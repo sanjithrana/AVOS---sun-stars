@@ -1,4 +1,4 @@
-"""Ghibli Recipe Prompt: the recipe is read from a link's published recipe data or pasted text, one 15 s prompt is written, and
+"""Anime Kitchen Recipe Prompt: the recipe is read from a link's published recipe data or pasted text, one 15 s prompt is written, and
 nothing private is ever fetched. No network, no real key."""
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def test_a_link_with_no_recipe_says_so_and_private_addresses_are_refused(monkeyp
 def test_the_built_in_prompt_is_one_timed_continuous_scene():
     rec = G.parse_recipe(PAGE)
     t = G.template_prompt(rec, 15)
-    assert G.usable(t, 15) and "Studio Ghibli" in t and "no cuts" in t and "0-4s" in t and "11-15s" in t
+    assert G.usable(t, 15) and "hand-painted anime" in t and "no cuts" in t and "0-4s" in t and "11-15s" in t
     assert "tomatoes" in t and "steam" in t and "No text" in t
 
 
@@ -70,7 +70,7 @@ def test_prompts_only_run_gives_the_prompt_and_nothing_else(monkeypatch):
     pipeline._run(pid, "recipe")
     p = store.load(pid)
     assert p["status"] == "done", p.get("error")
-    assert p["title"] == "Tomato Soup" and "Studio Ghibli" in p["prompts"]["video"] and not p.get("video")
+    assert p["title"] == "Tomato Soup" and "hand-painted anime" in p["prompts"]["video"] and not p.get("video")
     pipeline.spec_of(p)["reset"](p, "prompt")
     assert "prompts" not in p and "recipe" in p
 

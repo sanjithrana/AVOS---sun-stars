@@ -357,7 +357,7 @@ keeps them out.
 | Folder | What it is | Needs |
 |---|---|---|
 | `avos-wingman` | the production-bible + hard-cut character short pattern | nothing — it is a way of writing prompts |
-| `disney-pixar-animation` | Pixar-look prompts for ads and B-roll | an image/video model |
+| `stylized-3d-animation` | 3D animated feature-film look prompts for ads and B-roll | an image/video model |
 | `song-style-ad` | a sung product ad | a music model |
 | `animation-skills/` | six MIT code-rendered skills by Artem Novitckii | Node + headless Chrome |
 | `faceless-shorts/` | six narrated-short styles, free and fully local | **Node 22, Chrome, ~1 GB of voice models** |

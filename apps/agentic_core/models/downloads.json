@@ -1,0 +1,711 @@
+{
+ "about": "ComfyUI files per model (verified against Hugging Face listings and ComfyUI's official templates, Oct 2026). Downloads go to <models dir>/<folder>/<file name>. Sizes in bytes.",
+ "models": {
+  "z-image": {
+   "template": "image_z_image_turbo",
+   "verified": true,
+   "variants": {
+    "bf16": [
+     {
+      "repo": "Comfy-Org/z_image_turbo",
+      "path": "split_files/diffusion_models/z_image_turbo_bf16.safetensors",
+      "folder": "diffusion_models",
+      "size": 12309866400
+     }
+    ],
+    "int8": [
+     {
+      "repo": "Comfy-Org/z_image_turbo",
+      "path": "split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors",
+      "folder": "diffusion_models",
+      "size": 6201001296
+     }
+    ],
+    "fp4": [
+     {
+      "repo": "Comfy-Org/z_image_turbo",
+      "path": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors",
+      "folder": "diffusion_models",
+      "size": 4509509600
+     }
+    ]
+   },
+   "default": "bf16",
+   "shared": [
+    {
+     "repo": "Comfy-Org/z_image_turbo",
+     "path": "split_files/text_encoders/qwen_3_4b.safetensors",
+     "folder": "text_encoders",
+     "size": 8044982048
+    },
+    {
+     "repo": "Comfy-Org/z_image_turbo",
+     "path": "split_files/vae/ae.safetensors",
+     "folder": "vae",
+     "size": 335304388
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Comfy-Org/z_image_turbo",
+     "path": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+     "folder": "text_encoders",
+     "size": 5631994051,
+     "label": "Smaller text encoder (fp8)"
+    }
+   ],
+   "notes": "The official template uses bf16; int8 / nvfp4 (RTX 50) are the low-VRAM versions."
+  },
+  "qwen-image": {
+   "template": "image_qwen_image",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+      "path": "split_files/diffusion_models/qwen_image_fp8_e4m3fn.safetensors",
+      "folder": "diffusion_models",
+      "size": 20430635136
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+      "path": "split_files/diffusion_models/qwen_image_bf16.safetensors",
+      "folder": "diffusion_models",
+      "size": 40861031488
+     }
+    ],
+    "fp4": [
+     {
+      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+      "path": "split_files/diffusion_models/qwen_image_nvfp4.safetensors",
+      "folder": "diffusion_models",
+      "size": 19769139136
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+     "path": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 9384670680
+    },
+    {
+     "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+     "path": "split_files/vae/qwen_image_vae.safetensors",
+     "folder": "vae",
+     "size": 253806246
+    }
+   ],
+   "optional": [
+    {
+     "repo": "lightx2v/Qwen-Image-Lightning",
+     "path": "Qwen-Image-Lightning-8steps-V1.0.safetensors",
+     "folder": "loras",
+     "size": 1698951104,
+     "label": "Lightning 8-step LoRA (the template uses it: much faster)",
+     "recommended": true
+    }
+   ],
+   "notes": "The official template uses fp8 + the Lightning 8-step LoRA."
+  },
+  "flux-schnell": {
+   "template": "flux_schnell",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Comfy-Org/flux1-schnell",
+      "path": "flux1-schnell-fp8.safetensors",
+      "folder": "checkpoints",
+      "size": 17236328572
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Comfy-Org/flux1-schnell",
+      "path": "flux1-schnell.safetensors",
+      "folder": "diffusion_models",
+      "size": 23782506688
+     },
+     {
+      "repo": "comfyanonymous/flux_text_encoders",
+      "path": "t5xxl_fp16.safetensors",
+      "folder": "text_encoders",
+      "size": 9787841024
+     },
+     {
+      "repo": "comfyanonymous/flux_text_encoders",
+      "path": "clip_l.safetensors",
+      "folder": "text_encoders",
+      "size": 246144152
+     },
+     {
+      "repo": "Comfy-Org/Lumina_Image_2.0_Repackaged",
+      "path": "split_files/vae/ae.safetensors",
+      "folder": "vae",
+      "size": 335304388
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [],
+   "optional": [],
+   "notes": "fp8 is one all-in-one checkpoint (template flux_schnell); bf16 is the split full version."
+  },
+  "wan-2.2": {
+   "template": "video_wan2_2_14B_i2v",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "folder": "diffusion_models",
+      "size": 14294742832
+     },
+     {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "folder": "diffusion_models",
+      "size": 14294742832
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
+      "folder": "diffusion_models",
+      "size": 28577914792
+     },
+     {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
+      "folder": "diffusion_models",
+      "size": 28577914792
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 6735906897
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+     "path": "split_files/vae/wan_2.1_vae.safetensors",
+     "folder": "vae",
+     "size": 253815318
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+     "path": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+     "folder": "loras",
+     "size": 1226977424
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+     "path": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+     "folder": "loras",
+     "size": 1226977424
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
+     "folder": "text_encoders",
+     "size": 11366399385,
+     "label": "Full-precision text encoder (umt5 fp16)"
+    }
+   ],
+   "notes": "Two 14B experts (high noise + low noise) plus the 4-step lightx2v LoRAs, as in the official template."
+  },
+  "ltx-2.3": {
+   "template": "video_ltx2_3_i2v",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Lightricks/LTX-2.3-fp8",
+      "path": "ltx-2.3-22b-dev-fp8.safetensors",
+      "folder": "checkpoints",
+      "size": 29145431166
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Lightricks/LTX-2.3",
+      "path": "ltx-2.3-22b-dev.safetensors",
+      "folder": "checkpoints",
+      "size": 46149344974
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/ltx-2",
+     "path": "split_files/text_encoders/gemma_3_12B_it_fp4_mixed.safetensors",
+     "folder": "text_encoders",
+     "size": 9447702218
+    },
+    {
+     "repo": "Lightricks/LTX-2.3",
+     "path": "ltx-2.3-spatial-upscaler-x2-1.1.safetensors",
+     "folder": "latent_upscale_models",
+     "size": 995743560
+    },
+    {
+     "repo": "Comfy-Org/ltx-2.3",
+     "path": "split_files/loras/ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
+     "folder": "loras",
+     "size": 2741024390
+    },
+    {
+     "repo": "Comfy-Org/ltx-2",
+     "path": "split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors",
+     "folder": "loras",
+     "size": 628203616
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Lightricks/LTX-2.3-fp8",
+     "path": "ltx-2.3-22b-distilled-fp8.safetensors",
+     "folder": "checkpoints",
+     "size": 29531884062,
+     "label": "Distilled checkpoint (fewer steps)"
+    },
+    {
+     "repo": "Comfy-Org/ltx-2",
+     "path": "split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 13205434827,
+     "label": "Better text encoder (Gemma 3 fp8)"
+    }
+   ],
+   "notes": "The checkpoint includes the video and audio VAE. LTX-2 Community License."
+  },
+  "wan-vace": {
+   "template": "video_wan_vace_14B",
+   "verified": true,
+   "variants": {
+    "bf16": [
+     {
+      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "path": "split_files/diffusion_models/wan2.1_vace_14B_fp16.safetensors",
+      "folder": "diffusion_models",
+      "size": 34675323640
+     }
+    ]
+   },
+   "default": "bf16",
+   "shared": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 6735906897
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/vae/wan_2.1_vae.safetensors",
+     "folder": "vae",
+     "size": 253815318
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "Wan21_CausVid_14B_T2V_lora_rank32.safetensors",
+     "folder": "loras",
+     "size": 319120000,
+     "approx": true
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
+     "folder": "text_encoders",
+     "size": 11366399385,
+     "label": "Full-precision text encoder (umt5 fp16)"
+    }
+   ],
+   "notes": "Only an fp16 file exists; ComfyUI can cast it to fp8 when it loads (weight_dtype)."
+  },
+  "longcat-avatar": {
+   "template": null,
+   "verified": false,
+   "variants": {
+    "bf16": [
+     {
+      "repo": "Kijai/WanVideo_comfy",
+      "path": "LongCat/LongCat-Avatar-15_bf16.safetensors",
+      "folder": "diffusion_models",
+      "size": 31706036736
+     }
+    ]
+   },
+   "default": "bf16",
+   "shared": [
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "LongCat/LongCat-Avatar-15_dmd_distill_lora_rank128_bf16.safetensors",
+     "folder": "loras",
+     "size": 1261613536
+    },
+    {
+     "repo": "Kijai/wav2vec2_safetensors",
+     "path": "wav2vec2-chinese-base_fp16.safetensors",
+     "folder": "audio_encoders",
+     "size": 190115368
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 6735906897
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+     "path": "split_files/vae/wan_2.1_vae.safetensors",
+     "folder": "vae",
+     "size": 253815318
+    }
+   ],
+   "notes": "Runs through kijai's WanVideoWrapper nodes (no official ComfyUI template). Check his example workflow for the text encoder / VAE it expects."
+  },
+  "infinitetalk": {
+   "template": "video_wan2_1_infinitetalk",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Kijai/WanVideo_comfy_fp8_scaled",
+      "path": "I2V/Wan2_1-I2V-14B-480p_fp8_e4m3fn_scaled_KJ.safetensors",
+      "folder": "diffusion_models",
+      "size": 16643349018
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "path": "split_files/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors",
+      "folder": "diffusion_models",
+      "size": 32791377504
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/model_patches/wan2.1_infiniteTalk_multi_fp16.safetensors",
+     "folder": "model_patches",
+     "size": 5124439112
+    },
+    {
+     "repo": "Kijai/wav2vec2_safetensors",
+     "path": "wav2vec2-chinese-base_fp16.safetensors",
+     "folder": "audio_encoders",
+     "size": 190115368
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 6735906897
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "Wan2_1_VAE_bf16.safetensors",
+     "folder": "vae",
+     "size": 253806278
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+     "folder": "loras",
+     "size": 738005744
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/model_patches/wan2.1_infiniteTalk_single_fp16.safetensors",
+     "folder": "model_patches",
+     "size": 5125258232,
+     "label": "Single-speaker patch"
+    }
+   ],
+   "notes": "Native ComfyUI template (no custom nodes)."
+  },
+  "wan-2.2-animate": {
+   "template": "video_wan2_2_14B_animate",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Kijai/WanVideo_comfy_fp8_scaled",
+      "path": "Wan22Animate/Wan2_2-Animate-14B_fp8_e4m3fn_scaled_KJ.safetensors",
+      "folder": "diffusion_models",
+      "size": 18401760586
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "path": "split_files/diffusion_models/wan2.2_animate_14B_bf16.safetensors",
+      "folder": "diffusion_models",
+      "size": 34549787368
+     }
+    ],
+    "int8": [
+     {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "path": "split_files/diffusion_models/wan2.2_animate_14B_int8_convrot.safetensors",
+      "folder": "diffusion_models",
+      "size": 18413068672
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 6735906897
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/clip_vision/clip_vision_h.safetensors",
+     "folder": "clip_vision",
+     "size": 1264219396
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+     "path": "split_files/vae/wan_2.1_vae.safetensors",
+     "folder": "vae",
+     "size": 253815318
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+     "folder": "loras",
+     "size": 738005744
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "LoRAs/Wan22_relight/WanAnimate_relight_lora_fp16.safetensors",
+     "folder": "loras",
+     "size": 1436672440
+    }
+   ],
+   "optional": [],
+   "notes": "The template also auto-downloads SAM2 through a custom node."
+  },
+  "scail-2": {
+   "template": "video_wan21_scail2_character_replacement",
+   "verified": true,
+   "variants": {
+    "bf16": [
+     {
+      "repo": "Comfy-Org/SCAIL-2",
+      "path": "diffusion_models/wan2.1_14B_SCAIL_2_fp16.safetensors",
+      "folder": "diffusion_models",
+      "size": 32794040328
+     }
+    ],
+    "fp8": [
+     {
+      "repo": "Comfy-Org/SCAIL-2",
+      "path": "diffusion_models/wan2.1_14B_SCAIL_2_fp8_scaled.safetensors",
+      "folder": "diffusion_models",
+      "size": 17694586857
+     }
+    ],
+    "int8": [
+     {
+      "repo": "Comfy-Org/SCAIL-2",
+      "path": "diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
+      "folder": "diffusion_models",
+      "size": 16654506256
+     }
+    ],
+    "fp4": [
+     {
+      "repo": "Comfy-Org/SCAIL-2",
+      "path": "diffusion_models/wan2.1_14B_SCAIL_2_nvfp4_mxpf8_mix.safetensors",
+      "folder": "diffusion_models",
+      "size": 11023570536
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/SCAIL-2",
+     "path": "loras/wan2.1_SCAIL_2_DPO_lora_bf16.safetensors",
+     "folder": "loras",
+     "size": 1226936552
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+     "folder": "loras",
+     "size": 738005744
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 6735906897
+    },
+    {
+     "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+     "path": "split_files/clip_vision/clip_vision_h.safetensors",
+     "folder": "clip_vision",
+     "size": 1264219396
+    },
+    {
+     "repo": "Kijai/WanVideo_comfy",
+     "path": "Wan2_1_VAE_bf16.safetensors",
+     "folder": "vae",
+     "size": 253806278
+    },
+    {
+     "repo": "Comfy-Org/sam3.1",
+     "path": "checkpoints/sam3.1_multiplex_fp16.safetensors",
+     "folder": "checkpoints",
+     "size": 1745546848
+    }
+   ],
+   "optional": [
+    {
+     "repo": "Comfy-Org/SCAIL-2",
+     "path": "loras/wan2.1_SCAIL_2_relight_lora_bf16.safetensors",
+     "folder": "loras",
+     "size": 1226936552,
+     "label": "Relight LoRA"
+    }
+   ],
+   "notes": "Official native template (character replacement)."
+  },
+  "qwen-image-edit": {
+   "template": "image_qwen_image_edit_2511",
+   "verified": true,
+   "variants": {
+    "fp8": [
+     {
+      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+      "path": "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
+      "folder": "diffusion_models",
+      "size": 20533762817
+     }
+    ],
+    "bf16": [
+     {
+      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+      "path": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors",
+      "folder": "diffusion_models",
+      "size": 40861031560
+     }
+    ]
+   },
+   "default": "fp8",
+   "shared": [
+    {
+     "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+     "path": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+     "folder": "text_encoders",
+     "size": 9384670680
+    },
+    {
+     "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+     "path": "split_files/vae/qwen_image_vae.safetensors",
+     "folder": "vae",
+     "size": 253806246
+    }
+   ],
+   "optional": [
+    {
+     "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+     "path": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+     "folder": "loras",
+     "size": 849608296,
+     "label": "Lightning 4-step LoRA (much faster keyframes)",
+     "recommended": true
+    }
+   ],
+   "notes": "Same text encoder and VAE as Qwen-Image (shared files are skipped when already there)."
+  },
+  "ace-step": {
+   "template": "audio_ace_step_1_5_checkpoint",
+   "verified": true,
+   "variants": {
+    "turbo": [
+     {
+      "repo": "Comfy-Org/ace_step_1.5_ComfyUI_files",
+      "path": "checkpoints/ace_step_1.5_turbo_aio.safetensors",
+      "folder": "checkpoints",
+      "size": 10025478736
+     }
+    ]
+   },
+   "default": "turbo",
+   "shared": [],
+   "notes": "All-in-one checkpoint (model, text encoder, VAE) used by ComfyUI's ACE-Step 1.5 template."
+  },
+  "hunyuan-foley": {
+   "template": null,
+   "verified": true,
+   "variants": {
+    "xxl": [
+     {
+      "repo": "tencent/HunyuanVideo-Foley",
+      "path": "hunyuanvideo_foley.pth",
+      "folder": "hunyuanvideo_foley",
+      "size": 10301204679
+     }
+    ],
+    "xl": [
+     {
+      "repo": "tencent/HunyuanVideo-Foley",
+      "path": "hunyuanvideo_foley_xl.pth",
+      "folder": "hunyuanvideo_foley",
+      "size": 5854140970
+     }
+    ]
+   },
+   "default": "xl",
+   "shared": [
+    {
+     "repo": "tencent/HunyuanVideo-Foley",
+     "path": "synchformer_state_dict.pth",
+     "folder": "hunyuanvideo_foley",
+     "size": 950058171
+    },
+    {
+     "repo": "tencent/HunyuanVideo-Foley",
+     "path": "vae_128d_48k.pth",
+     "folder": "hunyuanvideo_foley",
+     "size": 1486465965
+    }
+   ],
+   "notes": "For the GPU worker's foley backend (FOLEY_MODELS = <models dir>/hunyuanvideo_foley, FOLEY_SIZE = xl or xxl). SigLIP2 and CLAP download by themselves on the first run.",
+   "needs_gb": {
+    "xxl": 20,
+    "xl": 16
+   }
+  }
+ }
+}

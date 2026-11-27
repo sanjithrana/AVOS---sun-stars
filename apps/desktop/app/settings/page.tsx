@@ -5,7 +5,7 @@ import { useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  CheckCircle2, CircleDashed, Cpu, ExternalLink, KeyRound, Loader2, Plus, Server, Settings2, Trash2, Upload, Wand2, X,
+  CheckCircle2, CircleDashed, Cpu, ExternalLink, KeyRound, Loader2, Plus, Server, Settings2, Trash2, Upload, Wand2, X, XCircle,
 } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -51,9 +51,21 @@ function useSave() {
 }
 
 // ---------------- API keys ----------------
+/** Keys and addresses the backend can check with one free call (apps/api/src/routes/keycheck.py). */
+const TESTABLE = new Set(["OPENAI_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "REPLICATE_API_TOKEN", "STABILITY_API_KEY", "CLOUDFLARE_API_TOKEN",
+  "HF_TOKEN", "GEMINI_API_KEY", "ANTHROPIC_API_KEY", "FAL_KEY", "OLLAMA_BASE_URL", "OLLAMA_MODEL", "LLAMACPP_URL", "IMAGE_SERVICE_URL", "COMFYUI_URL"]);
+
 function KeyRow({ k }: { k: SettingKey }) {
   const [value, setValue] = useState("");
   const { busy, msg, run } = useSave();
+  const [testing, setTesting] = useState(false);
+  const [test, setTest] = useState<{ ok: boolean; detail: string; ms: number } | null>(null);
+  const runTest = async () => {
+    setTesting(true); setTest(null);
+    try { setTest(await settingsApi.testKey(k.name)); }
+    catch (e) { setTest({ ok: false, detail: e instanceof Error ? e.message : "The studio did not answer. Is it running?", ms: 0 }); }
+    finally { setTesting(false); }
+  };
   return (
     <div className="grid grid-cols-1 gap-2 border-t border-border py-3 first:border-t-0 md:grid-cols-[260px_1fr_auto]" data-key={k.name}>
       <div className="min-w-0">
@@ -72,9 +84,20 @@ function KeyRow({ k }: { k: SettingKey }) {
         <button className={primary} disabled={!value.trim() || !!busy} onClick={() => run("save", async () => { const r = await settingsApi.setKeys({ [k.name]: value.trim() }); setValue(""); return r; })}>
           {busy === "save" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}Save
         </button>
+        {TESTABLE.has(k.name) && (
+          <button className={btn} disabled={!k.set || testing || !!busy} onClick={runTest} title={k.set ? "Check that this works (free, nothing is generated)" : "Save a value first"}>
+            {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}Test
+          </button>
+        )}
         {k.source === "settings" && <button className={btn} disabled={!!busy} onClick={() => run("clear", () => settingsApi.setKeys({ [k.name]: null }), "Removed")}>Clear</button>}
         {msg && <span className={`text-xs ${msg.ok ? "text-emerald-500" : "text-red-400"}`}>{msg.text}</span>}
       </div>
+      {test && (
+        <div className={`flex items-start gap-2 text-xs md:col-span-3 ${test.ok ? "text-emerald-500" : "text-red-400"}`} role="status">
+          {test.ok ? <CheckCircle2 className="mt-px h-3.5 w-3.5 shrink-0" /> : <XCircle className="mt-px h-3.5 w-3.5 shrink-0" />}
+          <span>{test.detail}{test.ms ? <span className="ml-2 font-mono text-muted-foreground tabular-nums">{test.ms} ms</span> : null}</span>
+        </div>
+      )}
     </div>
   );
 }

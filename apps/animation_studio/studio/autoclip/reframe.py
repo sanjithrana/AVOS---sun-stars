@@ -49,14 +49,43 @@ CAM_H = 0.38                                      # share of the frame height th
 
 
 # ---------- what is installed ----------
+MODEL_URL = "https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx"   # MIT, OpenCV Zoo
+
+
+_TRIED = False
+
+
+def ensure_model() -> bool:
+    """Fetch the YuNet face finder (230 KB) the first time it is needed, when the repository came without it."""
+    global _TRIED
+    if MODEL.is_file() or _TRIED:
+        return MODEL.is_file()
+    _TRIED = True
+    try:
+        import urllib.request
+        MODEL.parent.mkdir(parents=True, exist_ok=True)
+        tmp = MODEL.with_suffix(".part")
+        with urllib.request.urlopen(MODEL_URL, timeout=30) as r, open(tmp, "wb") as f:  # noqa: S310 - fixed https address
+            f.write(r.read())
+        if tmp.stat().st_size > 100_000:
+            tmp.replace(MODEL)
+        else:
+            tmp.unlink(missing_ok=True)
+    except Exception:  # noqa: BLE001 - offline: face tracking falls back to the centre crop
+        return False
+    return MODEL.is_file()
+
+
 def status() -> dict:
+    ensure_model()
     try:
         import cv2  # noqa: F401
         have_cv = hasattr(cv2, "FaceDetectorYN")
     except Exception:  # noqa: BLE001
         have_cv = False
     return {"ready": bool(have_cv and MODEL.is_file()), "opencv": have_cv, "model": MODEL.is_file(),
-            "fix": "" if have_cv else "Face tracking needs OpenCV: docker compose exec animation-studio pip install opencv-python-headless"}
+            "fix": ("Face tracking needs OpenCV: docker compose exec animation-studio pip install opencv-python-headless" if not have_cv else
+                    "" if MODEL.is_file() else f"Face tracking needs the YuNet model (no internet on first use). Download {MODEL_URL} to {MODEL}")}
 
 
 # ---------- reading the video ----------

@@ -24,7 +24,7 @@ def test_pacing_and_palettes() -> None:
 
 def test_look_is_recognised_and_short_enough_for_free_picture_services() -> None:
     assert paper.is_paper(paper.LOOK_SHORT) and paper.is_paper(paper.LOOK)
-    assert not paper.is_paper("3D animated look, glossy Pixar-like render")
+    assert not paper.is_paper("3D animated look, glossy animated-feature render")
     assert not paper.is_paper(None)
     assert len(paper.LOOK_SHORT) < 320                    # routes keep 600 characters of the style field
     assert len(paper.tail("space", short=True)) < len(paper.tail("space"))

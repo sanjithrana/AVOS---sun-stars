@@ -5,7 +5,7 @@ from .. import paper
 
 STYLES: list[dict] = [
     {"id": "auto", "name": "Auto", "prompt": ""},
-    {"id": "3d", "name": "3D animated", "prompt": "3D animated look, glossy Pixar-like render, soft studio lighting, saturated colours, shallow depth of field, clean background"},
+    {"id": "3d", "name": "3D animated", "prompt": "3D animated look, glossy animated-feature render, soft studio lighting, saturated colours, shallow depth of field, clean background"},
     {"id": "cinematic", "name": "Cinematic", "prompt": "cinematic film still, dramatic soft lighting, shallow depth of field, rich colour grade, realistic materials"},
     {"id": "photoreal", "name": "Photorealistic", "prompt": "photorealistic, natural light, real-life documentary photography, sharp detail"},
     {"id": "doc70", "name": "70s documentary", "prompt": "1970s documentary film look, grainy 16mm film, warm faded colours, soft vignette"},

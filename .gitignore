@@ -1,7 +1,9 @@
 # ---- big tools you can reinstall (never upload) ----
 ComfyUI_windows_portable/
 **/ComfyUI*/
-**/models/
+# downloaded AI model weights: the top-level D:\star\models folder and the weight files themselves
+# (never "**/models/": that also hid the source folders apps/agentic_core/models and apps/api/src/database/models)
+/models/
 *.safetensors
 *.ckpt
 *.pt
@@ -9,6 +11,8 @@ ComfyUI_windows_portable/
 *.onnx
 *.gguf
 *.bin
+# small models the app ships with (YuNet face finder, MIT, 230 KB)
+!apps/animation_studio/studio/autoclip/assets/*.onnx
 
 # ---- build output and installed packages ----
 node_modules/
@@ -50,14 +54,20 @@ secrets/
 **/autoclip/jobs/
 **/autoclip/settings.json
 **/autoclip/youtube*.json
-**/projects/
-**/outputs/
+/projects/
+/outputs/
+apps/reelmimic/projects/*
+!apps/reelmimic/projects/.gitkeep
 
 # ---- system junk ----
 .DS_Store
 Thumbs.db
 desktop.ini
 *.log
+*.tsbuildinfo
+next-env.d.ts
+*.part
+yt-test.txt
 
 # unzipped update packs
 avos-all-updates/

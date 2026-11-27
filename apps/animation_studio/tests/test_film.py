@@ -61,7 +61,7 @@ def test_reading_prompts_with_rules_and_json():
     assert (s2["framing"], s2["camera"], s2["angle"]) == ("close-up", "static", "eye level") and s2["dialogue"][0]["character"] == "Rabbit"
     assert (s3["angle"], s3["camera"], s3["end"]) == ("low angle", "push_in", 9) and any("plop" in x["sound"] for x in s3["sfx"])
     assert bd["audio"]["music"] == "playful orchestral music" and bd["audio"]["ambience"] == "forest ambience"
-    assert bd["style"].startswith("3D Pixar-style") and bd["detected"]["shots"] == 3 and bd["detected"]["dialogue"] == 2
+    assert bd["style"].startswith("3D animated feature-film") and bd["detected"]["shots"] == 3 and bd["detected"]["dialogue"] == 2
 
     # "SHOT n (a–b s)" prompts, gaps closed, "(14.00s – end)" read as a start
     chef = film.normalize(film.builtin_breakdown(CHEF))
