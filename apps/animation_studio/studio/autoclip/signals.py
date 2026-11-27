@@ -23,10 +23,10 @@ import subprocess
 from pathlib import Path
 from typing import Callable
 
-WEIGHTS = {"visual": 0.35, "audio": 0.25, "reaction": 0.20, "chat": 0.15, "replay": 0.15, "comments": 0.10, "voice": 0.12, "words": 0.08}
+WEIGHTS = {"visual": 0.35, "audio": 0.25, "reaction": 0.20, "chat": 0.15, "replay": 0.15, "comments": 0.10, "voice": 0.12, "bang": 0.12, "words": 0.10}
 NAMES = {"visual": "Visual action", "audio": "Audio excitement", "reaction": "Streamer reaction", "chat": "Live chat", "replay": "Replay graph",
          "comments": "Comment timestamps",
-         "voice": "Voice comes back", "words": "Excited words"}
+         "voice": "Voice comes back", "bang": "Gunfire and explosions", "words": "Excited words"}
 
 
 def combine(sig: dict[str, list[float]], n: int) -> tuple[list[float], list[str]]:

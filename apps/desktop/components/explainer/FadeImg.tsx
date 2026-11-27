@@ -9,7 +9,7 @@ export function FadeImg({ src, alt, className = "" }: { src: string; alt: string
     <div className={`relative overflow-hidden ${ok ? "" : "animate-pulse bg-muted"}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} loading="lazy" decoding="async" onLoad={() => setOk(true)} onError={() => setOk(true)}
-        className={`${className} transition-all duration-500 ease-out ${ok ? "scale-100 opacity-100 blur-0" : "scale-[1.02] opacity-0 blur-sm"}`} />
+        className={`${className} transition-colors duration-500 ease-out ${ok ? "scale-100 opacity-100 blur-0" : "scale-[1.02] opacity-0 blur-sm"}`} />
     </div>
   );
 }

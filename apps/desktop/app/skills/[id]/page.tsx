@@ -24,14 +24,14 @@ const OUT_FALLBACK: RunOutput[] = [
 ];
 
 function StepDot({ s }: { s?: string }) {
-  if (s === "done") return <Check className="h-4 w-4 text-[var(--signal)]" />;
+  if (s === "done") return <Check className="h-4 w-4 text-signal" />;
   if (s === "working") return <Loader2 className="h-4 w-4 animate-spin" />;
   if (s === "error") return <TriangleAlert className="h-4 w-4 text-red-400" />;
   return <span className="block h-2 w-2 bg-muted-foreground/40" />;
 }
 
 function PromptBox({ run, k, onSave, busy }: { run: Run; k: string; onSave: (text: string) => void; busy: boolean }) {
-  const text = run.prompts?.[k] ?? "";
+  const text = (run.prompts as Record<string, string> | undefined)?.[k] ?? "";
   const [draft, setDraft] = useState(text);
   const [copied, setCopied] = useState(false);
   useEffect(() => setDraft(text), [text]);
@@ -42,7 +42,7 @@ function PromptBox({ run, k, onSave, busy }: { run: Run; k: string; onSave: (tex
       <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={8} className="prompt-field mt-2 w-full resize-y border border-border p-3 text-xs leading-relaxed" />
       <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-xs"><Copy className="h-3.5 w-3.5" />{copied ? "Copied" : "Copy"}</button>
-        {draft !== text && <button type="button" disabled={busy} onClick={() => onSave(draft)} className="border border-[rgba(200,255,58,0.6)] px-3 py-1.5 text-xs disabled:opacity-50">Save and re-make from here</button>}
+        {draft !== text && <button type="button" disabled={busy} onClick={() => onSave(draft)} className="border border-signal/60 px-3 py-1.5 text-xs disabled:opacity-50">Save and re-make from here</button>}
       </div>
     </details>
   );
@@ -131,7 +131,7 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
                   </div>
                   {file && <a href={skills.file(r.id, file)} download className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"><Download className="h-3.5 w-3.5" />Download</a>}
                   {file && o.kind === "video" && o.key === (r.outputs?.length ? r.outputs : OUT_FALLBACK).slice(-1)[0].key && <div className="mt-2"><QueueVideo url={skills.file(r.id, file)} title={r.title || "video"} /></div>}
-                  {o.prompt && r.prompts?.[o.prompt] !== undefined && (
+                  {o.prompt && (r.prompts as Record<string, string> | undefined)?.[o.prompt] !== undefined && (
                     <PromptBox run={r} k={o.prompt} busy={busy || save.isPending}
                       onSave={(text) => save.mutate({ k: o.prompt as string, step: o.step, text })} />)}
                 </section>

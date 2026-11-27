@@ -11,6 +11,12 @@ from .. import config
 LEVEL = re.compile(r"lavfi\.astats\.Overall\.RMS_level=(-?[\d.]+|-?inf|nan)")
 
 
+def _growth() -> str:
+    from . import growth
+    g = growth.rules()
+    return "\n\n" + g if g else ""
+
+
 def duration(path: str) -> float:
     r = subprocess.run([config.ffprobe(), "-v", "error", "-show_entries", "format=duration", "-of", "json", path], capture_output=True, text=True, timeout=120)
     try:
@@ -158,7 +164,7 @@ def ai_titles(s: dict, texts: list[str], log: Any = None) -> list[str] | None:
     from ..series import writers
     if not writers.uses_ai(s) or not any(texts):
         return None
-    data = writers.ask(s, "story", writers.system("avos-autoclip-titles", TITLER),
+    data = writers.ask(s, "story", writers.system("avos-autoclip-titles", TITLER) + _growth(),
                        "\n".join(f"Clip {i + 1}: {t[:900]}" for i, t in enumerate(texts)), log, max_tokens=700, temperature=0.6)
     t = (data or {}).get("titles") if isinstance(data, dict) else None
     if isinstance(t, list) and len(t) == len(texts):

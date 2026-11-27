@@ -39,14 +39,14 @@ export function PromptBar() {
   const ready = kind === "animation" || text.trim().length >= 3;
   const placeholder = KINDS.find((k) => k[0] === kind)?.[2];
   return (
-    <div className="prompt-bar w-full max-w-3xl text-left" data-testid="home-prompt">
-      <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="What to make">
+    <div className="prompt-bar w-full text-left" data-testid="home-prompt">
+      <div className="flex flex-wrap gap-5 border-b border-border" role="tablist" aria-label="What to make">
         {KINDS.map(([k, l]) => (
           <button key={k} type="button" role="tab" aria-selected={kind === k} onClick={() => setKind(k)} data-testid={`make-${k}`}
-            className={`rounded-full px-4 py-1.5 text-sm transition-colors ${kind === k ? "bg-[rgba(200,255,58,0.22)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+            className={`border-b-2 px-1 pb-2 text-[14px] transition-colors ${kind === k ? "border-signal font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>{l}</button>
         ))}
       </div>
-      <form className="prompt-box mt-3 rounded-[1.75rem] border border-[rgba(200,255,58,0.22)] bg-[rgba(8,6,22,0.94)] p-3"
+      <form className="prompt-box mt-4 border border-input bg-background p-2"
         onSubmit={(e) => { e.preventDefault(); if (ready && !go.isPending) go.mutate(); }}>
         <label htmlFor="home-idea" className="sr-only">Your idea</label>
         <textarea id="home-idea" value={text} onChange={(e) => setText(e.target.value)} rows={3} placeholder={placeholder} data-testid="home-idea"
@@ -57,36 +57,36 @@ export function PromptBar() {
             <label className="sr-only" htmlFor="home-len">Length</label>
           )}
           {kind === "explainer" && (
-            <select id="home-len" value={seconds} onChange={(e) => setSeconds(Number(e.target.value))} className="h-9 rounded-full px-4 text-sm" data-testid="home-length">
+            <select id="home-len" value={seconds} onChange={(e) => setSeconds(Number(e.target.value))} className="h-9 px-3 text-[13px]" data-testid="home-length">
               {[15, 30, 45, 60].map((n) => <option key={n} value={n}>{n} seconds</option>)}
             </select>
           )}
           {kind !== "animation" && (
             <>
               <label className="sr-only" htmlFor="home-shape">Shape</label>
-              <select id="home-shape" value={aspect} onChange={(e) => setAspect(e.target.value)} className="h-9 rounded-full px-4 text-sm" data-testid="home-shape">
+              <select id="home-shape" value={aspect} onChange={(e) => setAspect(e.target.value)} className="h-9 px-3 text-[13px]" data-testid="home-shape">
                 <option value="9:16">Vertical 9:16</option>
                 <option value="16:9">Wide 16:9</option>
                 <option value="1:1">Square 1:1</option>
               </select>
-              <div className="inline-flex h-9 items-center rounded-full border border-[rgba(200,255,58,0.3)] p-0.5 text-sm" role="radiogroup" aria-label="How it runs">
+              <div className="inline-flex h-9 items-center border border-input text-[13px]" role="radiogroup" aria-label="How it runs">
                 {([[false, "Ask me"], [true, "Automatic"]] as const).map(([v, l]) => (
                   <button key={l} type="button" role="radio" aria-checked={auto === v} onClick={() => setAuto(v)} data-testid={`home-auto-${v ? "on" : "off"}`}
-                    className={`h-8 rounded-full px-3 transition-colors ${auto === v ? "bg-[rgba(200,255,58,0.28)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+                    className={`h-full px-3 transition-colors ${auto === v ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
                 ))}
               </div>
             </>
           )}
           <button type="submit" disabled={!ready || go.isPending} data-testid="home-generate"
-            className="ml-auto inline-flex h-10 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold disabled:opacity-40">
-            {go.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}{kind === "animation" ? "Open Animation" : "Generate"}
+            className="ml-auto inline-flex h-10 items-center gap-2 bg-primary px-5 text-sm font-semibold disabled:opacity-40">
+            {go.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}{kind === "animation" ? "Open Animation" : "Make the video"}
           </button>
         </div>
       </form>
-      {go.isError && <p className="mt-2 text-sm text-[#ff8aa0]" role="alert">{(go.error as Error).message}</p>}
+      {go.isError && <p className="mt-2 text-sm text-destructive" role="alert">{(go.error as Error).message}</p>}
       <div className="mt-3 flex flex-wrap gap-2">
         {EXAMPLES[kind].map((x) => (
-          <button key={x} type="button" onClick={() => setText(x)} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">{x}</button>
+          <button key={x} type="button" onClick={() => setText(x)} className="border border-border px-2.5 py-1 text-[12px] text-muted-foreground transition-colors hover:text-foreground">{x}</button>
         ))}
       </div>
     </div>

@@ -4,7 +4,7 @@ import { Check, Loader2 } from "lucide-react";
 import { skills, type Plan } from "@/lib/skills";
 
 const card = "border border-border p-4";
-const chip = (on: boolean) => `border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] leading-none transition-colors ${on ? "border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+const chip = (on: boolean) => `border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] leading-none transition-colors ${on ? "border-signal/70 bg-signal/18 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
 
 /** The suggested plan after the script: the character, the storyboard, the motion and the audio, each with its Change control. "Approve" is the one button that spends credit. */
 export function PlanCards({ plan, busy, onCharacter, onMotion, onVoice, onApprove, approving }: {
@@ -12,7 +12,7 @@ export function PlanCards({ plan, busy, onCharacter, onMotion, onVoice, onApprov
   onCharacter: (id: string) => void; onMotion: (m: "video" | "poses") => void; onVoice: (v: "male" | "female") => void; onApprove: () => void;
 }) {
   return (
-    <section className="space-y-3 border border-[rgba(200,255,58,0.5)] p-4" data-testid="plan-cards" aria-label="Suggested plan">
+    <section className="space-y-3 border border-signal/50 p-4" data-testid="plan-cards" aria-label="Suggested plan">
       <div>
         <p className="text-xs uppercase tracking-wider text-amber-400">Review the plan</p>
         <h2 className="text-lg font-semibold">Here is what will be made</h2>
@@ -24,7 +24,7 @@ export function PlanCards({ plan, busy, onCharacter, onMotion, onVoice, onApprov
         <div className="mt-2 flex flex-wrap gap-2">
           {plan.characters.map((c) => (
             <button key={c.id} type="button" disabled={busy} onClick={() => onCharacter(c.id)} aria-pressed={c.chosen} title={c.about}
-              className={`flex w-24 flex-col items-center gap-1 border p-1.5 text-[11px] disabled:opacity-60 ${c.chosen ?"border-[rgba(200,255,58,0.8)] bg-[rgba(200,255,58,0.18)]" :"border-border"}`}>
+              className={`flex w-24 flex-col items-center gap-1 border p-1.5 text-[11px] disabled:opacity-60 ${c.chosen ?"border-signal/80 bg-signal/18" :"border-border"}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-24 w-full bg-muted object-contain" />
               <span className="text-center leading-tight">{c.name}</span>

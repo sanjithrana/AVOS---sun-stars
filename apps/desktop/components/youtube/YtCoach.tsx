@@ -79,7 +79,7 @@ export function YtCoach() {
         <>
           <div role="radiogroup" aria-label="Coach mode" className="grid gap-2 sm:grid-cols-3">
             {MODES.map(([k, l, d]) => (
-              <button key={k} type="button" role="radio" aria-checked={c.mode === k} onClick={() => set.mutate({ mode: k })} className={`border p-3 text-left transition ${c.mode === k ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground hover:text-foreground"}`}>
+              <button key={k} type="button" role="radio" aria-checked={c.mode === k} onClick={() => set.mutate({ mode: k })} className={`border p-3 text-left transition ${c.mode === k ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground hover:text-foreground"}`}>
                 <div className="flex items-center gap-2 text-sm font-medium"><Brain className="h-4 w-4" />{l}</div><div className="mt-1 text-xs">{d}</div>
               </button>))}
           </div>

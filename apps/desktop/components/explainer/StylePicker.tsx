@@ -16,9 +16,9 @@ export function StylePicker({ styles, value, onChange }: { styles: { id: string;
     <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Look" data-testid="explainer-style">
       {styles.map((s) => (
         <button key={s.id} type="button" role="radio" aria-checked={value === s.id} onClick={() => onChange(s.id)}
-          className={`group overflow-hidden border text-left transition-all duration-200 active:scale-[0.97] ${value === s.id ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border hover:border-amber-500/50"}`}>
+          className={`group overflow-hidden border text-left transition-colors duration-200 active:scale-[0.97] ${value === s.id ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border hover:border-amber-500/50"}`}>
           <div style={INLINE[s.id] ? { backgroundImage: INLINE[s.id] } : undefined}
-            className={`h-12 transition-transform duration-300 group-hover:scale-110 ${INLINE[s.id] ? "" : `bg-gradient-to-br ${SWATCH[s.id] ?? SWATCH.auto}`}`} />
+            className={`h-12 transition-transform duration-300 ${INLINE[s.id] ? "" : `bg-gradient-to-br ${SWATCH[s.id] ?? SWATCH.auto}`}`} />
           <p className="px-2 py-1.5 text-xs font-medium">{s.name}</p>
         </button>
       ))}

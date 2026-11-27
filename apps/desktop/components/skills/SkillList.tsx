@@ -28,7 +28,7 @@ export function SkillList({ items, value, onChange, loading }: { items: SkillInf
         <div className="mt-3 flex gap-1 rounded-full border border-border p-0.5 text-xs" role="tablist" aria-label="Skill group">
           {([["make", "Make here"], ["stickman", "Stickman looks"]] as const).map(([v, l]) => (
             <button key={v} type="button" role="tab" aria-selected={tab === v} onClick={() => setTab(v)} data-testid={`skill-tab-${v}`}
-              className={`flex-1 rounded-full px-2 py-1.5 transition-colors ${tab === v ? "bg-[rgba(200,255,58,0.25)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+              className={`flex-1 rounded-full px-2 py-1.5 transition-colors ${tab === v ? "bg-signal/25 text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
           ))}
         </div>
         <label className="relative mt-3 block">
@@ -48,7 +48,7 @@ export function SkillList({ items, value, onChange, loading }: { items: SkillInf
                 return (
                   <li key={s.id}>
                     <button type="button" role="radio" aria-checked={on} onClick={() => onChange(s.id)} data-testid={`skill-${s.id}`}
-                      className={`skill-card block w-full overflow-hidden rounded-2xl border text-left transition ${on ? "border-[rgba(200,255,58,0.75)] shadow-[0_0_28px_-6px_rgba(200,255,58,0.95)]" : "border-border"}`}>
+                      className={`skill-card block w-full overflow-hidden rounded-2xl border text-left transition ${on ? "border-signal/75" : "border-border"}`}>
                       <span className="relative block">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={`/skills/${s.id}.jpg`} alt="" loading="lazy" className="aspect-video w-full object-cover" />

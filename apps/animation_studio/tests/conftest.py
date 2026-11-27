@@ -61,3 +61,15 @@ def _no_web_comments(monkeypatch):
     except Exception:  # noqa: BLE001
         return
     monkeypatch.setattr(signals, "comments", lambda url, dest, cancel=None, limit=400: [])
+
+
+@pytest.fixture(autouse=True)
+def _no_web_transcripts(request, monkeypatch):
+    """Jobs with YouTube links must not ask YouTube for a transcript during tests (test_yttranscript tests it directly)."""
+    if request.module.__name__.endswith("test_yttranscript"):
+        return
+    try:
+        from studio.autoclip import yttranscript
+    except Exception:  # noqa: BLE001
+        return
+    monkeypatch.setattr(yttranscript, "fetch", lambda url, langs=None, log=None: (None, "tests run offline"))

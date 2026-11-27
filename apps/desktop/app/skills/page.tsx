@@ -36,9 +36,9 @@ export default function SkillsHome() {
   const runs = q.data?.runs ?? [];
 
   return (
-    <AppShell header={<span className="text-lg font-semibold">Skills</span>}>
+    <AppShell header={<span className="text-lg font-semibold">Video skills</span>}>
       <div className="w-full space-y-10 px-4 py-6 md:px-8 2xl:px-12">
-        <PageHero eyebrow="Skills" title={<>Pick a skill. <Lit>Get a finished video.</Lit></>}
+        <PageHero eyebrow="Skills" title={<>Pick a skill, get a <Lit>finished video</Lit></>}
           blurb="Each skill is a ready-made way to make one kind of video: a company story, a toy that builds itself, a recipe in anime style and more."
           steps={[{ icon: ListChecks, t: "Choose a skill", d: "Search the grid below." }, { icon: TypeIcon, t: "Name the subject", d: "A company, a product, a dish." }, { icon: Video, t: "Review and publish", d: "Approve the plan, then it renders." }]} />
         {/* The chosen skill first, then everything else underneath. With seventy-one skills a sidebar list is
@@ -58,7 +58,7 @@ export default function SkillsHome() {
           {!runs.length ? <p className="text-sm text-muted-foreground">Nothing yet.</p>
             : <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
                 {runs.map((r) => (
-                  <Link key={r.id} href={`/skills/${r.id}`} className="overflow-hidden border border-border bg-card hover:border-[rgba(200,255,58,0.5)]">
+                  <Link key={r.id} href={`/skills/${r.id}`} className="overflow-hidden border border-border bg-card hover:border-signal/50">
                     <div className="flex aspect-[3/4] items-center justify-center bg-muted">
                       {r.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={skills.file(r.id, r.thumb, r.updatedAt)} alt="" className="h-full w-full object-cover" /> : <Film className="h-8 w-8 text-muted-foreground" />}
                     </div>

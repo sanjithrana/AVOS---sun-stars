@@ -261,7 +261,9 @@ def recommend(job: dict, clip: dict, research: dict, ask: Callable[[str, str], A
                              "candidate_mentions": ment_c[:6], "known_handles": known, "top_title_length": a["title_len"], "top_titles_use_emoji": a["emoji_share"] >= 0.4},
                             ensure_ascii=False)
         try:
-            out = ask(WRITER, prompt)
+            from . import growth
+            g = growth.rules()                         # Ootto's content skills: hook checklist, caption shape, human tone
+            out = ask(WRITER + ("\n\n" + g if g else ""), prompt)
         except Exception:  # noqa: BLE001 - the rules' pack stands
             out = None
         if isinstance(out, dict):

@@ -6,8 +6,8 @@ import { autoclip, type RightsCheck as R, type Verdict } from "@/lib/autoclip";
 import { Note } from "./ui";
 
 const TAG: Record<Verdict, { label: string; cls: string; Icon: typeof ShieldCheck }> = {
-  own: { label: "Yours: safe to clip", cls: "border-[rgba(200,255,58,0.85)] text-primary", Icon: ShieldCheck },
-  "creative-commons": { label: "Creative Commons: reuse allowed, give credit", cls: "border-[rgba(200,255,58,0.85)] text-primary", Icon: ShieldCheck },
+  own: { label: "Yours: safe to clip", cls: "border-signal/85 text-primary", Icon: ShieldCheck },
+  "creative-commons": { label: "Creative Commons: reuse allowed, give credit", cls: "border-signal/85 text-primary", Icon: ShieldCheck },
   ask: { label: "The creator owns it: ask first", cls: "border-amber-400/80 text-amber-300", Icon: AlertTriangle },
   unknown: { label: "Can't tell: only your own recordings are safe", cls: "border-amber-400/80 text-amber-300", Icon: AlertCircle },
   blocked: { label: "Not clippable", cls: "border-red-400/80 text-red-300", Icon: Ban },
@@ -69,7 +69,7 @@ export function RightsCheck({ url, isFile, onChange }: { url: string; isFile: bo
           <div className="text-xs font-medium">Record the next…</div>
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Minutes to record">
             {MINUTES.map((m) => <button key={m} type="button" role="radio" aria-checked={minutes === m} onClick={() => setMinutes(m)}
-              className={`border px-3 py-1.5 text-xs ${minutes === m ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>{m < 60 ? `${m} min` : `${m / 60} hour${m > 60 ? "s" : ""}`}</button>)}
+              className={`border px-3 py-1.5 text-xs ${minutes === m ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>{m < 60 ? `${m} min` : `${m / 60} hour${m > 60 ? "s" : ""}`}</button>)}
           </div>
           <p className="text-[11px] text-muted-foreground">Recording takes that long in real time, then the clips are made from it. You can press Stop at any time and keep what was recorded.</p>
         </div>

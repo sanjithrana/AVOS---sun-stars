@@ -110,7 +110,7 @@ export function MakeClips({ ov, onMade, initialUrl = "" }: { ov: Overview; onMad
   const lenOn = LENGTHS.find(([, a, b]) => a === o.min_seconds && b === o.max_seconds)?.[0];
   const capName = cap.caption_styles?.[cv.caption]?.label ?? cap.captions?.[cv.caption] ?? cv.caption;
   const tplName = cap.template_info?.[fr.template]?.label ?? "No template";
-  const chip = (on: boolean) => `border px-3 py-2 text-sm transition ${on ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+  const chip = (on: boolean) => `border px-3 py-2 text-sm transition ${on ? "border-signal/85 bg-signal/12 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
   return (
     <Card title="Make clips" hint="Paste a link, press Get clips. Everything else is already set for you.">
       {/* 1. what kind of video: sets layout, captions and how moments are picked */}
@@ -168,7 +168,7 @@ export function MakeClips({ ov, onMade, initialUrl = "" }: { ov: Overview; onMad
       )}
 
       {/* 4. the one thing that most improves the picks */}
-      <div className="border border-[rgba(200,255,58,0.35)] p-3">
+      <div className="border border-signal/35 p-3">
         <p className="mb-2 text-xs text-muted-foreground"><span className="font-medium text-foreground">AI helper</span> — picks complete, interesting moments and writes titles. Without one, only loudness is used.</p>
         <CrewPicker value={o.crew} onChange={(v) => set("crew", v)} />
       </div>
@@ -244,8 +244,8 @@ export function MakeClips({ ov, onMade, initialUrl = "" }: { ov: Overview; onMad
       </Section>
 
       {go.isError && <Note tone="err">{(go.error as Error).message}</Note>}
-      {(!cap.yt_dlp || !cap.whisper) && (
-        <Note tone="warn">Missing: {[!cap.yt_dlp && "yt-dlp (links)", !cap.whisper && "faster-whisper (captions)"].filter(Boolean).join(", ")}. Install with <code className="font-mono">docker compose exec animation-studio pip install yt-dlp faster-whisper</code>.</Note>
+      {(!cap.yt_dlp || !cap.whisper || cap.yt_transcript === false) && (
+        <Note tone="warn">Missing: {[!cap.yt_dlp && "yt-dlp (links)", !cap.whisper && "faster-whisper (captions)", cap.yt_transcript === false && "youtube-transcript-api (instant YouTube transcripts)"].filter(Boolean).join(", ")}. Install with <code className="font-mono">docker exec avos-animation-studio pip install -U yt-dlp faster-whisper youtube-transcript-api</code>.</Note>
       )}
       <p className="text-xs text-muted-foreground">Clip only video you own or have permission to use.</p>
     </Card>

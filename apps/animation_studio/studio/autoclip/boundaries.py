@@ -112,12 +112,29 @@ def voice_return(words: list[dict] | None, n: int, offset: float = 0.0, quiet: f
     return v if hits >= 1 else []
 
 
+def no_dead_open(m: dict, words: list[dict] | None, min_s: float) -> dict:
+    """The first word is heard within half a second (Virality skill, checklist point 6): cut away silent lead-in."""
+    if not words:
+        return m
+    a, b = float(m["start"]), float(m["end"])
+    first = next((w for w in words if a - 0.05 <= w["s"] < min(b, a + 4.0)), None)
+    if not first or first["s"] - a <= 0.5:
+        return m
+    start = round(first["s"] - 0.2, 2)
+    if b - start < min_s - 3:
+        return m
+    n = dict(m)
+    n["start"] = start
+    return n
+
+
 def refine(moments: list[dict], words: list[dict] | None, curve: list[float] | None, offset: float, min_s: float, total: float | None = None) -> list[dict]:
     out = []
     for m in moments:
         if words:
             m = drop_trailing_question(m, words, min_s)
         m = start_on_peak(m, curve, offset, words, min_s)
+        m = no_dead_open(m, words, min_s)
         if not m.get("cut_question"):
             m = hold_reaction(m, curve, offset, total)
         out.append(m)

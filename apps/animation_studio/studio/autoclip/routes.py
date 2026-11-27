@@ -24,7 +24,7 @@ def err(status: int, msg: str, **kw: Any) -> JSONResponse:
 
 def capabilities() -> dict:
     import importlib.util as iu
-    return {"ffmpeg": bool(shutil.which("ffmpeg")), "yt_dlp": intake.have_ytdlp(), "whisper": iu.find_spec("faster_whisper") is not None,
+    return {"ffmpeg": bool(shutil.which("ffmpeg")), "yt_dlp": intake.have_ytdlp(), "yt_transcript": iu.find_spec("youtube_transcript_api") is not None, "whisper": iu.find_spec("faster_whisper") is not None,
             "layouts": cut.LAYOUTS, "captions": cut.CAPTIONS, "caption_styles": caption_styles(), "anims": captions.ANIMS, "fonts": captions.font_list(),
             "whisper_models": pipeline.WHISPER_MODELS, "whisper_pick": whisper_pick(), "edit_styles": {k: v["label"] for k, v in polish.STYLES.items()}, "looks": {k: v[0] for k, v in polish.LOOKS.items()}, "moods": music.MOODS, "reframe": reframe.status(),
             "templates": {k: v["label"] for k, v in templates.TEMPLATES.items()},
@@ -1122,3 +1122,4 @@ async def explore_add(req: Request) -> Any:
 def explore_del(handle: str) -> Any:
     from . import explore
     return {"mine": explore.remove_channel(handle)}
+

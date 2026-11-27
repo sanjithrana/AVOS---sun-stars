@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from . import boundaries, coach, craft, cut, meta, experiments, finder, hype, intake, pick, polish, presets, reframe, rights, signals, smart, store, templates, transcript, visual
+from . import boundaries, neonsig, coach, craft, cut, meta, experiments, finder, hype, intake, pick, polish, presets, reframe, rights, signals, smart, store, templates, transcript, visual
 
 _threads: dict[str, threading.Thread] = {}
 _cancel: dict[str, threading.Event] = {}
@@ -89,7 +89,7 @@ def clean_brand(b: dict | None) -> dict:
 
 
 def build_opts(o: dict | None) -> dict:
-    d = store.settings()["defaults"] | {"start_min": None, "end_min": None, "srt": None, "preset": "", "multi": "speaker", "smart": "auto", "smart_min": 45, "tighten": True, "whole": True, "accurate": True,
+    d = store.settings()["defaults"] | {"start_min": None, "end_min": None, "srt": None, "preset": "", "multi": "speaker", "smart": "auto", "smart_min": 45, "opening_hook": True, "tighten": True, "whole": True, "accurate": True,
                                         "cap": {}, "brand": {}, "cap_lang": "auto", "whisper_model": "small", "mode": "clips", "research": True, "content": "auto", "game_view": "auto",
                                         "template": "none", "canvas": {}, "card": {}, "finder": True, "riser": False}
     for k, v in (o or {}).items():
@@ -121,6 +121,7 @@ def build_opts(o: dict | None) -> dict:
         d["canvas"]["image"] = str(store.ROOT / "brand" / "canvas.png")
     d["card"] = templates.clean_card(d.get("card"))
     d["finder"] = str(d.get("finder")).lower() not in ("0", "false", "no", "off")
+    d["opening_hook"] = str(d.get("opening_hook")).lower() not in ("0", "false", "no", "off")
     d.update(polish.resolve(d))
     d["coach"] = str(d.get("coach")).lower() in ("1", "true", "yes", "on")
     d["hype_only"] = str(d.get("hype_only")).lower() in ("1", "true", "yes", "on")
@@ -267,6 +268,18 @@ def _run(jid: str) -> None:
                 how = ("the video's captions" if scouted else "faster-whisper (kept from the last run)") if cues else None
             except Exception:  # noqa: BLE001
                 cues = None
+        if not cues and not scouted and intake.is_youtube(job["source"].get("url") or ""):
+            from . import yttranscript                         # YouTube already has a transcript: read it in a second instead of listening for minutes
+            yc, why = yttranscript.fetch(job["source"]["url"], log=log)
+            if yc:
+                shift = float((store.load(jid)["source"].get("section") or [0.0])[0])   # only part of the video was downloaded
+                yc = [dict(c, start=c["start"] - shift, end=c["end"] - shift, words=[dict(w, s=w["s"] - shift, e=w["e"] - shift) for w in c.get("words") or []])
+                      for c in yc if c["end"] > shift and c["start"] - shift < total]
+                if yc:
+                    cues, how = yc, why
+                    cf.write_text(json.dumps(cues), "utf-8")
+            else:
+                log(f"No YouTube transcript ({why}); listening to the audio instead.")
         longsrc = (not scouted) and o.get("smart") != "off" and total >= float(o.get("smart_min") or 45) * 60
         if not cues and longsrc:
             log(f"This video is {total / 60:.0f} minutes long, so it is not transcribed from start to end (that takes hours). Clips are picked by sound first, then only each clip is listened to.")
@@ -329,6 +342,18 @@ def _run(jid: str) -> None:
                         if o.get("hype_only") and url:
                             cc = signals.comments_curve(signals.comments(url, d, lambda: _check(jid)), total)
                             sig["comments"] = cc[int(a):] if cc else []
+                        na = neonsig.audio(str(src), a, b)       # NeonClipping's ears: jumps against the last 2 minutes, raised voices, gunfire and booms
+                        if na:
+                            nac = neonsig.audio_curve(na)
+                            sig["audio"] = [max(x, nac[i] if i < len(nac) else 0.0) for i, x in enumerate(sig["audio"])] if sig.get("audio") else nac
+                            if gamey:
+                                sig["bang"] = na["bang"]
+                        if o.get("hype_only"):                     # NeonClipping's eyes: optical flow and hard cuts
+                            fl = neonsig.motion(str(src), a, b)
+                            if fl:
+                                sig["visual"] = [max(x, fl[i] if i < len(fl) else 0.0) for i, x in enumerate(sig.get("visual") or fl)]
+                        if words:                                  # what is said: "oh my god", "bhaago", "wasted", "headshot"
+                            sig["words"] = neonsig.excite(words, n_sec, a)
                         if gamey and words:                # the streamer going quiet, then talking fast: a reaction to what just happened
                             sig["voice"] = boundaries.voice_return(words, n_sec, a)
                         hcurve, used = signals.combine(sig, n_sec)
@@ -394,8 +419,14 @@ def _run(jid: str) -> None:
                         rest = [m for m in moments if all(min(m["end"], f["end"]) - max(m["start"], f["start"]) <= 0.5 * (m["end"] - m["start"]) for f in found)]
                         moments = sorted(found + rest, key=lambda m: m["start"])
                         log(f"{len(found)} complete moment{'s' if len(found) != 1 else ''} from the AI editor join {len(rest)} from the signals.")
+                if moments and words:                      # promo talk ("like and subscribe", "thanks for watching") is never a moment
+                    said = lambda m: " ".join(w["w"] for w in words if m["start"] <= w["s"] < m["end"])  # noqa: E731
+                    kept = [m for m in moments if not neonsig.filler(said(m))]
+                    moments = neonsig.varied(kept or moments, said, len(kept or moments))   # repeats of a moment already chosen lose
                 if moments:                                # never end on the next question, open on the moment, let the reaction land
                     moments = boundaries.refine(moments, words, hcurve, hoff, o["min_seconds"], total)
+                    if src and not scouted and Path(str(src)).is_file():     # start and end on a scene cut when one is right there
+                        moments = [neonsig.on_scene_cut(str(src), m, words, o["min_seconds"] - 2) for m in moments]
                     short = 0
                     for k, m in enumerate(moments):          # never shorter than the length you asked for: finish the thought instead
                         lack = o["min_seconds"] - (m["end"] - m["start"])
@@ -484,6 +515,12 @@ def _run(jid: str) -> None:
                     if note:
                         c["notice"] = note
                         log(f"Clip {c['n']}: {note}")
+            if o.get("opening_hook", True):                # an opening heading on every clip: the clip's own strongest line (NeonClipping)
+                for i, c in enumerate(clips):
+                    if not c.get("hook") and texts[i]:
+                        h = neonsig.extract_hook(texts[i])
+                        if h and (neonsig.hook_supported(h, texts[i]) or len(h.split()) >= 4):
+                            c["hook"] = h
             store.update(jid, lambda j: j.update(clips=clips, pick_key=key))
         _step(jid, "pick", status="done", note=(f"{len(clips)} clips (kept from the last run)" if reused else "") or f"{len(clips)} clips by {'loudness and the transcript (' + how + ')' if how else 'loudness only (no transcript: no captions)'}"
               + (", ranked by AI" if metas else "") + (", titles by AI" if titles else ""))

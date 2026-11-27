@@ -23,7 +23,7 @@ const ORDER: StepId[] = ["script", "scenes", "motion", "audio", "final"];
 const cardText = (c: Card) => c.type === "title" ? `${c.text} · ${c.years}` : c.type === "stat" ? `${c.value} ${c.unit ?? ""}` : c.type === "vs" ? `${c.left} vs ${c.right}` : c.type === "year" ? `${c.value}` : `${c.text}`;
 const box =" border border-border p-4";
 const btn ="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] disabled:opacity-50";
-const chip = (on: boolean) => `border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] leading-none transition-colors ${on ? "border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+const chip = (on: boolean) => `border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] leading-none transition-colors ${on ? "border-signal/70 bg-signal/18 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
 
 function NarrationRow({ sc, busy, onSay }: { sc: Scene; busy: boolean; onSay: (n: number, text: string) => void }) {
   const [text, setText] = useState(sc.narration);                 // the row is re-created (key) when the saved narration changes
@@ -33,7 +33,7 @@ function NarrationRow({ sc, busy, onSay }: { sc: Scene; busy: boolean; onSay: (n
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} aria-label={`Narration for scene ${sc.n}`} className="prompt-field mt-2 w-full resize-y border border-border p-2.5 text-sm leading-relaxed" />
       {sc.warning && <p className="mt-1 text-[11px] text-amber-300/90">{sc.warning}</p>}
       {sc.dropped > 0 && <p className="mt-1 text-[11px] text-muted-foreground">{sc.dropped} card(s) left out: their numbers weren&apos;t in the research.</p>}
-      {text !== sc.narration && <button type="button" disabled={busy} onClick={() => onSay(sc.n, text)} className="mt-2 border border-[rgba(200,255,58,0.6)] px-3 py-1.5 text-xs disabled:opacity-50">Save and re-record</button>}
+      {text !== sc.narration && <button type="button" disabled={busy} onClick={() => onSay(sc.n, text)} className="mt-2 border border-signal/60 px-3 py-1.5 text-xs disabled:opacity-50">Save and re-record</button>}
     </li>
   );
 }
@@ -186,7 +186,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
             <div className="mt-3 flex flex-wrap gap-2">
               {chars.map((c) => (
                 <button key={c.id} type="button" disabled={busy || saving} title={c.about} aria-pressed={c.id === cid} onClick={() => c.id !== cid && change.mutate({ character: c.id })}
-                  className={`flex w-24 flex-col items-center gap-1 border p-1.5 text-[11px] disabled:opacity-60 ${c.id === cid ?"border-[rgba(200,255,58,0.8)] bg-[rgba(200,255,58,0.18)]" :"border-border"}`}>
+                  className={`flex w-24 flex-col items-center gap-1 border p-1.5 text-[11px] disabled:opacity-60 ${c.id === cid ?"border-signal/80 bg-signal/18" :"border-border"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-24 w-full bg-muted object-contain" /><span className="text-center leading-tight">{c.name}</span>
                 </button>
@@ -269,7 +269,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
       {out === "storyboard" && (scenes.length ? (
         <ul className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {scenes.map((sc) => (
-            <li key={sc.n} className={`cursor-pointer border p-3 transition-colors ${sel === sc.n ?"border-[rgba(200,255,58,0.8)]" :"border-border"}`} onClick={() => { setSel(sc.n); setOut("shots"); }}>
+            <li key={sc.n} className={`cursor-pointer border p-3 transition-colors ${sel === sc.n ?"border-signal/80" :"border-border"}`} onClick={() => { setSel(sc.n); setOut("shots"); }}>
               <div className={`overflow-hidden bg-muted ${r.aspect ==="9:16" ?"aspect-[9/16]" : r.aspect ==="1:1" ?"aspect-square" :"aspect-video"}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 {sc.picture ? <img src={skills.file(r.id, sc.picture, `${sc.version ?? 1}-${r.updatedAt}`)} alt={`Scene ${sc.n}`} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-xs text-muted-foreground">{r.steps?.scenes?.status === "working" ? "Drawing…" : "Not drawn yet"}</span>}
@@ -304,7 +304,7 @@ export function CompanyRun({ run: r }: { run: Run }) {
           {chars.map((c) => {
             const on = c.id === cid;
             return (
-              <section key={c.id} className={`border p-4 ${on ?"border-[rgba(200,255,58,0.8)]" :"border-border opacity-70"}`}>
+              <section key={c.id} className={`border p-4 ${on ?"border-signal/80" :"border-border opacity-70"}`}>
                 <div className="flex gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-40 w-28 shrink-0 bg-muted object-contain" />

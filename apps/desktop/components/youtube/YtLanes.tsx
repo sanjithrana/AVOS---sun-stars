@@ -74,7 +74,7 @@ export function Lane({ c, tab }: { c: YtChannel; tab: YtTab }) {
                 {free.map((x) => { const k = `${x.jid}:${x.n}`; const on = sel.has(k); return (
                   <li key={k}>
                     <button type="button" aria-pressed={on} onClick={() => { const n = new Set(sel); on ? n.delete(k) : n.add(k); setSel(n); }}
-                      className={`relative block w-full border text-left ${on ? "border-[rgba(200,255,58,0.95)]" : "border-border"}`}>
+                      className={`relative block w-full border text-left ${on ? "border-signal/95" : "border-border"}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       {x.thumb ? <img src={autoclip.file(x.jid, x.thumb)} alt="" className="aspect-[9/16] w-full object-cover" /> : <div className="aspect-[9/16] w-full bg-muted" />}
                       {on && <CheckCircle2 className="absolute right-1 top-1 h-4 w-4 text-primary" />}
@@ -84,7 +84,7 @@ export function Lane({ c, tab }: { c: YtChannel; tab: YtTab }) {
                 {tab.uploads.map((u) => { const k = `u:${u.id}`; const on = sel.has(k); return (
                   <li key={k}>
                     <button type="button" aria-pressed={on} onClick={() => { const n = new Set(sel); on ? n.delete(k) : n.add(k); setSel(n); }}
-                      className={`relative block w-full border text-left ${on ? "border-[rgba(200,255,58,0.95)]" : "border-border"}`}>
+                      className={`relative block w-full border text-left ${on ? "border-signal/95" : "border-border"}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       {u.thumb ? <img src={autoclip.uploadCover(u.id)} alt="" className="aspect-[9/16] w-full object-cover" /> : <div className="aspect-[9/16] w-full bg-muted" />}
                       {on && <CheckCircle2 className="absolute right-1 top-1 h-4 w-4 text-primary" />}

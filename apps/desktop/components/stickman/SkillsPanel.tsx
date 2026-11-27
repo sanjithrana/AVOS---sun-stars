@@ -24,7 +24,7 @@ export function SkillsPanel({ styles, value, onChange, loading }: { styles: Styl
         <div className="mt-3 flex gap-1 rounded-full border border-border p-0.5 text-xs" role="tablist" aria-label="Mode">
           {([["all", "All"], ["director", "A · Director"], ["autopilot", "B · Autopilot"]] as const).map(([v, l]) => (
             <button key={v} type="button" role="tab" aria-selected={mode === v} onClick={() => setMode(v)}
-              className={`flex-1 rounded-full px-2 py-1.5 transition-colors ${mode === v ? "bg-[rgba(200,255,58,0.25)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+              className={`flex-1 rounded-full px-2 py-1.5 transition-colors ${mode === v ? "bg-signal/25 text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
           ))}
         </div>
       </div>
@@ -37,7 +37,7 @@ export function SkillsPanel({ styles, value, onChange, loading }: { styles: Styl
             return (
               <li key={s.id}>
                 <button type="button" role="radio" aria-checked={on} onClick={() => onChange(s.id)} data-testid={`style-${s.id}`}
-                  className={`skill-card block w-full overflow-hidden rounded-2xl border text-left transition ${on ? "border-[rgba(200,255,58,0.75)] shadow-[0_0_28px_-6px_rgba(200,255,58,0.95)]" : "border-border"}`}>
+                  className={`skill-card block w-full overflow-hidden rounded-2xl border text-left transition ${on ? "border-signal/75" : "border-border"}`}>
                   <span className="relative block">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`/stickman-styles/${s.id}.jpg`} alt="" loading="lazy" className="aspect-video w-full object-cover" />

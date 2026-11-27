@@ -4,14 +4,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Activity as ActivityIcon, Bell, CheckCircle2, Clock, Cpu, Loader2, Search, TriangleAlert, X } from "lucide-react";
+import { Activity as ActivityIcon, Bell, CheckCircle2, Clock, Loader2, Search, Sun, TriangleAlert, X } from "lucide-react";
 import { EMPTY_ACTIVITY, ago, fetchActivity, fetchCaps, type ActivityItem } from "@/lib/activity";
 
 const PAGES: { href: string; label: string; hint: string }[] = [
-  { href: "/", label: "Home", hint: "Production assistant" }, { href: "/explainer", label: "Explainer", hint: "Idea to finished video" },
+  { href: "/", label: "Home", hint: "Start something, see what is running" }, { href: "/explainer", label: "Explainer", hint: "Idea to finished video" },
+  { href: "/skills", label: "Video skills", hint: "Company Story, Mechanical Toy" }, { href: "/explainer/skills", label: "Crew skills", hint: "What each step of the crew knows" }, { href: "/explainer/prompts", label: "Explainer prompts", hint: "The prompts behind every run" },
   { href: "/stickman", label: "Stickman", hint: "Stickman videos" }, { href: "/animations", label: "Animations", hint: "Films, series, video style" },
-  { href: "/autoclip", label: "Auto Clip", hint: "Long video to Shorts" }, { href: "/connections", label: "Connections", hint: "YouTube, Instagram, TikTok" }, { href: "/skills", label: "Skills", hint: "Company Story, Mechanical Toy" }, { href: "/models", label: "Models", hint: "Open AI models in use" },
-  { href: "/gpu", label: "GPU", hint: "Workers, router, runs" }, { href: "/settings", label: "Settings", hint: "Keys, GPU, your models" },
+  { href: "/autoclip", label: "Auto Clip", hint: "Long video to Shorts" }, { href: "/youtube", label: "Channels", hint: "Post and schedule" },
+  { href: "/connections", label: "Channel accounts", hint: "YouTube, Instagram, TikTok" }, { href: "/library", label: "Library", hint: "Everything you have made" },
+  { href: "/settings", label: "Settings", hint: "Keys, GPU server, models" }, { href: "/gpu", label: "GPU", hint: "Workers, router, runs" },
+  { href: "/analytics", label: "Usage and cost", hint: "What each model cost" },
 ];
 
 /** A small popover: closes on an outside click or Escape. */
@@ -30,8 +33,8 @@ function Pop({ label, icon, badge, tone, children, wide }: { label: string; icon
   return (
     <div ref={box} className="relative">
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="dialog" aria-label={label} title={label}
-        className={`relative inline-flex h-10 items-center gap-2 border px-3 text-sm transition-colors ${open ?"border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)]" :"border-border text-muted-foreground hover:text-foreground"}`}>
-        {icon}<span className="hidden xl:inline">{label}</span>
+        className={`relative inline-flex h-10 items-center gap-2 border px-3 text-sm transition-colors ${open ?"border-signal/70 bg-signal/18" :"border-border text-muted-foreground hover:text-foreground"}`}>
+        {icon}<span className="hidden 2xl:inline">{label}</span>
         {!!badge && <span className={`absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center px-1 text-[10px] font-semibold text-white ${dot}`}>{badge > 99 ? "99+" : badge}</span>}
       </button>
       {open && (
@@ -52,7 +55,7 @@ function Row({ it, onGo }: { it: ActivityItem; onGo: () => void }) {
   const st = STATE[it.state] ?? STATE.done;
   return (
     <li>
-      <Link href={it.href} onClick={onGo} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[rgba(200,255,58,0.10)]">
+      <Link href={it.href} onClick={onGo} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-signal/10">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden border border-border bg-muted">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {it.thumb ? <img src={it.thumb} alt="" className="h-full w-full object-cover" loading="lazy" />
@@ -103,7 +106,7 @@ function Palette({ items, onClose }: { items: ActivityItem[]; onClose: () => voi
           {rows.length === 0 && <li className="px-4 py-6 text-center text-sm text-muted-foreground">Nothing matches.</li>}
           {rows.map((r, n) => (
             <li key={`${r.href}-${n}`}>
-              <button type="button" onMouseEnter={() => setI(n)} onClick={() => go(r.href)} className={`flex w-full items-center gap-3 px-4 py-2.5 text-left ${n === i ?"bg-[rgba(200,255,58,0.16)]" :""}`}>
+              <button type="button" onMouseEnter={() => setI(n)} onClick={() => go(r.href)} className={`flex w-full items-center gap-3 px-4 py-2.5 text-left ${n === i ?"bg-signal/16" :""}`}>
                 <span className="w-10 shrink-0 text-[10px] uppercase tracking-wider text-muted-foreground">{r.kind}</span>
                 <span className="min-w-0 flex-1"><span className="block truncate text-sm">{r.title}</span><span className="block truncate text-[11px] text-muted-foreground">{r.sub}</span></span>
               </button>
@@ -141,15 +144,15 @@ export function TopBar() {
   return (
     <div className="flex items-center gap-2" data-testid="top-bar">
       {pathname === "/" && (
-        <div className="mr-1 hidden items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 lg:flex" aria-label="Sun-Star by Sanjuuuuuu">
-          <span aria-hidden className="text-base leading-none">☀️</span>
-          <span className="text-sm font-semibold tracking-wide">Sun-Star</span>
-          <span className="text-xs text-muted-foreground">by Sanjuuuuuu</span>
+        <div className="mr-2 hidden items-center gap-2 lg:flex" aria-label="Sun-Star by Sanjuuuuuu">
+          <Sun aria-hidden className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+          <span className="text-[13px] font-medium">Sun-Star</span>
+          <span className="text-[12px] text-muted-foreground">by Sanjuuuuuu</span>
         </div>
       )}
       <button type="button" onClick={() => setPalette(true)} aria-label="Search (Ctrl K)" title="Search (Ctrl K)"
         className="inline-flex h-10 items-center gap-2 border border-border px-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
-        <Search className="h-4 w-4" /><span className="hidden 2xl:inline">Search</span><kbd className="hidden border border-border px-1.5 text-[10px] 2xl:inline">Ctrl K</kbd>
+        <Search className="h-4 w-4" strokeWidth={1.5} /><span className="hidden lg:inline">Search</span><kbd className="ml-4 hidden lg:inline">Ctrl K</kbd>
       </button>
       <Pop label="Jobs" icon={running.length ? <Loader2 className="h-4 w-4 animate-spin" /> : <ActivityIcon className="h-4 w-4" />} badge={running.length} tone="run" wide>
         <div className="border-b border-border px-4 py-3"><p className="text-sm font-semibold">Background jobs</p><p className="text-[11px] text-muted-foreground">Generations and renders keep running even if you close the page.</p></div>
@@ -164,7 +167,7 @@ export function TopBar() {
         <div className="border-b border-border px-4 py-3"><p className="text-sm font-semibold">Needs you</p><p className="text-[11px] text-muted-foreground">Approvals and runs that stopped with a problem.</p></div>
         {bell === 0 ? <Empty title="All clear" text="Nothing is waiting for your approval." /> : <ul className="divide-y divide-border">{[...waiting, ...failed].map((j) => <Row key={`${j.studio}-${j.id}`} it={j} onGo={close} />)}</ul>}
       </Pop>
-      <Pop label="Models" icon={<Cpu className="h-4 w-4" />}>
+      <Pop label="Status" icon={<span className={`h-2 w-2 rounded-full ${c ? (c.ai_video && c.voice ? "bg-emerald-400" : "bg-amber-400") : "bg-muted-foreground/40"}`} aria-hidden />}>
         <div className="border-b border-border px-4 py-3"><p className="text-sm font-semibold">What is ready</p></div>
         <ul className="space-y-2 px-4 py-3 text-sm">
           <li className="flex items-center gap-2">{dot(c?.ai_video)}AI video{c ? (c.ai_video ? "" : " · no fal.ai credit") : ""}</li>
@@ -173,7 +176,7 @@ export function TopBar() {
           <li className="flex items-center gap-2">{dot(c?.blender)}3D scenes (Blender)</li>
         </ul>
         {c?.hint && <p className="px-4 pb-2 text-[11px] leading-relaxed text-muted-foreground">{c.hint}</p>}
-        <div className="flex gap-2 border-t border-border px-4 py-3 text-xs"><Link href="/models" className="border border-border px-3 py-1.5 hover:text-foreground">Models</Link><Link href="/settings" className="border border-border px-3 py-1.5 hover:text-foreground">Settings</Link><Link href="/gpu" className="border border-border px-3 py-1.5 hover:text-foreground">GPU</Link></div>
+        <div className="flex gap-2 border-t border-border px-4 py-3 text-xs"><Link href="/settings" className="border border-border px-3 py-1.5 hover:text-foreground">Settings</Link><Link href="/gpu" className="border border-border px-3 py-1.5 hover:text-foreground">GPU</Link></div>
       </Pop>
       {palette && <Palette items={[...a.jobs, ...a.recent]} onClose={() => setPalette(false)} />}
     </div>

@@ -13,7 +13,7 @@ export function Gta6Kit({ ov }: { ov: Overview }) {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <h3 className="display text-sm">Your first 7 days</h3>
-          <ol className="mt-2 space-y-2 text-sm">{p.plan.map(([d, t]) => <li key={d} className="grid grid-cols-[68px_1fr] gap-2"><b className="text-[rgb(200,255,58)]">{d}</b><span className="text-muted-foreground">{t}</span></li>)}</ol>
+          <ol className="mt-2 space-y-2 text-sm">{p.plan.map(([d, t]) => <li key={d} className="grid grid-cols-[68px_1fr] gap-2"><b className="text-signal">{d}</b><span className="text-muted-foreground">{t}</span></li>)}</ol>
         </div>
         <div>
           <h3 className="display text-sm">Clip the smart way</h3>
@@ -23,7 +23,7 @@ export function Gta6Kit({ ov }: { ov: Overview }) {
       <div>
         <h3 className="display text-sm">The kit&apos;s own tool (optional)</h3>
         <p className="mt-1 text-xs text-muted-foreground">AVOS does the same job here. OpenShorts is what the kit recommends if you want a separate app with face tracking and 30+ language dubbing.</p>
-        <ul className="mt-2 flex flex-wrap gap-2 text-xs">{p.links.map((l) => <li key={l.url}><a className="inline-flex items-center gap-1 border border-border px-3 py-1.5 hover:border-[rgba(200,255,58,0.6)]" href={l.url} target="_blank" rel="noreferrer">{l.label}<ExternalLink className="h-3 w-3" /></a></li>)}</ul>
+        <ul className="mt-2 flex flex-wrap gap-2 text-xs">{p.links.map((l) => <li key={l.url}><a className="inline-flex items-center gap-1 border border-border px-3 py-1.5 hover:border-signal/60" href={l.url} target="_blank" rel="noreferrer">{l.label}<ExternalLink className="h-3 w-3" /></a></li>)}</ul>
       </div>
       <p className="text-[11px] text-muted-foreground">{p.credit} Clip only streams you own or have permission to use.</p>
     </Card>

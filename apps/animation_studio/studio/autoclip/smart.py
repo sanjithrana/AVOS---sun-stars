@@ -84,16 +84,20 @@ def captions(url: str, dest: Path, cancel: Callable[[], None] | None = None) -> 
     dest.mkdir(parents=True, exist_ok=True)
     for f in dest.glob("scout.*.json3"):
         f.unlink(missing_ok=True)
-    cmd = intake.ytdlp_base() + ["--no-playlist", "--skip-download", "--write-subs", "--write-auto-subs", "--sub-langs", "en.*,en", "--sub-format", "json3",
+    cmd = intake.ytdlp_base() + ["--no-playlist", "--skip-download", "--write-subs", "--write-auto-subs", "--sub-langs", "en.*,en,hi.*,hi,.*-orig", "--sub-format", "json3",
                                  "--no-warnings", "-o", str(dest / "scout.%(ext)s"), intake.public_url(url)]
     rc, _, _ = _exec(cmd, cancel, 300)
-    files = sorted(dest.glob("scout.*.json3"))
-    if rc != 0 or not files:
-        return None
-    try:
-        return parse_json3(json.loads(files[0].read_text("utf-8")))
-    except Exception:  # noqa: BLE001
-        return None
+    files = sorted(dest.glob("scout.*.json3"), key=lambda f: (0 if ".en" in f.name else 1 if ".hi" in f.name else 2, f.name))
+    if files:
+        try:
+            got = parse_json3(json.loads(files[0].read_text("utf-8")))     # json3 has real word times: best
+            if got:
+                return got
+        except Exception:  # noqa: BLE001
+            pass
+    from . import yttranscript                                 # refused or none: YouTube's transcript endpoint, any language
+    cues, _ = yttranscript.fetch(url)
+    return cues
 
 
 def parse_json3(j: dict) -> list[dict]:

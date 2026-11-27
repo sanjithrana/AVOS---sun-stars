@@ -32,7 +32,7 @@ function QueueTo({ jobId, n }: { jobId: string; n: number }) {
       <div className="flex flex-wrap gap-2">
         {chans.map((c) => (
           <button key={c.id} type="button" aria-pressed={sel.has(c.id)} onClick={() => { const x = new Set(sel); x.has(c.id) ? x.delete(c.id) : x.add(c.id); setSel(x); }}
-            className={`border px-3 py-1.5 text-sm ${sel.has(c.id) ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>
+            className={`border px-3 py-1.5 text-sm ${sel.has(c.id) ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>
             {c.title}<span className="ml-1.5 text-[10px] uppercase opacity-70">{c.platform || "youtube"}</span>
           </button>
         ))}
@@ -62,12 +62,12 @@ function QueueAll({ jobId, count }: { jobId: string; count: number }) {
   if (!chans.length) return null;
   const sel_ = "h-9 border border-border bg-transparent px-2 text-sm text-foreground";
   return (
-    <div className="space-y-2 border border-[rgba(200,255,58,0.5)] p-3">
+    <div className="space-y-2 border border-signal/50 p-3">
       <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Queue all {count} clips at once</div>
       <div className="flex flex-wrap gap-2">
         {chans.map((c) => (
           <button key={c.id} type="button" aria-pressed={sel.has(c.id)} onClick={() => { const x = new Set(sel); x.has(c.id) ? x.delete(c.id) : x.add(c.id); setSel(x); }}
-            className={`border px-3 py-1.5 text-sm ${sel.has(c.id) ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>
+            className={`border px-3 py-1.5 text-sm ${sel.has(c.id) ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>
             {c.title}<span className="ml-1.5 text-[10px] uppercase opacity-70">{c.platform || "youtube"}</span>
           </button>
         ))}
@@ -109,7 +109,7 @@ function Packaging({ job, clip }: { job: Job; clip: Clip }) {
       </div>
       {pk ? (<>
         {pk.description && <p className="whitespace-pre-line text-xs text-muted-foreground">{pk.description}</p>}
-        <div className="flex flex-wrap gap-1.5">{pk.hashtags.map((t) => <span key={t} className="border border-[rgba(200,255,58,0.6)] px-2 py-0.5 text-xs">#{t}</span>)}{pk.mentions.map((m) => <span key={m} className="border border-sky-400/60 px-2 py-0.5 text-xs text-sky-300">{m}</span>)}</div>
+        <div className="flex flex-wrap gap-1.5">{pk.hashtags.map((t) => <span key={t} className="border border-signal/60 px-2 py-0.5 text-xs">#{t}</span>)}{pk.mentions.map((m) => <span key={m} className="border border-sky-400/60 px-2 py-0.5 text-xs text-sky-300">{m}</span>)}</div>
         {pk.sound && (
           <p className="text-xs">
             Top sound on this topic: <span className="font-medium">♪ {pk.sound.title}{pk.sound.artist && ` · ${pk.sound.artist}`}</span> (in {pk.sound.uses} of the top Shorts).{" "}
@@ -159,7 +159,7 @@ function ClipRow({ job, clip, ov }: { job: Job; clip: Clip; ov: Overview }) {
       </div>
       <div className="min-w-0 space-y-2">
         {job.source.kind === "live" && <div><span className="inline-block border border-red-400/70 px-2 py-0.5 text-[11px] text-red-300">Live recording · {job.source.minutes ?? 20} min</span></div>}
-        <div className="flex flex-wrap items-center gap-2">{job.permission && <span className={`inline-block border px-2 py-0.5 text-[11px] ${job.permission === "unconfirmed" || job.permission === "blocked" ? "border-amber-400/80 text-amber-300" : "border-[rgba(200,255,58,0.6)]"}`}>{({ own: "Yours", cc: "Creative Commons: credit the channel", granted: "Permission confirmed", unconfirmed: "Permission not confirmed: won't post", blocked: "Not clippable" } as Record<string, string>)[job.permission]}</span>}
+        <div className="flex flex-wrap items-center gap-2">{job.permission && <span className={`inline-block border px-2 py-0.5 text-[11px] ${job.permission === "unconfirmed" || job.permission === "blocked" ? "border-amber-400/80 text-amber-300" : "border-signal/60"}`}>{({ own: "Yours", cc: "Creative Commons: credit the channel", granted: "Permission confirmed", unconfirmed: "Permission not confirmed: won't post", blocked: "Not clippable" } as Record<string, string>)[job.permission]}</span>}
           {!posted && (job.permission === "unconfirmed" || (!job.permission && !ov.settings.rights_ack)) && (
             <button type="button" className={btn + " !h-7 !px-3 text-xs"} disabled={grant.isPending} onClick={() => grant.mutate()}>I have permission to use this video</button>)}</div>
         <div className="text-xs text-muted-foreground">Clip {clip.n} · {mmss(clip.start)}–{mmss(clip.end)} ({Math.round(clip.end - clip.start)}s){clip.captions === false && " · no captions"}{clip.ai_score != null && ` · AI score ${clip.ai_score}/10`}</div>
@@ -171,7 +171,7 @@ function ClipRow({ job, clip, ov }: { job: Job; clip: Clip; ov: Overview }) {
             ))}
           </div>
         )}
-        {(clip.moment || clip.hook) && <div className="flex flex-wrap items-center gap-2 text-xs">{clip.moment && <span className="border border-[rgba(200,255,58,0.6)] px-2 py-0.5">{clip.moment}</span>}{clip.hook && <span className="text-muted-foreground">Hook on screen: “{clip.hook}”</span>}</div>}
+        {(clip.moment || clip.hook) && <div className="flex flex-wrap items-center gap-2 text-xs">{clip.moment && <span className="border border-signal/60 px-2 py-0.5">{clip.moment}</span>}{clip.hook && <span className="text-muted-foreground">Hook on screen: “{clip.hook}”</span>}</div>}
         <input className={field} value={title} maxLength={95} disabled={posted} onChange={(e) => setTitle(e.target.value)} onBlur={() => title !== clip.title && edit.mutate({ title })} aria-label={`Title of clip ${clip.n}`} />
         {clip.reframe && clip.reframe.length > 0 && !posted && <SceneEditor jobId={job.id} n={clip.n} scenes={clip.reframe} onDone={refresh} />}
         {ready && !posted && !job.busy && <Packaging job={job} clip={clip} />}
@@ -223,7 +223,7 @@ export function JobView({ id, ov, onGone }: { id: string; ov: Overview; onGone: 
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["autoclip", "job", id], queryFn: () => autoclip.job(id), refetchInterval: (s) => (s.state.data?.busy ? 2000 : false), retry: false });
   const act = useMutation({
-    mutationFn: (a: "run" | "stop" | "remove") => (a === "run" ? autoclip.run(id) : a === "stop" ? autoclip.stop(id) : autoclip.remove(id)),
+    mutationFn: (a: "run" | "stop" | "remove"): Promise<unknown> => (a === "run" ? autoclip.run(id) : a === "stop" ? autoclip.stop(id) : autoclip.remove(id)),
     onSuccess: (_r, a) => { qc.invalidateQueries({ queryKey: ["autoclip"] }); if (a === "remove") onGone(); },
   });
   const j = q.data;

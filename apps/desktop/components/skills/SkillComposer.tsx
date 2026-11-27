@@ -7,7 +7,7 @@ import { Loader2, Wand2 } from "lucide-react";
 import { skills, type SkillInfo } from "@/lib/skills";
 import { ModelPicker, NO_CHOICE, choiceBody, type ModelChoice } from "@/components/shared/ModelPicker";
 
-const chip = (on: boolean) => `border px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.08em] leading-none transition-colors ${on ? "border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+const chip = (on: boolean) => `border px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.08em] leading-none transition-colors ${on ? "border-signal/70 bg-signal/18 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
 
 /** One skill's input: the subject, what to make (pictures and video, or prompts only), shape and length. */
 const STORY_NOTE = "Research comes from Wikipedia and Wikidata, and every source is listed with the result (Wikidata settles the founding year). "
@@ -51,7 +51,7 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
   const motions = skill?.motions ?? [];                      // a skill can offer motion without being a story (ASMR Cooking)
   const handChoices = skill?.hands ?? [];                    // ASMR Cooking: gloved or bare
   const makes = skill?.make ?? [["media", "Pictures and video"], ["prompts", "Prompts only"]];
-  if (!skill) return <section className="composer border border-border p-8 text-sm text-muted-foreground">Pick a skill on the left.</section>;
+  if (!skill) return <section className="composer border border-border p-8 text-sm text-muted-foreground">Pick a skill below</section>;
   // Each skill's own note, with the two whose INFO lives in files this overlay does not ship falling back to the
   // text they have always had. Without this every non-story skill announced itself as a transformation toy.
   const note = skill.note
@@ -146,7 +146,7 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
                 const on = cast.founder === c.id;
                 return (
                   <button key={c.id} type="button" title={c.about} aria-pressed={on} onClick={() => setCast({ founder: c.id })}
-                    className={`flex w-32 flex-col items-center gap-1 border p-2 text-[11px] transition-colors ${on ?"border-[rgba(200,255,58,0.8)] bg-[rgba(200,255,58,0.18)]" :"border-border"}`}>
+                    className={`flex w-32 flex-col items-center gap-1 border p-2 text-[11px] transition-colors ${on ?"border-signal/80 bg-signal/18" :"border-border"}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={skills.character(`${c.id}_2d.jpg`)} alt={c.name} className="h-36 w-full bg-muted object-contain" />
                     <span className="text-center leading-tight">{c.name}</span>
@@ -163,7 +163,7 @@ export function SkillComposer({ skill }: { skill: SkillInfo | null }) {
       {skill.engine && <EngineNotice />}
 
       {note && (
-      <p className="mt-5 border border-[rgba(200,255,58,0.35)] p-3 text-xs leading-relaxed text-muted-foreground">{note}</p>)}
+      <p className="mt-5 border border-signal/35 p-3 text-xs leading-relaxed text-muted-foreground">{note}</p>)}
 
       {handChoices.length > 1 && (
         <div className="mt-6" data-testid="hand-options">

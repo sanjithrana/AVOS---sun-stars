@@ -22,7 +22,7 @@ export function PolishEditor({ jobId, clip, onDone, styles, looks }: { jobId: st
       {open && (
         <div className="space-y-3 border border-border p-3">
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Edit style">
-            {[["off", "No effects"], ...Object.entries(styles)].map(([k, l]) => <button key={k} type="button" role="radio" aria-checked={v.edit === k} onClick={() => set("edit", k)} className={`border px-3 py-1.5 text-sm ${v.edit === k ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>{l.split(":")[0]}</button>)}
+            {[["off", "No effects"], ...Object.entries(styles)].map(([k, l]) => <button key={k} type="button" role="radio" aria-checked={v.edit === k} onClick={() => set("edit", k)} className={`border px-3 py-1.5 text-sm ${v.edit === k ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>{l.split(":")[0]}</button>)}
           </div>
           <LookPicker value={v.look} onChange={(x) => set("look", x)} looks={looks} />
           <div className="grid gap-3 sm:grid-cols-2"><Switch on={v.zoom} onChange={(x) => set("zoom", x)} label="Zooms" /><Switch on={v.stickers} onChange={(x) => set("stickers", x)} label="Callouts" /><Switch on={v.fx} onChange={(x) => set("fx", x)} label="Hype effects" /><Switch on={v.sfx} onChange={(x) => set("sfx", x)} label="Sound effects" /><Switch on={v.progress} onChange={(x) => set("progress", x)} label="Progress bar" /></div>

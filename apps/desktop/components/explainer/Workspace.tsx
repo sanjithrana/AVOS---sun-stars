@@ -83,7 +83,7 @@ export function StoryboardView({ p, shots, sheet, go }: { p: Project; shots: Sho
           <section className="space-y-3">
             {scenes.map((sc) => (
               <div key={sc.n} className={card}>
-                <button type="button" onClick={() => { setLevel("scenes"); setPick(String(sc.n)); }} className="text-left text-sm font-semibold hover:text-[var(--signal)]">
+                <button type="button" onClick={() => { setLevel("scenes"); setPick(String(sc.n)); }} className="text-left text-sm font-semibold hover:text-signal">
                   Scene {sc.n}{sc.title ? <span className="font-normal text-muted-foreground"> — {sc.title}</span> : null}
                   <span className="ml-2 text-xs font-normal text-muted-foreground">{secs(sc.seconds)} · {sc.shots.length} shots</span>
                 </button>
@@ -104,7 +104,7 @@ export function StoryboardView({ p, shots, sheet, go }: { p: Project; shots: Sho
         <div className="space-y-5">
           {chars.filter((c) => b.cast[c.id]).map((c) => (
             <section key={c.id} className="space-y-2">
-              <h3 className="flex items-center gap-2 text-sm font-semibold">{c.name}{c.memory && <span className="rounded-full border border-[rgba(200,255,58,0.45)] px-2 py-0.5 text-[10px] font-medium text-[var(--signal)]">Remembered</span>}</h3>
+              <h3 className="flex items-center gap-2 text-sm font-semibold">{c.name}{c.memory && <span className="rounded-full border border-signal/45 px-2 py-0.5 text-[10px] font-medium text-signal">Remembered</span>}</h3>
               <Board p={p} rel={b.cast[c.id]} alt={`${c.name}: identity portrait, design sheet and locked look`} />
             </section>
           ))}
@@ -117,7 +117,7 @@ export function StoryboardView({ p, shots, sheet, go }: { p: Project; shots: Sho
             {scenes.map((sc) => <button key={sc.n} type="button" onClick={() => setPick(String(sc.n))} aria-pressed={(pick ?? String(scenes[0]?.n)) === String(sc.n)} className={chip((pick ?? String(scenes[0]?.n)) === String(sc.n))}>Scene {sc.n}{sc.title ? ` · ${sc.title}` : ""}</button>)}
           </div>
           {(() => { const n = pick ?? String(scenes[0]?.n); return b.scenes[n] ? <Board p={p} rel={b.scenes[n]} alt={`Scene ${n} board`} /> : empty; })()}
-          <button type="button" onClick={() => go("shots", { scene: Number(pick ?? scenes[0]?.n), shot: null })} className="text-sm text-[var(--signal)] underline-offset-4 hover:underline">Open the shots to edit them</button>
+          <button type="button" onClick={() => go("shots", { scene: Number(pick ?? scenes[0]?.n), shot: null })} className="text-sm text-signal underline-offset-4 hover:underline">Open the shots to edit them</button>
         </div>
       ))}
       {level === "clips" && (!b || !Object.keys(b.clips).length ? empty : (
@@ -134,7 +134,7 @@ export function StoryboardView({ p, shots, sheet, go }: { p: Project; shots: Sho
             })}
           </div>
           {(() => { const sid = pick ?? shots[0]?.id; return sid && b.clips[sid] ? <Board p={p} rel={b.clips[sid]} alt={`Clip ${sid}: first frame, last frame and what moves`} /> : empty; })()}
-          <button type="button" onClick={() => go("shots", { shot: pick ?? shots[0]?.id })} className="text-sm text-[var(--signal)] underline-offset-4 hover:underline">Open this shot to redraw or change its prompts</button>
+          <button type="button" onClick={() => go("shots", { shot: pick ?? shots[0]?.id })} className="text-sm text-signal underline-offset-4 hover:underline">Open this shot to redraw or change its prompts</button>
         </div>
       ))}
     </div>
@@ -209,7 +209,7 @@ export function CharactersView({ p, shots, sel, go }: { p: Project; shots: Shot[
       </div>
       <section className={card}>
         <p className={label}>Character{c.role ? ` · ${c.role}` : ""}</p>
-        <h2 className="mt-1 flex items-center gap-2 text-xl font-semibold">{c.name}{c.memory && <span className="rounded-full border border-[rgba(200,255,58,0.45)] px-2 py-0.5 text-[11px] font-medium text-[var(--signal)]" data-testid="char-remembered">Remembered</span>}</h2>
+        <h2 className="mt-1 flex items-center gap-2 text-xl font-semibold">{c.name}{c.memory && <span className="rounded-full border border-signal/45 px-2 py-0.5 text-[11px] font-medium text-signal" data-testid="char-remembered">Remembered</span>}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{c.look}</p>
         {p.assets[`ref:${c.id}`] && <FadeImg src={explainer.file(p.id, p.assets[`ref:${c.id}`])} alt={`${c.name} identity portrait`} className="mt-3 max-h-80 rounded-lg bg-muted" />}
         {c.voice && <p className="mt-2 text-sm"><b>Voice:</b> <span className="text-muted-foreground">{c.voice}</span></p>}

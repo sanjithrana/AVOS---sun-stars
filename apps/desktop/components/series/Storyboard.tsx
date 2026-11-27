@@ -72,7 +72,7 @@ export function Storyboard({ sid, snap, ep, part, act, pending }: { sid: string;
           <div key={s.id} className={`overflow-hidden border bg-card/40 ${sel.includes(s.id) ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border"}`} data-testid={`frame-${s.id}`}>
             <button className="relative block aspect-video w-full bg-muted/40" onClick={() => toggle(s.id)} title="Select to redraw or change the camera">
               {s.files.key && <img src={seriesApi.file(sid, s.files.key, `${v}-${s.takes?.picture}-${s.keyOverride?.history?.length ?? 0}`)} alt={s.picture} className="h-full w-full object-cover" />}
-              <span className="absolute left-1 top-1 bg-amber-500 px-1.5 py-0.5 text-[11px] font-bold text-black">{String(i + 1).padStart(2, "0")}</span>
+              <span className="absolute left-1 top-1 bg-amber-500 px-1.5 py-0.5 text-[11px] font-semibold text-black">{String(i + 1).padStart(2, "0")}</span>
               <span className="absolute bottom-1 left-1 bg-black/65 px-1.5 py-0.5 text-[10px] text-white">{t0[i].toFixed(1)}–{(t0[i] + s.seconds).toFixed(1)}s</span>
               {s.qa?.key && !s.qa.key.pass && <AlertTriangle className="absolute right-1 top-1 h-4 w-4 text-amber-400" />}
             </button>

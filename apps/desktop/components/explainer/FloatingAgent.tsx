@@ -92,7 +92,7 @@ export function FloatingAgent(props: AgentProps) {
       <AgentPanel {...props} controls={controls} onGrab={begin("move")} compact={mode === "min"} />
       {mode === "open" && (
         <span onPointerDown={begin("size")} data-testid="agent-resize" aria-hidden
-          className="absolute bottom-1 right-1 h-5 w-5 cursor-nwse-resize touch-none rounded-br-[1.25rem] border-b-2 border-r-2 border-[rgba(200,255,58,0.6)]" />
+          className="absolute bottom-1 right-1 h-5 w-5 cursor-nwse-resize touch-none border-b-2 border-r-2 border-signal/60" />
       )}
     </div>
   );

@@ -53,7 +53,7 @@ export function FilmHome() {
     <main className="mx-auto max-w-7xl space-y-8 p-4 md:p-8" data-testid="films-home">
       <div>
         <Link href="/animations" className="text-xs text-muted-foreground hover:underline">← Animations</Link>
-        <h1 className="mb-2 mt-1 text-2xl font-bold text-foreground md:text-3xl">Films: prompt → animation</h1>
+        <h1 className="mb-2 mt-1 text-2xl font-semibold text-foreground md:text-3xl">Films: prompt → animation</h1>
         <p className="max-w-4xl text-muted-foreground">
           Lock the look, storyboard, animate every frame separately, design the sound, assemble. Your prompt is read into timed shots, characters and a world;
           you approve the breakdown, each character, the storyboard and the cut. Every stage leaves real files you can download.

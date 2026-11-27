@@ -48,7 +48,7 @@ export function OpenModelsSettings({ info, save }: { info: AgentsInfo; save: (b:
   return (
     <div data-testid="open-models">
       <div className="sub-h row" style={{ gap: 6 }}><I n="layers" /><span>{say("開源 AI 模型", "Open AI models")}</span><span className="grow" />
-        <Link href="/models" className="small" style={{ textDecoration: "underline" }}>{say("模型總覽", "All models")}</Link>
+        <Link href="/settings#models" className="small" style={{ textDecoration: "underline" }}>{say("模型總覽", "All models")}</Link>
         <Link href="/settings" className="small" style={{ textDecoration: "underline" }} data-testid="open-settings">{say("設定頁", "Settings")}</Link></div>
       <div className="list">
         <div className="li"><div className="li-ico accent"><I n="image" /></div>

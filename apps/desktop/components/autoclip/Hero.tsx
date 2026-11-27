@@ -8,7 +8,7 @@ const WORDS = ["Smart moments", "Word-by-word captions", "9:16 vertical", "Blurr
 export function Hero() {
   return (
     <div className="space-y-4">
-      <PageHero eyebrow="Auto Clip" title={<>One long video. <Lit>A week of Shorts.</Lit></>}
+      <PageHero eyebrow="Auto Clip" title={<>One long video, <Lit>a week of Shorts</Lit></>}
         blurb="Drop a video or a link. Auto Clip picks the best moments, cuts them for phones, adds captions, and can post them to your channel while you sleep."
         steps={[
           { icon: Scissors, t: "Find the moments", d: "Loud, lively parts of your video, snapped to full sentences." },
@@ -24,7 +24,7 @@ export function Hero() {
       <div className="marquee py-1" aria-hidden>
         {[0, 1].map((k) => (
           <ul key={k} className="font-display">
-            {WORDS.map((w) => <li key={w} className="display whitespace-nowrap text-xl text-[rgba(255,255,255,0.14)] md:text-3xl">{w} <span className="text-[var(--signal)]">✦</span></li>)}
+            {WORDS.map((w) => <li key={w} className="display whitespace-nowrap text-xl text-[rgba(255,255,255,0.14)] md:text-3xl">{w} <span className="text-signal">✦</span></li>)}
           </ul>
         ))}
       </div>

@@ -70,7 +70,7 @@ export function SeriesPage({ id }: { id: string }) {
       <div>
         <Link href="/animations/series" className="text-xs text-muted-foreground hover:underline">← Series</Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
+          <h1 className="text-2xl font-semibold text-foreground md:text-3xl">{s.title}</h1>
           <span className="bg-muted px-2 py-0.5 text-xs text-muted-foreground">{q.data.language.name}</span>
           <span className="bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
           <span className="bg-muted px-2 py-0.5 text-xs text-muted-foreground">parts: {s.partPlan.join(" → ")} min</span>
@@ -148,7 +148,7 @@ export function WorkBar({ snap, onStop }: { snap: SeriesSnapshot; onStop: () => 
         <span className="grow" />
         {snap.busy && <Button size="sm" variant="outline" onClick={onStop} data-testid="work-stop"><Square />Stop</Button>}
       </div>
-      {pct !== null && snap.busy && <div className="mt-3 h-1.5 overflow-hidden bg-muted"><div className="h-full bg-amber-500 transition-all" style={{ width: `${pct}%` }} /></div>}
+      {pct !== null && snap.busy && <div className="mt-3 h-1.5 overflow-hidden bg-muted"><div className="h-full bg-amber-500 transition-colors" style={{ width: `${pct}%` }} /></div>}
       {w.error && !snap.busy && <p className="mt-2 text-sm text-red-700 dark:text-red-300">{w.error}</p>}
       {(w.queue?.length ?? 0) > 0 && <p className="mt-2 text-xs text-muted-foreground">Next: {w.queue!.join(" · ")}</p>}
     </div>

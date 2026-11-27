@@ -25,19 +25,19 @@ export function HeroWindow({ project }: { project: HeroProject | null }) {
   const p = project ?? EXAMPLE;
   return (
     <div className="hero-window mx-auto w-full max-w-6xl text-left" data-testid="hero-window">
-      <div className="grid overflow-hidden rounded-[1.6rem] border border-[rgba(200,255,58,0.18)] bg-[rgba(12,12,16,0.72)] p-2 backdrop-blur-xl md:grid-cols-[15rem_minmax(0,1fr)]">
+      <div className="grid overflow-hidden border border-signal/18 bg-[rgba(12,12,16,0.72)] p-2 backdrop-blur-xl md:grid-cols-[15rem_minmax(0,1fr)]">
         <div className="hidden rounded-2xl bg-[rgba(255,255,255,0.025)] p-4 md:block">
           <p className="text-sm font-medium text-foreground">{project ? "Latest project" : "Example project"}</p>
           <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{p.title}</p>
           <p className="mt-6 text-[11px] text-muted-foreground">Scenes</p>
           <ul className="mt-2 space-y-1 text-[13px]">
             {SCENES.map((s, i) => (
-              <li key={s} className={`truncate rounded-lg px-2.5 py-1.5 ${i === 1 ? "bg-[rgba(200,255,58,0.14)] text-foreground" : "text-muted-foreground"}`}>{s}</li>
+              <li key={s} className={`truncate rounded-lg px-2.5 py-1.5 ${i === 1 ? "bg-signal/14 text-foreground" : "text-muted-foreground"}`}>{s}</li>
             ))}
           </ul>
         </div>
         <div className="rounded-2xl bg-[rgba(255,255,255,0.02)]">
-          <div className="flex gap-1 border-b border-[rgba(200,255,58,0.12)] p-2" role="tablist">
+          <div className="flex gap-1 border-b border-signal/12 p-2" role="tablist">
             {TABS.map((t) => (
               <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}
                 className={`rounded-xl px-5 py-2 text-sm transition-colors ${tab === t ? "bg-[rgba(255,255,255,0.07)] text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{t}</button>
@@ -57,11 +57,11 @@ export function HeroWindow({ project }: { project: HeroProject | null }) {
               </div>
             )}
             {tab === "Shots" && (
-              <ol className="divide-y divide-[rgba(200,255,58,0.10)] text-[13px]">
+              <ol className="divide-y divide-signal/10 text-[13px]">
                 {SHOTS.map(([a, d, s], i) => (
                   <li key={i} className="grid grid-cols-[2rem_5rem_minmax(0,1fr)_3rem] items-center gap-2 py-2.5">
                     <span className="text-muted-foreground">{i + 1}</span>
-                    <span className="text-[var(--signal)]">{a}</span>
+                    <span className="text-signal">{a}</span>
                     <span className="truncate">{d}</span>
                     <span className="text-right text-muted-foreground">{s}</span>
                   </li>
@@ -70,7 +70,7 @@ export function HeroWindow({ project }: { project: HeroProject | null }) {
             )}
             {tab === "Timeline" && (
               <div className="space-y-3 pt-2 text-[11px] text-muted-foreground">
-                {[["Picture", [4, 3, 4, 5, 4, 3], "bg-[rgba(200,255,58,0.45)]"], ["Voice", [7, 9, 7], "bg-[rgba(54,224,200,0.30)]"], ["Music", [23], "bg-[rgba(255,143,210,0.28)]"]].map(([label, parts, tone]) => (
+                {[["Picture", [4, 3, 4, 5, 4, 3], "bg-signal/45"], ["Voice", [7, 9, 7], "bg-[rgba(54,224,200,0.30)]"], ["Music", [23], "bg-[rgba(255,143,210,0.28)]"]].map(([label, parts, tone]) => (
                   <div key={label as string} className="grid grid-cols-[4rem_minmax(0,1fr)] items-center gap-3">
                     <span>{label as string}</span>
                     <div className="flex h-9 gap-1">

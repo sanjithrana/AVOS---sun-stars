@@ -31,10 +31,10 @@ export function ShotCard({ p, shot, editable, onEdit, onAgain, onRate, busy }: P
     catch (e) { setUp((e as Error).message); }
   };
   return (
-    <article id={`shot-card-${shot.id}`} className="scroll-mt-24 animate-in fade-in slide-in-from-bottom-1 border border-border bg-card/50 p-4 transition-all duration-300 hover:border-amber-500/30 hover:shadow-md md:p-5" data-testid={`shot-${shot.id}`}>
+    <article id={`shot-card-${shot.id}`} className="scroll-mt-24 animate-in fade-in slide-in-from-bottom-1 border border-border bg-card/50 p-4 transition-colors duration-300 hover:border-amber-500/30 hover:shadow-md md:p-5" data-testid={`shot-${shot.id}`}>
       {up !== "idle" && up !== "sending" && <p className="mb-3 border border-[#e0657c]/40 p-2 text-sm text-[#ff8aa0]" role="alert">{up}</p>}
       <header className="flex flex-wrap items-center gap-2">
-        <span className="bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">{shot.id}</span>
+        <span className="bg-amber-500/15 px-2 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">{shot.id}</span>
         <span className="text-sm font-semibold">{TYPE_LABEL[shot.shot_type] ?? shot.shot_type}</span>
         <span className="text-xs text-muted-foreground">{shot.seconds}s · {shot.camera.type.replace(/_/g, " ")}, {shot.camera.movement.replace(/_/g, " ")}</span>
         {shot.speaker && <span className="border border-amber-500/40 px-2.5 py-1 text-xs" title="This character speaks the line in their own voice">{shot.speaker} speaks</span>}

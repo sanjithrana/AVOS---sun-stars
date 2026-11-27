@@ -75,7 +75,7 @@ export function ModelChoices({ sid, act, open: startOpen = false }: { sid: strin
             <span className="text-xs text-muted-foreground">
               Used from the next thing it makes (redo shots to apply to rendered ones). Keys for fal.ai, Cloudflare and others:{" "}
               <Link href="/settings" className="inline-flex items-center gap-1 text-amber-600 underline"><KeyRound className="h-3 w-3" />Settings → API keys</Link>
-              {" "}· downloaded models: <Link href="/models" className="text-amber-600 underline">Models page</Link>
+              {" "}· downloaded models: <Link href="/settings#models" className="text-amber-600 underline">Models in Settings</Link>
             </span>
           </div>
         </div>

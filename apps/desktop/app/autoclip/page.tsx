@@ -41,10 +41,10 @@ function Inner() {
           </>
         ) : (
           <>
-            <nav aria-label="Auto Clip" className="flex flex-wrap gap-2">
-              {([["clips", "Make clips from a video", "/autoclip"], ["explore", "Explore trending", "/autoclip?view=explore"], ["live", "Watch live streamers", "/autoclip?view=live"], ["channel", "Channel & autopilot", "/autoclip?view=channel"]] as const).map(([k, label, href]) => (
+            <nav aria-label="Auto Clip" className="-mt-2 flex flex-wrap gap-6 border-b border-border">
+              {([["clips", "Make clips", "/autoclip"], ["explore", "Explore trending", "/autoclip?view=explore"], ["live", "Live streamers", "/autoclip?view=live"], ["channel", "Channel and autopilot", "/autoclip?view=channel"]] as const).map(([k, label, href]) => (
                 <Link key={k} href={href} scroll={false} aria-current={view === k ? "page" : undefined}
-                  className={`inline-flex h-10 items-center border px-4 text-sm transition-colors ${view === k ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"}`}>{label}</Link>
+                  className={`relative -mb-px inline-flex h-10 items-center border-b-2 text-[13.5px] transition-colors ${view === k ? "border-signal text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>{label}</Link>
               ))}
             </nav>
             {view === "live" ? <LiveWatch /> : view === "explore" ? <Explore onPick={(u) => router.push(`/autoclip?url=${encodeURIComponent(u)}`)} /> : view === "channel" ? (

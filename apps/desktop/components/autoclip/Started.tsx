@@ -12,7 +12,7 @@ export function Started({ id }: { id: string }) {
   if (!j) return null;
   if (j.status === "done") {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-3 border border-primary bg-[rgba(200,255,58,0.12)] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border border-primary bg-signal/12 px-4 py-3">
         <span className="inline-flex items-center gap-2 text-sm font-medium"><CheckCircle2 className="h-4 w-4 text-primary" />Your video was ready: {j.clips.length} clip{j.clips.length === 1 ? "" : "s"} from “{j.title}”.</span>
         <span className="flex gap-2"><Link href={`/autoclip?open=${id}`} className={btnPrimary}>Open your clips</Link><Link href="/library?studio=autoclip" className="inline-flex h-10 items-center border border-border px-4 text-sm hover:bg-muted">Library</Link></span>
       </div>

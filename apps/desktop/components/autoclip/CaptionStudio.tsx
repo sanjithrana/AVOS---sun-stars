@@ -92,7 +92,7 @@ export function CaptionStudio({ ov, v, set }: { ov: Overview; v: CaptionValue; s
   const models = cap.whisper_models ?? {};
   const mine = useMemo(() => fonts.filter((f) => f.mine), [fonts]);
   const toggle = (k: "bold" | "italic" | "upper", def: boolean) => setC({ [k]: !(c[k] ?? def) } as Partial<CapOpts>);
-  const pill = (on: boolean) => `border px-3 py-1.5 text-sm ${on ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground hover:text-foreground"}`;
+  const pill = (on: boolean) => `border px-3 py-1.5 text-sm ${on ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground hover:text-foreground"}`;
   const gridOn = (g: { x: number; y: number }) => Math.abs((c.x ?? 0.5) - g.x) < 0.01 && Math.abs((c.y ?? 0.77) - g.y) < 0.01;
   return (
     <div className="space-y-3">
@@ -103,7 +103,7 @@ export function CaptionStudio({ ov, v, set }: { ov: Overview; v: CaptionValue; s
           const on = id === v.caption;
           return (
             <button key={id} type="button" role="radio" aria-checked={on} onClick={() => set({ caption: id })}
-              className={`flex flex-col overflow-hidden rounded-xl border-2 text-left transition-all ${on ? "border-primary shadow-[0_0_24px_-8px_rgba(200,255,58,0.8)]" : "border-border hover:border-white/30"}`}>
+              className={`flex flex-col overflow-hidden rounded-xl border-2 text-left transition-colors ${on ? "border-primary" : "border-border hover:border-white/30"}`}>
               <span className="flex h-24 items-center justify-center overflow-hidden bg-[#0b0b0f] px-2"><Sample st={s} cap={on ? c : undefined} /></span>
               <span className="flex items-center justify-between bg-[#0a0a0d] px-2.5 py-1.5 text-xs font-medium text-white">{s.label}<span className="text-[10px] uppercase tracking-wider text-white/50">{anims[s.anim] ?? ""}</span></span>
             </button>
@@ -161,7 +161,7 @@ export function CaptionStudio({ ov, v, set }: { ov: Overview; v: CaptionValue; s
                   <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Position</span>
                   <div className="grid w-28 grid-cols-3 gap-1">
                     {GRID.map((g) => <button key={g.id} type="button" title={g.label} aria-label={g.label} aria-pressed={gridOn(g)} onClick={() => setC({ x: g.x === 0.5 ? undefined : g.x, y: g.y === 0.77 ? undefined : g.y })}
-                      className={`h-8 border ${gridOn(g) ? "border-primary bg-[rgba(200,255,58,0.25)]" : "border-border hover:bg-muted"}`} />)}
+                      className={`h-8 border ${gridOn(g) ? "border-primary bg-signal/25" : "border-border hover:bg-muted"}`} />)}
                   </div>
                 </div>
                 <Label text={`Height: ${Math.round((c.y ?? 0.77) * 100)}% down`} hint="YouTube's title and buttons cover the bottom 20% and the right edge: 60–80% down is the safe band.">

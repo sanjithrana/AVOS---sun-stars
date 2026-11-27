@@ -6,7 +6,7 @@ export interface Clip { start: number; end: number; label: string; tone?: "prima
 export interface Lane { id: string; label: string; clips: Clip[] }
 
 const TONE: Record<string, string> = {
-  primary: "border-[rgba(200,255,58,0.6)] bg-[rgba(200,255,58,0.28)]", amber: "border-amber-400/60 bg-amber-400/20", green: "border-emerald-400/60 bg-emerald-400/20", muted: "border-border bg-muted",
+  primary: "border-signal/60 bg-signal/28", amber: "border-amber-400/60 bg-amber-400/20", green: "border-emerald-400/60 bg-emerald-400/20", muted: "border-border bg-muted",
 };
 
 /** Lanes on a time axis with a playhead you can click or drag (the same timeline for every studio: video, poses, cards, narration, music). */

@@ -21,7 +21,7 @@ function Inner() {
   const tab = q.data;
   const cur = pick === LEARN ? LEARN : (tab?.channels.find((c) => c.id === pick)?.id ?? tab?.channels[0]?.id ?? LEARN);
   const chan = tab?.channels.find((c) => c.id === cur);
-  const tabBtn = (on: boolean) => `flex items-center gap-2 border px-4 py-2 text-sm ${on ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground hover:text-foreground"}`;
+  const tabBtn = (on: boolean) => `flex items-center gap-2 border px-4 py-2 text-sm ${on ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground hover:text-foreground"}`;
   return (
     <AppShell header={<span className="text-lg font-semibold">YouTube</span>}>
       <div className="w-full space-y-6 px-4 py-6 md:px-8 2xl:px-12">

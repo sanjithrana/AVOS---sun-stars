@@ -27,7 +27,7 @@ export function Switch({ on, onChange, label, hint, disabled }: { on: boolean; o
       <div><div className="text-sm font-medium">{label}</div>{hint && <div className="text-xs text-muted-foreground">{hint}</div>}</div>
       <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={() => onChange(!on)}
         className={`relative mt-1 h-6 w-11 shrink-0 border transition-colors disabled:opacity-40 ${on ? "border-primary bg-primary" : "border-border bg-muted"}`}>
-        <span className={`absolute top-0.5 h-4 w-4 bg-white transition-all ${on ? "left-6" : "left-0.5"}`} />
+        <span className={`absolute top-0.5 h-4 w-4 bg-white transition-colors ${on ? "left-6" : "left-0.5"}`} />
       </button>
     </div>
   );

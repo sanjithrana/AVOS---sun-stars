@@ -9,7 +9,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Sign in to AVOS</CardTitle>
+          <CardTitle className="text-2xl font-semibold">Sign in to AVOS</CardTitle>
           <CardDescription>Enter your credentials to access your studio.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

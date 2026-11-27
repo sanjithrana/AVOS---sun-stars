@@ -68,7 +68,7 @@ export function YtComments() {
       {d && (
         <>
           <div role="tablist" className="flex flex-wrap gap-2">
-            {TABS.map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`border px-3 py-1.5 text-sm ${tab === k ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>{l} {d.counts[k] ? `(${d.counts[k]})` : ""}</button>)}
+            {TABS.map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`border px-3 py-1.5 text-sm ${tab === k ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>{l} {d.counts[k] ? `(${d.counts[k]})` : ""}</button>)}
           </div>
           {rows.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><MessageSquare className="h-4 w-4" />{d.last_sync ? "Nothing here." : "Press “Check comments” to read the comments on your latest clips."}</p> : <ul className="divide-y divide-border border border-border">{rows.map((c) => <Row key={c.id + c.status} c={c} onView={set} />)}</ul>}
           <p className="text-xs text-muted-foreground">Spam is flagged by plain rules (links, “sub4sub”, contact numbers, money pitches, shouting, copy-pasted text). Checked automatically every few hours once you have used this once.</p>

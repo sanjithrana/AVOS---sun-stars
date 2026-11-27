@@ -308,6 +308,7 @@ services:
       - ./animation_studio/reelmimic_assets:/app/animation_studio/reelmimic_assets
       - ./agentic_core/models/catalog.json:/app/animation_studio/catalog.json:ro
       - ./skills:/app/skills:ro                      # the agents' SKILL.md files (edit them to change how AVOS directs)
+      - ./neonclipping/data:/neon_data:ro           # NeonClipping's finished clips, for Auto Clip > NeonClipping > Add to my library
       - ./comfyui_workflows:/app/comfyui_workflows
       - animation_projects:/data
       - avos_settings:/data/settings
@@ -330,6 +331,7 @@ services:
       # Series (Animations → Series): stored in the animation_projects volume (/data/series)
       SERIES_CONCURRENCY: ${SERIES_CONCURRENCY:-}        # shots at once; empty = 2 per online GPU worker
       STUDIO_REASONING_EFFORT: ${STUDIO_REASONING_EFFORT:-}   # gpt-oss on Groq: low (default) / medium / high
+      NEON_DATA: /neon_data
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped

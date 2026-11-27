@@ -163,7 +163,7 @@ function WorkerCard({ w, onChanged }: { w: GpuWorker; onChanged: () => void }) {
             {running ? (
               <div className="space-y-1">
                 <p className="text-foreground">{running.status === "loading" ? "Loading" : "Running"} {running.model} ({running.precision}) · {running.step}{running.tag ? <span className="text-muted-foreground"> · {running.tag}</span> : null}</p>
-                <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-all" style={{ width: `${Math.round((running.progress || 0) * 100)}%` }} /></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-colors" style={{ width: `${Math.round((running.progress || 0) * 100)}%` }} /></div>
               </div>
             ) : "Idle."}
             {(w.queue ?? []).length > 0 && (
@@ -269,7 +269,7 @@ function Limits({ limits, preferences, onSaved }: { limits: GenerationLimits; pr
     }
   };
   return (
-    <Card id="limits" icon={<SlidersHorizontal className="h-5 w-5 text-amber-400" />} title="Generation limits"
+    <Card id="limits" icon={<SlidersHorizontal className="h-5 w-5 text-muted-foreground" />} title="Generation limits"
       sub="How the router trades quality, speed and cost for every shot, and when it stops trying. A project can override these (Priority in New video).">
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Preference">
@@ -332,7 +332,7 @@ function RoutePreview() {
     }
   };
   return (
-    <Card id="route" icon={<Route className="h-5 w-5 text-amber-400" />} title="Ask the router"
+    <Card id="route" icon={<Route className="h-5 w-5 text-muted-foreground" />} title="Ask the router"
       sub="What AVOS would pick for a shot like this right now: model, where, precision, and the estimate. Nothing is generated.">
       <div className="flex flex-wrap items-end gap-2">
         <label className="text-xs text-muted-foreground">Job
@@ -402,7 +402,7 @@ function Learned() {
   const q = useQuery({ queryKey: ["gpu-learned"], queryFn: gpuApi.learned, refetchInterval: 30_000, retry: false });
   const rows = q.data?.rows ?? [];
   return (
-    <Card id="learned" icon={<Gauge className="h-5 w-5 text-amber-400" />} title="What routing has learned"
+    <Card id="learned" icon={<Gauge className="h-5 w-5 text-muted-foreground" />} title="What routing has learned"
       sub={`Measured speed, success and QA per model and GPU. After ${q.data?.min_runs ?? 3} runs the router uses these instead of the catalog's estimates.`}>
       {rows.length === 0 ? <p className="text-sm text-muted-foreground">Nothing measured yet.</p> : (
         <div className="overflow-x-auto">
@@ -453,7 +453,7 @@ export default function GpuPage() {
     <AppShell header={header}>
       <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
         <div>
-          <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">GPU</h1>
+          <h1 className="mb-2 text-2xl font-semibold text-foreground md:text-3xl">GPU</h1>
           <p className="max-w-3xl text-sm text-muted-foreground">
             Your GPU workers and what they are doing. For every picture and clip the Model Router picks the model, the GPU
             (or a hosted API) and the precision that fits its VRAM, by quality, speed and cost, and keeps models loaded between shots.
@@ -472,7 +472,7 @@ export default function GpuPage() {
               <Stat label="Spent" value={fmtUsd(d.totals.cost_usd)} sub="GPU hours + hosted APIs" />
             </div>
 
-            <Card id="workers" icon={<Server className="h-5 w-5 text-amber-400" />} title="GPU workers"
+            <Card id="workers" icon={<Server className="h-5 w-5 text-muted-foreground" />} title="GPU workers"
               sub="One worker per GPU. AVOS doesn't care where the GPU is: your PC, a rented pod or a cloud VM.">
               {!d.tokenSet && d.workers.length > 0 && (
                 <p className="mb-3 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
@@ -488,7 +488,7 @@ export default function GpuPage() {
             <Limits limits={d.limits} preferences={d.preferences} onSaved={refresh} />
             <RoutePreview />
 
-            <Card id="runs" icon={<Activity className="h-5 w-5 text-amber-400" />} title="Runs"
+            <Card id="runs" icon={<Activity className="h-5 w-5 text-muted-foreground" />} title="Runs"
               sub="Every picture and clip, where it ran, how long it took and what it cost. Live while a project is generating.">
               <RunsTable jobs={runs.data ?? d.jobs} />
             </Card>

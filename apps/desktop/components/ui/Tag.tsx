@@ -15,7 +15,7 @@ export type TagTone = "plain" | "accent" | "good" | "warn" | "bad" | "muted";
 
 const TONE: Record<TagTone, string> = {
   plain: "border-border text-foreground/85",
-  accent: "border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.12)] text-foreground",
+  accent: "border-signal/70 bg-signal/12 text-foreground",
   good: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
   warn: "border-amber-500/40 bg-amber-500/10 text-amber-300",
   bad: "border-red-500/40 bg-red-500/10 text-red-300",

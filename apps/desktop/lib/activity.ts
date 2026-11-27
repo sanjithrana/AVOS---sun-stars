@@ -35,6 +35,7 @@ export function ago(iso: string, now = Date.now()): string {
 export interface LibraryItem {
   studio: string; kind: string; id: string; title: string; state: string; stage: string;
   updatedAt: string; href: string; thumb: string | null; needs: number; error: string;
+  style?: string; video?: string | null; createdAt?: string;
 }
 export interface Library {
   items: LibraryItem[]; total: number;

@@ -17,7 +17,7 @@ export function StepTabs({ steps, active, onChange }: { steps: StepDef[]; active
         const on = s.id === active;
         return (
           <button key={s.id} type="button" role="tab" aria-selected={on} disabled={s.locked} data-testid={`step-${s.id}`} onClick={() => onChange(s.id)} title={s.note}
-            className={`flex shrink-0 items-center gap-2 px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${on ?"border border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)] text-foreground" :"border border-transparent text-muted-foreground hover:text-foreground"}`}>
+            className={`flex shrink-0 items-center gap-2 px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${on ?"border border-signal/70 bg-signal/18 text-foreground" :"border border-transparent text-muted-foreground hover:text-foreground"}`}>
             <span className="text-[10px] tabular-nums text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
             {s.label}
             {ICON(s.state, s.locked)}

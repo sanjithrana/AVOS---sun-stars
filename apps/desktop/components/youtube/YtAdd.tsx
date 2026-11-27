@@ -72,7 +72,7 @@ export function YtAdd({ tab }: { tab: YtTab }) {
             return (
               <li key={k}>
                 <button type="button" disabled={off} aria-pressed={on} onClick={() => toggle(sel, k, setSel)} title={!c.allowed ? "Permission not confirmed in Auto Clip" : c.queued ? "Already in the queue" : c.job_title}
-                  className={`relative block w-full border text-left transition ${on ? "border-[rgba(200,255,58,0.95)]" : "border-border"} ${off ? "opacity-45" : "hover:border-foreground/50"}`}>
+                  className={`relative block w-full border text-left transition ${on ? "border-signal/95" : "border-border"} ${off ? "opacity-45" : "hover:border-foreground/50"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {c.thumb ? <img src={autoclip.file(c.jid, c.thumb)} alt="" className="aspect-[9/16] w-full object-cover" /> : <div className="aspect-[9/16] w-full bg-muted" />}
                   {on && <CheckCircle2 className="absolute right-1 top-1 h-5 w-5 text-primary" />}
@@ -87,7 +87,7 @@ export function YtAdd({ tab }: { tab: YtTab }) {
             const on = sel.has(k);
             return (
               <li key={k} className="relative">
-                <button type="button" aria-pressed={on} onClick={() => toggle(sel, k, setSel)} className={`relative block w-full border text-left ${on ? "border-[rgba(200,255,58,0.95)]" : "border-border"}`}>
+                <button type="button" aria-pressed={on} onClick={() => toggle(sel, k, setSel)} className={`relative block w-full border text-left ${on ? "border-signal/95" : "border-border"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {u.thumb ? <img src={autoclip.uploadCover(u.id)} alt="" className="aspect-[9/16] w-full object-cover" /> : <div className="aspect-[9/16] w-full bg-muted" />}
                   {on && <CheckCircle2 className="absolute right-1 top-1 h-5 w-5 text-primary" />}
@@ -113,7 +113,7 @@ export function YtAdd({ tab }: { tab: YtTab }) {
         <div className="mt-2 flex flex-wrap gap-2">
           {tab.channels.map((c) => (
             <button key={c.id} type="button" aria-pressed={chans.has(c.id)} onClick={() => toggle(chans, c.id, setChans)}
-              className={`border px-3 py-2 text-sm ${chans.has(c.id) ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>{c.title}{c.platform && c.platform !== "youtube" && <span className="ml-1.5 text-[10px] uppercase opacity-70">{c.platform}</span>}</button>
+              className={`border px-3 py-2 text-sm ${chans.has(c.id) ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>{c.title}{c.platform && c.platform !== "youtube" && <span className="ml-1.5 text-[10px] uppercase opacity-70">{c.platform}</span>}</button>
           ))}
         </div>
         {chans.size > 1 && <p className="mt-1 text-xs text-muted-foreground">Each video goes to every picked channel. Posting the same video to several channels of one platform can look like spam: use different channels for different audiences. Instagram posts are always public; TikTok posts stay private until TikTok audits your app.</p>}
@@ -124,7 +124,7 @@ export function YtAdd({ tab }: { tab: YtTab }) {
         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="When to post">
           {([["auto", "Pick the times for me", `${tab.plan.per_day}/day, ${tab.plan.hours[0]}:00–${tab.plan.hours[1]}:00 (set above)`], ["schedule", "At a time I choose", "then spaced by the minimum gap"], ["now", "As soon as possible", "one after another"]] as const).map(([m, l, h]) => (
             <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}
-              className={`border px-3 py-2 text-left text-sm ${mode === m ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>{l}<span className="block text-[11px] opacity-70">{h}</span></button>
+              className={`border px-3 py-2 text-left text-sm ${mode === m ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>{l}<span className="block text-[11px] opacity-70">{h}</span></button>
           ))}
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

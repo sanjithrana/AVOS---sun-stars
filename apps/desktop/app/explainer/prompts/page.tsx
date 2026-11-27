@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, FlaskConical, Loader2, RotateCcw, Sparkles } from "lucide-react";
+import { Check, FlaskConical, Loader2, RotateCcw, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { explainer, type PromptItem, type PromptLibrary } from "@/lib/explainer";
 
@@ -13,7 +12,7 @@ function Bar({ rate, uses }: { rate: number; uses: number }) {
   const good = uses ? 1 - rate : 0;
   return (
     <div className="h-2 w-full overflow-hidden bg-muted" role="img" aria-label={uses ? `${pct(rate)} bad results over ${uses} uses` : "not used yet"}>
-      <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${good * 100}%` }} />
+      <div className="h-full bg-emerald-500 transition-colors duration-500" style={{ width: `${good * 100}%` }} />
     </div>
   );
 }
@@ -36,7 +35,7 @@ function Card({ it, onLib }: { it: PromptItem; onLib: (l: PromptLibrary) => void
 
       <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
         <Bar rate={a.bad_rate} uses={a.uses} />
-        <p className="text-xs text-muted-foreground">{a.uses ? `${a.uses} uses · ${pct(a.bad_rate)} bad · 👍 ${a.up} 👎 ${a.down}` : "not used yet"}</p>
+        <p className="text-xs text-muted-foreground">{a.uses ? `${a.uses} uses · ${pct(a.bad_rate)} bad · ${a.up} liked, ${a.down} disliked` : "not used yet"}</p>
       </div>
       {flags.length > 0 && <p className="mt-1 text-xs text-muted-foreground">Problems seen: {flags.map(([f, n]) => `${f.replace(/_/g, " ")} ×${n}`).join(", ")}</p>}
 
@@ -91,11 +90,9 @@ export default function PromptLibraryPage() {
   }, [lib.data]);
   return (
     <AppShell header={<span className="text-lg font-semibold">Prompt library</span>}>
-      <div className="mx-auto max-w-4xl space-y-8 px-4 py-8 md:px-8">
+      <div className="w-full max-w-5xl space-y-8 px-4 py-6 md:px-8">
         <div>
-          <Link href="/explainer" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />Explainer</Link>
-          <h1 className="mt-2 text-2xl font-semibold">Prompt library</h1>
-          <p className="mt-1 text-sm text-muted-foreground">The strong prompts behind every script, picture and clip. Each result is traced back to the prompt version that made it. Dark, blank or repeated pictures, refused prompts, pictures you redo and your 👍/👎 count against a prompt. When one keeps doing badly, an improved version is tried on about half of the next videos, and it only replaces the old one if it is clearly better. Every version is kept; you can edit or restore any of them.</p>
+          <p className="text-sm text-muted-foreground">The strong prompts behind every script, picture and clip. Each result is traced back to the prompt version that made it. Dark, blank or repeated pictures, refused prompts, pictures you redo and your likes and dislikes count against a prompt. When one keeps doing badly, an improved version is tried on about half of the next videos, and it only replaces the old one if it is clearly better. Every version is kept; you can edit or restore any of them.</p>
           <button type="button" disabled={learn.isPending} onClick={() => learn.mutate()} className="mt-3 inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-sm transition hover:bg-accent disabled:opacity-50" data-testid="learn-now">
             {learn.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FlaskConical className="h-4 w-4" />}Check for improvements now</button>
           {lib.data?.message && <p className="mt-2 text-sm" role="status">{lib.data.message}</p>}

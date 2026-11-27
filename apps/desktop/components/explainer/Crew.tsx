@@ -10,7 +10,7 @@ const ORDER: StageId[] = ["plan", "design", "board", "shoot", "finish"];
 
 const ICON: Record<AgentState, { el: typeof CheckCircle2; tone: string; word: string }> = {
   done: { el: CheckCircle2, tone: "text-[#52c79a]", word: "Done" },
-  working: { el: Loader2, tone: "text-[var(--signal)] animate-spin", word: "Working" },
+  working: { el: Loader2, tone: "text-signal animate-spin", word: "Working" },
   waiting: { el: CircleDashed, tone: "text-muted-foreground", word: "Waiting" },
   skipped: { el: MinusCircle, tone: "text-[#d9a64e]", word: "Skipped" },
   off: { el: CircleSlash, tone: "text-muted-foreground", word: "Off" },
@@ -31,7 +31,7 @@ export function Crew({ p, onPick }: { p: Project; onPick: (a: Agent) => void }) 
         <h2 className="text-base font-semibold">The crew</h2>
         <span className="text-xs text-muted-foreground">{done} of {agents.length} agents finished{open ? "" : " · show"}</span>
       </button>
-      {working.length > 0 && !open && <p className="mt-2 text-xs text-[var(--signal)]">Working now: {working.map((a) => a.name).join(", ")}</p>}
+      {working.length > 0 && !open && <p className="mt-2 text-xs text-signal">Working now: {working.map((a) => a.name).join(", ")}</p>}
       <div hidden={!open} className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {ORDER.map((st) => {
           const list = agents.filter((a) => a.stage === st);
@@ -46,7 +46,7 @@ export function Crew({ p, onPick }: { p: Project; onPick: (a: Agent) => void }) 
                   return (
                     <li key={a.id}>
                       <button type="button" onClick={() => onPick(a)} data-testid={`agent-${a.id}`} title={a.does}
-                        className={`agent w-full rounded-xl border px-3 py-2.5 text-left transition ${a.state === "working" ? "border-[rgba(200,255,58,0.55)] bg-[rgba(200,255,58,0.10)]" : "border-border"} ${a.state === "off" ? "opacity-55" : ""}`}>
+                        className={`agent w-full rounded-xl border px-3 py-2.5 text-left transition ${a.state === "working" ? "border-signal/55 bg-signal/10" : "border-border"} ${a.state === "off" ? "opacity-55" : ""}`}>
                         <span className="flex items-center gap-2">
                           <I.el className={`h-4 w-4 shrink-0 ${I.tone}`} aria-label={I.word} />
                           <span className="truncate text-sm font-medium">{a.name}</span>

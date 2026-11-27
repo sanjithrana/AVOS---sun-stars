@@ -30,14 +30,14 @@ export function AssistantMap() {
         {RIGHT.map((label, i) => (
           <span key={label} className={`absolute z-10 -translate-y-1/2 ${pill}`} style={{ left: "72%", top: pct(YS[i], H) }}>{label}</span>
         ))}
-        <Link href="/explainer" className="absolute left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-4 border border-[var(--signal)]/60 bg-card px-9 py-5 avos-glow transition-colors hover:border-[var(--signal)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        <Link href="/explainer" className="absolute left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-4 border border-signal/60 bg-card px-9 py-5 avos-glow transition-colors hover:border-signal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           style={{ top: pct(C, H) }}>
           <Mark className="h-7 w-7" />
           <span className="display whitespace-nowrap text-3xl">Production Assistant</span>
         </Link>
         <div className="absolute left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 gap-3" style={{ top: pct(272, H) }}>
           <Link href="/explainer/prompts" className={action}>Skills</Link>
-          <Link href="/models" className={action}>Models</Link>
+          <Link href="/settings#models" className={action}>Models</Link>
         </div>
       </div>
 
@@ -50,7 +50,7 @@ export function AssistantMap() {
         <ul className="mt-4 flex flex-wrap gap-2">
           {[...LEFT, ...RIGHT].map((l) => <li key={l} className={pill}>{l}</li>)}
           <li><Link href="/explainer/prompts" className={action}>Skills</Link></li>
-          <li><Link href="/models" className={action}>Models</Link></li>
+          <li><Link href="/settings#models" className={action}>Models</Link></li>
         </ul>
       </div>
     </section>

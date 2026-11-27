@@ -52,7 +52,7 @@ function ClipCard({ p, c, busy, onAgain }: { p: Project; c: Clip; busy: boolean;
   return (
     <article className="rounded-xl border border-border bg-card/50 p-4 md:p-5" data-testid={`clip-${c.n}`}>
       <header className="flex flex-wrap items-center gap-2">
-        <span className="rounded-lg bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">C{String(c.n).padStart(2, "0")}</span>
+        <span className="rounded-lg bg-amber-500/15 px-2 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">C{String(c.n).padStart(2, "0")}</span>
         <span className="text-sm font-semibold">{c.t0}-{c.t1} s</span>
         <span className="text-xs text-muted-foreground">{c.location}, {c.time_of_day}</span>
         {c.engine && <span className="ml-auto rounded-md border border-border px-2.5 py-1 text-xs">{c.engine === "ai_video" ? "AI video" : c.engine === "blender" ? "3D" : "Picture + camera move"}</span>}
@@ -118,7 +118,7 @@ export function ProjectView({ id }: { id: string }) {
         <BackLink direct href="/stickman" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All videos</BackLink>
         <div className="mt-2 flex flex-wrap items-start gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold" data-testid="stickman-title">{p.title}</h1>
+            <h1 className="text-2xl font-semibold" data-testid="stickman-title">{p.title}</h1>
             <p className="text-sm text-muted-foreground">{p.project?.date_place || "Choosing an event"} · {p.clip_count} clips × 10 s · {p.aspect}</p>
           </div>
           {running && <button type="button" onClick={() => act.mutate(() => stickman.cancel(id))} className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"><OctagonX className="h-4 w-4" />Stop</button>}
@@ -144,7 +144,7 @@ export function ProjectView({ id }: { id: string }) {
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {p.topics.topics.map((t, i) => (
               <article key={t.title} className={`flex flex-col rounded-xl border p-4 ${i === p.topics!.recommended ? "border-amber-500 bg-amber-500/5" : "border-border bg-card/50"}`}>
-                <p className="font-semibold">{t.title}{i === p.topics!.recommended && <span className="ml-2 rounded-md bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">RECOMMENDED</span>}</p>
+                <p className="font-semibold">{t.title}{i === p.topics!.recommended && <span className="ml-2 rounded-md bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white">RECOMMENDED</span>}</p>
                 <p className="text-xs text-muted-foreground">{t.date_place} · {t.clips} clips · {t.duration_s} s · {t.difficulty}</p>
                 <p className="mt-2 text-sm">{t.premise}</p>
                 <p className="mt-2 text-xs text-muted-foreground"><b>First 2 seconds:</b> {t.opening_visual}</p>

@@ -159,7 +159,7 @@ export function Composer() {
 
       <button type="button" disabled={!ready || create.isPending}
         onClick={() => create.mutate({ ...(from === "article" ? { url: url.trim(), mode } : { brief: brief.trim(), research }), seconds, aspect, auto, style_id: styleId, ...(voice ? { voice_id: voice.id, language: voice.locale.split("-")[0] } : {}), ...body })}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 font-semibold text-white transition-all duration-200 active:scale-[0.98] disabled:opacity-50 sm:w-auto"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 font-semibold text-white transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 sm:w-auto"
         data-testid="explainer-create">
         {create.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />} Make my video
       </button>

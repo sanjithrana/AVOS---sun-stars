@@ -10,7 +10,6 @@ import { library, type LibraryItem as Item0 } from "@/lib/activity";
 
 type LibraryItem = Item0 & { createdAt?: string };
 import { Tag, type TagTone } from "@/components/ui/Tag";
-import { Lit, PageHero } from "@/components/brand/PageHero";
 import { QueueVideo } from "@/components/youtube/QueueVideo";
 
 const STATE_LABEL: Record<string, string> = {
@@ -71,13 +70,13 @@ function Library() {
   return (
     <AppShell header={<span className="text-lg font-semibold">Library</span>}>
       <div className="w-full space-y-6 px-4 py-6 md:px-8 2xl:px-12">
-        <PageHero compact eyebrow="Library" title={<>Everything you have <Lit>made.</Lit></>} blurb="Videos, films, clips and runs from every studio, in one place." />
+        <p className="text-[13.5px] text-muted-foreground">Videos, films, clips and runs from every studio, newest first</p>
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Search everything you have made"
               aria-label="Search outputs"
-              className="w-full border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[rgba(200,255,58,0.6)]" />
+              className="w-full border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-signal/60" />
           </div>
           <p className="text-xs text-muted-foreground">{items.length} of {q.data?.total ?? 0}</p>
         </div>
@@ -119,7 +118,7 @@ function Library() {
               </h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
                 {list.map((x) => (
-                  <div key={`${x.studio}-${x.id}`} className="flex flex-col overflow-hidden border border-border bg-card transition hover:border-[rgba(200,255,58,0.5)]">
+                  <div key={`${x.studio}-${x.id}`} className="flex flex-col overflow-hidden border border-border bg-card transition hover:border-signal/50">
                     <Link href={x.href} className="block">
                       <div className="flex aspect-[3/4] items-center justify-center bg-muted">
                         {x.thumb ? /* eslint-disable-next-line @next/next/no-img-element */
@@ -162,7 +161,7 @@ function stamp(iso: string): string {
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={on}
-      className={`whitespace-nowrap border px-3 py-1.5 text-xs transition ${on ?"border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)] text-foreground" :"border-border text-muted-foreground hover:text-foreground"}`}>
+      className={`whitespace-nowrap border px-3 py-1.5 text-xs transition ${on ?"border-signal/85 bg-signal/12 text-foreground" :"border-border text-muted-foreground hover:text-foreground"}`}>
       {children}
     </button>
   );

@@ -22,7 +22,7 @@ export function SeriesHome() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <Link href="/animations" className="text-xs text-muted-foreground hover:underline">← Animations</Link>
-          <h1 className="mb-2 mt-1 text-2xl font-bold text-foreground md:text-3xl">Series</h1>
+          <h1 className="mb-2 mt-1 text-2xl font-semibold text-foreground md:text-3xl">Series</h1>
           <p className="max-w-3xl text-muted-foreground">
             An animated series made with you at every step: the AI drafts each character (look and voice) and you approve them one by one;
             episodes are written and rendered in parts (1 min, then 3 min, …) and nothing moves on until you approve the part you just watched.

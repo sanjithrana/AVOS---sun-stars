@@ -2,106 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, Clapperboard, Cpu, Home, Landmark, Library, PieChart, Scissors, Settings2, Sparkles, Wand2, Send, Plug } from "lucide-react";
+import { Clapperboard, Home, Landmark, Library, Scissors, Settings2, Sparkles, Send, Wand2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { Mark } from "@/components/layout/Mark";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { TopBar } from "@/components/layout/TopBar";
 
-// Studios: Explainer (one idea -> a finished explainer video; characters, 3D, AI video and voice chosen per shot)
-// and Animations (films, series, video style), plus the Models page (which open model does which job).
+// Eight rooms. Pages that belong together share one tab and switch with a strip under the top bar:
+// Explainer (make, skills, prompts), Channels (posting, accounts) and Settings (studio, GPU, usage and cost).
 const NAV = [
-  {
-    href: "/",
-    label: "Home",
-    hint: "Production assistant",
-    icon: Home,
-    match: (p: string) => p === "/",
-  },
-  {
-    href: "/explainer",
-    label: "Explainer",
-    hint: "Idea to finished video",
-    icon: Sparkles,
-    match: (p: string) => p.startsWith("/explainer"),
-  },
-  {
-    href: "/stickman",
-    label: "Stickman",
-    hint: "Stickman videos, 13 looks",
-    icon: Landmark,
-    match: (p: string) => p.startsWith("/stickman"),
-  },
-  {
-    href: "/animations",
-    label: "Animations",
-    hint: "Films, series, video style",
-    icon: Clapperboard,
-    match: (p: string) => p.startsWith("/animations"),
-  },
-  {
-    href: "/autoclip",
-    label: "Auto Clip",
-    hint: "Long video to Shorts",
-    icon: Scissors,
-    match: (p: string) => p.startsWith("/autoclip"),
-  },
-  {
-    href: "/youtube",
-    label: "YouTube",
-    hint: "Post, schedule, monitor",
-    icon: Send,
-    match: (p: string) => p.startsWith("/youtube"),
-  },
-  {
-    href: "/connections",
-    label: "Connections",
-    hint: "YouTube, Instagram, TikTok",
-    icon: Plug,
-    match: (p: string) => p.startsWith("/connections"),
-  },
-  {
-    href: "/skills",
-    label: "Skills",
-    hint: "One-subject skills, e.g. toys",
-    icon: Wand2,
-    match: (p: string) => p.startsWith("/skills"),
-  },
-  {
-    href: "/library",
-    label: "Library",
-    hint: "Everything you have made",
-    icon: Library,
-    match: (p: string) => p.startsWith("/library"),
-  },
-  {
-    href: "/models",
-    label: "Models",
-    hint: "Open AI models in use",
-    icon: Boxes,
-    match: (p: string) => p.startsWith("/models"),
-  },
-  {
-    href: "/gpu",
-    label: "GPU",
-    hint: "Workers, router, runs",
-    icon: Cpu,
-    match: (p: string) => p.startsWith("/gpu"),
-  },
-  {
-    href: "/analytics",
-    label: "Analytics",
-    hint: "Models, usage, cost",
-    icon: PieChart,
-    match: (p: string) => p.startsWith("/analytics"),
-  },
-  {
-    href: "/settings",
-    label: "Settings",
-    hint: "Keys, GPU, your models",
-    icon: Settings2,
-    match: (p: string) => p.startsWith("/settings"),
-  },
+  { href: "/", label: "Home", hint: "Start something, see what is running", icon: Home, match: (p: string) => p === "/" },
+  { href: "/explainer", label: "Explainer", hint: "Idea to finished video, crew skills and prompts", icon: Sparkles, match: (p: string) => p.startsWith("/explainer") },
+  { href: "/skills", label: "Video skills", hint: "Ready-made videos: company story, mechanical toy, cartoon shorts", icon: Wand2, match: (p: string) => p.startsWith("/skills") },
+  { href: "/stickman", label: "Stickman", hint: "Stickman videos, 13 looks", icon: Landmark, match: (p: string) => p.startsWith("/stickman") },
+  { href: "/animations", label: "Animations", hint: "Films, series, video style", icon: Clapperboard, match: (p: string) => p.startsWith("/animations") },
+  { href: "/autoclip", label: "Auto Clip", hint: "Long video to Shorts", icon: Scissors, match: (p: string) => p.startsWith("/autoclip") },
+  { href: "/youtube", label: "Channels", hint: "Post, schedule, connect accounts", icon: Send, match: (p: string) => p.startsWith("/youtube") || p.startsWith("/connections") },
+  { href: "/library", label: "Library", hint: "Everything you have made", icon: Library, match: (p: string) => p.startsWith("/library") },
+  { href: "/settings", label: "Settings", hint: "Keys, models, GPU, usage and cost", icon: Settings2, match: (p: string) => p.startsWith("/settings") || p.startsWith("/gpu") || p.startsWith("/analytics") || p.startsWith("/models") },
+];
+
+/** Tabs inside a room. A page listed here gets the strip instead of its own title. */
+const ROOMS: { title: string; tabs: [string, string][] }[] = [
+  { title: "Explainer", tabs: [["/explainer", "Make"], ["/explainer/skills", "Crew skills"], ["/explainer/prompts", "Prompts"]] },
+  { title: "Channels", tabs: [["/youtube", "Posting"], ["/connections", "Accounts"]] },
+  { title: "Settings", tabs: [["/settings", "Studio"], ["/gpu", "GPU"], ["/analytics", "Usage and cost"]] },
 ];
 
 interface AppShellProps {
@@ -109,65 +34,106 @@ interface AppShellProps {
   header?: ReactNode;
 }
 
-const ring = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+const GROUPS: [string, string[]][] = [
+  ["Make", ["/", "/explainer", "/skills", "/stickman", "/animations", "/autoclip"]],
+  ["Publish", ["/youtube", "/library"]],
+];
 
-/** Sidebar + header frame shared by every page: olive board, the current page lit in yellow. */
+const ring = "focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring";
+
+/** The frame every page sits in: one grid, cut by hairlines. Rail on the left, a thin bar on top, the page in the big cell. */
 export function AppShell({ children, header }: AppShellProps) {
   const pathname = usePathname();
+  const byHref = Object.fromEntries(NAV.map((n) => [n.href, n]));
+  const room = ROOMS.find((r) => r.tabs.some(([h]) => h === pathname));
+  const hue = NAV.find((n) => n.match(pathname))?.href ?? "/";
+  const settings = byHref["/settings"];
+  const setOn = settings.match(pathname);
 
   return (
-    <div className="app-frame flex h-dvh overflow-hidden text-foreground">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-        <Link href="/" className={`flex h-20 items-center gap-3 px-6 ${ring}`} aria-label="AVOS Studio home">
-          <Mark className="h-7 w-7" />
-          <span className="leading-none">
-            <span className="block text-lg font-semibold tracking-wide">AVOS</span>
-            <span className="mt-1 block text-[11px] text-muted-foreground">Studio</span>
-          </span>
-        </Link>
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2" aria-label="Main">
-          {NAV.map((item) => {
-            const active = item.match(pathname);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`flex min-h-[46px] items-center gap-3 px-3.5 py-2 text-[13px] font-medium transition-all ${ring} ${ active ?"border border-[rgba(200,255,58,0.35)] bg-[rgba(200,255,58,0.10)] text-foreground" :"border border-transparent text-muted-foreground hover:bg-[rgba(200,255,58,0.10)] hover:text-foreground hover:shadow-[0_0_22px_-2px_rgba(200,255,58,0.9)] hover:border-[rgba(200,255,58,0.4)]" }`}
-              >
-                <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ?"text-[var(--signal)]" :""}`} strokeWidth={1.5} />
-                <span className="flex flex-col leading-tight">
-                  {item.label}
-                  <span className="text-[11px] font-normal text-muted-foreground">{item.hint}</span>
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-        <p className="px-6 py-5 text-[11px] text-muted-foreground">AI video operating system</p>
-      </aside>
+    <div data-room={hue} className="app-frame grid grid-cols-1 grid-rows-[auto_3.5rem_minmax(0,1fr)] gap-px bg-border text-foreground md:grid-cols-[15rem_minmax(0,1fr)] md:grid-rows-[3.5rem_minmax(0,1fr)]">
+      {/* corner: the mark */}
+      <Link href="/" className={`hidden items-center gap-2.5 bg-sidebar px-5 md:flex ${ring}`} aria-label="AVOS Studio home">
+        <Mark className="h-6 w-6" />
+        <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-[-0.02em]">AVOS Studio</span>
+      </Link>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <nav className="flex gap-1 overflow-x-auto border-b border-border bg-sidebar p-2 md:hidden" aria-label="Main">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={item.match(pathname) ? "page" : undefined}
-              className={`flex shrink-0 items-center gap-2 px-3.5 py-2 text-sm ${ring} ${ item.match(pathname) ?"bg-[rgba(109,76,255,0.22)] text-foreground" :"text-muted-foreground" }`}
-            >
-              <item.icon className="h-4 w-4" strokeWidth={1.5} />
-              {item.label}
+      {/* mobile: one scrolling strip */}
+      <nav className="flex gap-px overflow-x-auto bg-sidebar md:hidden" aria-label="Main">
+        {NAV.map((item) => {
+          const on = item.match(pathname);
+          return (
+            <Link key={item.href} href={item.href} aria-current={on ? "page" : undefined}
+              className={`flex shrink-0 items-center gap-2 border-b-2 px-3.5 py-3 text-[13px] ${ring} ${on ? "border-signal text-foreground" : "border-transparent text-muted-foreground"}`}>
+              <item.icon className="h-4 w-4" strokeWidth={1.6} />{item.label}
             </Link>
+          );
+        })}
+      </nav>
+
+      {/* top bar */}
+      <header className="flex min-w-0 items-center justify-between gap-3 bg-background px-4 md:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3 self-stretch text-[13px]">{room ? <RoomTabs room={room} pathname={pathname} /> : header}</div>
+        <TopBar />
+        <ThemeToggle />
+      </header>
+
+      {/* rail */}
+      <aside className="hidden min-h-0 flex-col overflow-y-auto bg-sidebar md:flex">
+        <nav className="flex-1 px-2 pb-4 pt-2" aria-label="Main">
+          {GROUPS.map(([group, hrefs]) => (
+            <div key={group} className="pt-4 first:pt-2">
+              <p className="px-3 pb-2 text-[12px] text-muted-foreground">{group}</p>
+              <ul className="space-y-0.5">
+                {hrefs.map((h) => byHref[h]).filter(Boolean).map((item) => <RailLink key={item.href} item={item} on={item.match(pathname)} />)}
+              </ul>
+            </div>
           ))}
         </nav>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border px-4 md:h-20 md:px-10">
-          <div className="flex min-w-0 flex-1 items-center gap-4">{header}</div>
-          <TopBar />
-          <ThemeToggle />
-        </header>
-        <div className="min-h-0 flex-1 overflow-auto overscroll-contain" data-scroll-root>{children}</div>
-      </main>
+        <div className="border-t border-border px-2 py-2">
+          <ul><RailLink item={settings} on={setOn} /></ul>
+        </div>
+      </aside>
+
+      {/* the page */}
+      <main className="room-wash min-h-0 min-w-0 overflow-auto overscroll-contain bg-background" data-scroll-root>{children}</main>
+    </div>
+  );
+}
+
+type Item = (typeof NAV)[number];
+
+/** One row of the rail: 36 tall, the icon in one 16px column, a 2px key-blue edge when it is the room you are in. */
+function RailLink({ item, on }: { item: Item; on: boolean }) {
+  return (
+    <li>
+      <Link href={item.href} title={item.hint} aria-current={on ? "page" : undefined}
+        className={`group relative flex h-9 items-center gap-2.5 px-3 text-[13.5px] transition-colors duration-150 ${ring} ${on ? "bg-[color-mix(in_oklab,var(--room)_12%,var(--background))] text-foreground" : "text-muted-foreground hover:bg-background/70 hover:text-foreground"}`}>
+        <span aria-hidden className={`absolute inset-y-1.5 left-0 w-[2px] transition-colors ${on ? "bg-[var(--room)]" : "bg-transparent"}`} />
+        <item.icon data-room={item.href} className={`rail-ico h-4 w-4 shrink-0 transition-colors ${on ? "on" : ""}`} strokeWidth={1.5} />
+        {item.label}
+      </Link>
+    </li>
+  );
+}
+
+/** The strip of tabs for a room that holds several pages. */
+function RoomTabs({ room, pathname }: { room: (typeof ROOMS)[number]; pathname: string }) {
+  return (
+    <div className="flex min-w-0 items-stretch gap-6 self-stretch">
+      <span className="flex items-center gap-2 font-[family-name:var(--font-display)] text-[15px] text-foreground"><span aria-hidden className="h-2 w-2 bg-[var(--room)]" />{room.title}</span>
+      <nav className="flex min-w-0 items-stretch gap-1 overflow-x-auto" aria-label={`${room.title} pages`}>
+        {room.tabs.map(([href, label]) => {
+          const on = pathname === href;
+          return (
+            <Link key={href} href={href} aria-current={on ? "page" : undefined}
+              className={`relative flex shrink-0 items-center px-3 text-[13px] transition-colors ${ring} ${on ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              {label}
+              <span aria-hidden className={`absolute inset-x-3 bottom-0 h-[2px] transition-colors ${on ? "bg-[var(--room)]" : "bg-transparent"}`} />
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

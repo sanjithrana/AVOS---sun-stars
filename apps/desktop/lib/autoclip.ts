@@ -50,7 +50,7 @@ export interface Overview {
   presets?: Preset[];
   settings: Settings; channels: Channel[]; jobs: JobRow[]; google: { has_client: boolean };
   autopilot: { recent: number; per_day: number; in_hours: boolean; notice?: string | null; waiting: number; running: boolean };
-  capabilities: { ffmpeg: boolean; yt_dlp: boolean; whisper: boolean; layouts: Record<string, string>; captions: Record<string, string>; reframe: { ready: boolean; opencv: boolean; model: boolean; fix: string }; edit_styles?: Record<string, string>; looks?: Record<string, string>; moods?: Record<string, string>;
+  capabilities: { ffmpeg: boolean; yt_dlp: boolean; yt_transcript?: boolean; whisper: boolean; layouts: Record<string, string>; captions: Record<string, string>; reframe: { ready: boolean; opencv: boolean; model: boolean; fix: string }; edit_styles?: Record<string, string>; looks?: Record<string, string>; moods?: Record<string, string>;
     caption_styles?: Record<string, CaptionStyle>; anims?: Record<string, string>; fonts?: FontItem[]; whisper_models?: Record<string, WhisperModel>; whisper_pick?: string;
     templates?: Record<string, string>; backgrounds?: Record<string, string>; caption_modes?: Record<string, string>;
     template_info?: Record<string, { label: string; cat: string; desc: string; card: boolean }>; template_cats?: Record<string, string>; card_fonts?: string[] };
@@ -89,7 +89,7 @@ export interface CommentRow { id: string; vid: string; channel: string; author: 
 export interface CommentsView { items: CommentRow[]; counts: Record<string, number>; ideas: { idea: string; count: number; likes: number; examples: string[] }[]; last_sync: string | null; sync?: { new: number; needs_reconnect: string[]; drafted: number } }
 export interface MusicTrack { id: string; name: string; mood: string; builtin: boolean; duration?: number }
 export interface CoachRow { option: string | boolean; n: number; mean: number | null; score?: number; sd?: number; avg_views?: number | null }
-export interface CoachInsights { summary: string; do_more: string[]; avoid: string[]; title_tips: string[]; hashtag_tips: string[]; experiments: string[]; by: "ai" | "rules"; n: number; tables: Record<string, CoachRow[]>; retention?: RetentionSummary | null; experiments?: ExpSummary; best: Record<string, string | boolean>; tags: string[]; at: string }
+export interface CoachInsights { summary: string; do_more: string[]; avoid: string[]; title_tips: string[]; hashtag_tips: string[]; experiments: string[]; by: "ai" | "rules"; n: number; tables: Record<string, CoachRow[]>; retention?: RetentionSummary | null; best: Record<string, string | boolean>; tags: string[]; at: string }
 export interface CoachView { mode: "off" | "suggest" | "auto"; dims: Record<string, boolean>; explore: number; last_run: string | null; insights: CoachInsights | null; labels: Record<string, string>; options: Record<string, (string | boolean)[]>; changes?: CoachChange[]; retention_fetch?: { updated: number; needs_reconnect: string[] } }
 export interface Stats {
   posted: { job: string; n: number; title: string; youtube_id: string; posted_at?: string; views?: number; likes?: number; privacy?: string }[];

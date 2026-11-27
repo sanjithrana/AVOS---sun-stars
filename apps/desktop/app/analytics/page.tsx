@@ -53,7 +53,7 @@ export default function Analytics() {
                 <div className="flex h-36 items-end gap-1">
                   {d.by_day.map((x) => (
                     <div key={x.day} className="group relative flex-1" title={`${x.day}: ${money(x.cost)} over ${x.calls} calls`}>
-                      <div className="w-full bg-[rgba(200,255,58,0.55)] transition group-hover:bg-[rgba(200,255,58,0.9)]"
+                      <div className="w-full bg-signal/55 transition group-hover:bg-signal/90"
                         style={{ height: `${Math.max(2, (x.cost / peak) * 100)}%` }} />
                     </div>
                   ))}
@@ -119,7 +119,7 @@ function Table({ title, rows, unitLabel }: { title: string; rows: Bucket[]; unit
                 <span className="shrink-0 font-mono tabular-nums">{money(r.cost)}</span>
               </div>
               <div className="mt-1 h-1 overflow-hidden bg-muted">
-                <div className="h-full bg-[rgba(200,255,58,0.6)]" style={{ width: `${(r.cost / top) * 100}%` }} />
+                <div className="h-full bg-signal/60" style={{ width: `${(r.cost / top) * 100}%` }} />
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
                 {r.calls} call{r.calls === 1 ? "" : "s"}{unitLabel && r.units ? ` · ${r.units} units` : ""}

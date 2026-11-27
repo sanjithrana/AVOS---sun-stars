@@ -100,7 +100,7 @@ function PartCard({ sid, snap, ep, p, act, pending }: { sid: string; snap: Serie
           {mine && work.step && (
             <div>
               <p className="text-sm text-muted-foreground">{work.step}{work.total ? ` · ${work.done}/${work.total}` : ""}</p>
-              {!!work.total && <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-all" style={{ width: `${Math.round((100 * (work.done || 0)) / work.total)}%` }} /></div>}
+              {!!work.total && <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-colors" style={{ width: `${Math.round((100 * (work.done || 0)) / work.total)}%` }} /></div>}
             </div>
           )}
           {p.status === "script_review" && p.script && <ScriptReview key={`${p.version}-${p.index}`} sid={sid} snap={snap} ep={ep} p={p} act={act} pending={pending} />}
@@ -126,7 +126,7 @@ export function ScriptView({ snap, script }: { snap: SeriesSnapshot; script: Scr
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Scene {i + 1} · {snap.series.locations.find((l) => l.id === sc.location)?.name ?? sc.location} · {sc.time}</div>
           {sc.beats.map((b, k) => b.type === "line" ? (
             <p key={b.id ?? k}><b className="text-foreground">{speakerName(snap, b.character)}</b>{b.emotion && b.emotion !== "neutral" ? <span className="text-muted-foreground"> ({b.emotion})</span> : null}: {b.text}</p>
-          ) : <p key={b.id ?? k} className="italic text-muted-foreground">[{b.text}]{b.sfx ? ` 🔊 ${b.sfx}` : ""}</p>)}
+          ) : <p key={b.id ?? k} className="italic text-muted-foreground">[{b.text}]{b.sfx ? ` · sound: ${b.sfx}` : ""}</p>)}
         </div>
       ))}
     </div>

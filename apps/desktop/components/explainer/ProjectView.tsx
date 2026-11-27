@@ -129,9 +129,9 @@ export function ProjectView({ id }: { id: string }) {
             <BackLink direct href="/explainer" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All videos</BackLink>
             <div className="mt-2 flex flex-wrap items-start gap-3">
               <div className="w-full min-w-0 sm:w-auto sm:flex-1">
-                <h1 className="text-2xl font-bold leading-tight sm:text-3xl" data-testid="explainer-title">{p.title || p.brief}</h1>
+                <h1 className="text-2xl font-semibold leading-tight sm:text-3xl" data-testid="explainer-title">{p.title || p.brief}</h1>
                 <p className="mt-1 text-xs text-muted-foreground">{p.totalSeconds || p.seconds}s · {p.aspect}{p.plan ? ` · ${p.plan.shots.length} shots` : ""}</p>
-                {p.source && <a href={p.source.url} target="_blank" rel="noreferrer" className="text-xs text-[var(--signal)] underline">Source: {p.source.title}</a>}
+                {p.source && <a href={p.source.url} target="_blank" rel="noreferrer" className="text-xs text-signal underline">Source: {p.source.title}</a>}
               </div>
               {p.plan && <button type="button" onClick={async () => { const r = await explainer.masterPrompt(id); await navigator.clipboard.writeText(r.text); setCopied(true); setTimeout(() => setCopied(false), 2500); }}
                 className="inline-flex items-center gap-1.5 border border-border px-3 py-2 text-sm hover:bg-accent" data-testid="master-prompt" title="One timed multi-shot prompt for Seedance, Kling, Veo and similar tools">
@@ -145,7 +145,7 @@ export function ProjectView({ id }: { id: string }) {
           </div>
 
           {gate === "plan" && dirty && (
-            <div className="flex flex-wrap items-center gap-3 border border-[rgba(200,255,58,0.45)] p-3 text-sm">
+            <div className="flex flex-wrap items-center gap-3 border border-signal/45 p-3 text-sm">
               <span className="text-muted-foreground">You changed the script.</span>
               <button type="button" onClick={() => save.mutate(shots)} className="border border-border px-4 py-1.5 text-sm hover:bg-accent">Save changes</button>
             </div>
@@ -160,9 +160,9 @@ export function ProjectView({ id }: { id: string }) {
                 <div className="space-y-2 text-sm">
                   <p className="text-muted-foreground">{p.finalSeconds}s, with voice and word-by-word captions.</p>
                   {shots.some((s) => s.engine === "still") && (
-                    <p className="max-w-md border border-[rgba(200,255,58,0.35)] p-3 text-xs leading-relaxed text-muted-foreground" data-testid="motion-hint">
+                    <p className="max-w-md border border-signal/35 p-3 text-xs leading-relaxed text-muted-foreground" data-testid="motion-hint">
                       {shots.filter((s) => s.engine === "still").length} shots are animatics (pictures with a camera move), because no video model is ready here.
-                      For real motion: download the <a href={explainer.shotPack(id)} download className="text-[var(--signal)] underline">shot pack</a>, make each shot on Kling, Runway or OpenArt from its first and last frame, then press <b>Use my clip</b> on the shot. Or add fal.ai credit in Settings and press Make clip again.
+                      For real motion: download the <a href={explainer.shotPack(id)} download className="text-signal underline">shot pack</a>, make each shot on Kling, Runway or OpenArt from its first and last frame, then press <b>Use my clip</b> on the shot. Or add fal.ai credit in Settings and press Make clip again.
                     </p>
                   )}
                   <a href={explainer.file(id, p.final)} download className="inline-flex items-center gap-1.5 bg-primary px-4 py-2 font-semibold text-white"><Download className="h-4 w-4" />Download MP4</a>
@@ -187,7 +187,7 @@ export function ProjectView({ id }: { id: string }) {
                 <div className="mt-3 space-y-3">
                   <ul className="space-y-2">
                     {p.research.facts.map((f, i) => (
-                      <li key={i} className="flex gap-2"><span className="text-[var(--signal)]">✓</span>
+                      <li key={i} className="flex gap-2"><span className="text-signal">✓</span>
                         <span>{f.fact} <a href={f.source.url} target="_blank" rel="noreferrer" className="whitespace-nowrap text-xs text-muted-foreground underline">{f.source.title}</a></span></li>
                     ))}
                   </ul>

@@ -27,14 +27,14 @@ function Mini({ id }: { id: string }) {
   const a = ART[id] ?? ART.none;
   return (
     <span className="relative mx-auto block aspect-[9/16] w-full max-w-[86px] overflow-hidden" style={{ background: a.bg }}>
-      {a.chrome === "phone" && <><span className="absolute inset-[3%] rounded-[10px] border-2 border-zinc-600" /><span className="absolute left-1/2 top-[5%] h-[3%] w-[30%] -translate-x-1/2 rounded-full bg-black" /></>}
+      {a.chrome === "phone" && <><span className="absolute inset-[3%] border-2 border-zinc-600" /><span className="absolute left-1/2 top-[5%] h-[3%] w-[30%] -translate-x-1/2 rounded-full bg-black" /></>}
       {(a.chrome === "comment" || a.chrome === "term" || (a.card && !a.chrome)) && <span className="absolute inset-x-[6%] top-[14%] h-[20%] rounded" style={{ background: a.card }} />}
       {a.chrome === "term" && <span className="absolute left-[10%] top-[16%] flex gap-0.5">{["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <i key={c} className="block h-1 w-1 rounded-full" style={{ background: c }} />)}</span>}
       {a.chrome === "pill" && <span className="absolute left-[7%] top-[16%] flex gap-0.5"><i className="block h-1.5 w-4 rounded-sm bg-white" /><i className="block h-1.5 w-3 rounded-sm" style={{ background: a.mark }} /></span>}
       {a.chrome === "quote" && <span className="absolute left-[7%] top-[12%] text-[14px] leading-none" style={{ color: a.mark }}>“</span>}
       {a.mark && !a.chrome && <span className="absolute left-[7%] top-[17%] h-2.5 w-2.5 rounded-full" style={{ background: a.mark }} />}
       {id !== "none" && id !== "podcast" && <><span className="absolute left-[7%] right-[10%] top-[26%] h-[2.5%]" style={{ background: a.ink, opacity: 0.85 }} /><span className="absolute left-[7%] right-[35%] top-[31%] h-[2.5%]" style={{ background: a.ink, opacity: 0.85 }} /></>}
-      <span className={`absolute bg-gradient-to-br from-sky-500 to-indigo-600 ${a.clip}`} />
+      <span className={`absolute bg-[#9d9ea8] ${a.clip}`} />
     </span>
   );
 }
@@ -62,11 +62,11 @@ export function FramePicker({ ov, v, set }: { ov: Overview; v: FrameValue; set: 
   const setK = (p: Partial<CardOpts>) => set({ card: Object.fromEntries(Object.entries({ ...k, ...p }).filter(([, x]) => x !== undefined && x !== "")) as CardOpts });
   const shown = Object.entries(info).filter(([id, t]) => (cat === "all" || t.cat === cat || id === "none") && (!q || `${t.label} ${t.desc}`.toLowerCase().includes(q.toLowerCase())));
   const cur = info[v.template];
-  const pill = (on: boolean) => `px-3 py-1.5 text-xs transition border ${on ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.15)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+  const pill = (on: boolean) => `px-3 py-1.5 text-xs transition border ${on ? "border-signal/85 bg-signal/15 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
   return (
     <div className="space-y-4 border border-border p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Video template <span className="normal-case text-[rgba(200,255,58,0.9)]">{Object.keys(info).length - 1} styles</span></span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Video template <span className="normal-case text-signal/90">{Object.keys(info).length - 1} styles</span></span>
         <input className={`${field} max-w-[220px]`} placeholder="Search templates" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       <div className="flex flex-wrap gap-2">{Object.entries(cats).map(([id, name]) => <button key={id} type="button" className={pill(cat === id)} onClick={() => setCat(id)}>{name}</button>)}</div>
@@ -75,8 +75,8 @@ export function FramePicker({ ov, v, set }: { ov: Overview; v: FrameValue; set: 
           const on = v.template === id;
           return (
             <button key={id} type="button" role="radio" aria-checked={on} title={t.desc} onClick={() => set({ template: id, canvas: {} })}
-              className={`relative space-y-1 border p-1.5 text-left text-xs transition ${on ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.08)]" : "border-border text-muted-foreground hover:text-foreground"}`}>
-              {on && <span className="absolute right-1 top-1 z-10 bg-[rgb(200,255,58)] px-1 text-[9px] font-semibold text-black">ACTIVE</span>}
+              className={`relative space-y-1 border p-1.5 text-left text-xs transition ${on ? "border-signal/85 bg-signal/8" : "border-border text-muted-foreground hover:text-foreground"}`}>
+              {on && <span className="absolute right-1 top-1 z-10 bg-signal px-1 text-[9px] font-semibold text-black">ACTIVE</span>}
               <Mini id={id} />
               <span className="block truncate font-medium">{t.label}</span>
               {t.desc && <span className="line-clamp-2 block text-[10px] text-muted-foreground">{t.desc}</span>}
@@ -107,7 +107,7 @@ export function FramePicker({ ov, v, set }: { ov: Overview; v: FrameValue; set: 
           </div>
           <label className="flex items-center justify-between gap-3 text-sm">
             <span>Verified badge</span>
-            <input type="checkbox" className="h-5 w-5 accent-[rgb(200,255,58)]" checked={k.verified !== false} onChange={(e) => setK({ verified: e.target.checked })} />
+            <input type="checkbox" className="h-5 w-5 accent-signal" checked={k.verified !== false} onChange={(e) => setK({ verified: e.target.checked })} />
           </label>
           <Label text="Post hook / statement">
             <textarea className={`${field} min-h-[72px]`} value={k.hook ?? ""} placeholder="Leave empty: each clip uses its own title as the hook (recommended for a batch)" onChange={(e) => setK({ hook: e.target.value })} />

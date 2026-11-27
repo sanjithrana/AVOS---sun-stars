@@ -88,7 +88,7 @@ function Keys({ s }: { s: AppSettings }) {
   const [name, setName] = useState(""), [value, setValue] = useState("");
   const { busy, msg, run } = useSave();
   return (
-    <Card id="keys" icon={<KeyRound className="h-5 w-5 text-amber-400" />} title="API keys"
+    <Card id="keys" icon={<KeyRound className="h-5 w-5 text-muted-foreground" />} title="API keys"
       sub="Used by Explainer and Animations. A key saved here wins over the same name in apps/.env; Clear goes back to .env. Keys stay on this computer.">
       {groups.map(([group, keys]) => (
         <div key={group} className="mb-4">
@@ -121,7 +121,7 @@ function Gpu({ s }: { s: AppSettings }) {
     setMsg({ ok: r.ok, text: r.detail });
   };
   return (
-    <Card id="gpu" icon={<Cpu className="h-5 w-5 text-amber-400" />} title="GPU server"
+    <Card id="gpu" icon={<Cpu className="h-5 w-5 text-muted-foreground" />} title="GPU server"
       sub="Your own GPU running ComfyUI (for example an A100 rented on RunPod or Vast.ai). Models whose workflow you upload below run there, free per call, before any paid API.">
       <div className="flex flex-wrap items-center gap-2">
         <input className={`${input} max-w-md`} value={shown} onChange={(e) => setUrl(e.target.value)} placeholder="http://<pod address>:8188" aria-label="ComfyUI address" data-testid="gpu-url" />
@@ -292,7 +292,7 @@ function Models({ s }: { s: AppSettings }) {
     ["Open models (catalog)", list.filter((m) => !m.custom)],
   ];
   return (
-    <Card id="models" icon={<Wand2 className="h-5 w-5 text-amber-400" />} title="Models"
+    <Card id="models" icon={<Wand2 className="h-5 w-5 text-muted-foreground" />} title="Models"
       sub="Every model Explainer and Animations can use. Upload a ComfyUI workflow to run a model on your GPU server, or add any fal.ai, Replicate, ComfyUI or OpenAI-compatible model of your own.">
       {groups.map(([title, ms]) => ms.length > 0 && (
         <div key={title} className="mb-4">
@@ -300,7 +300,7 @@ function Models({ s }: { s: AppSettings }) {
           <div className="rounded-xl border border-border px-3">{ms.map((m) => <ModelRow key={m.id} m={m} s={s} />)}</div>
         </div>
       ))}
-      <p className="text-xs text-muted-foreground">Licences, prices and what each model is best at: <Link href="/models" className="underline">Models page</Link>.</p>
+      <p className="text-xs text-muted-foreground">Licences, prices and what each model is best at: <a href="#models" className="underline">Models below</a>.</p>
       <AddModel s={s} />
     </Card>
   );
@@ -313,15 +313,13 @@ export default function SettingsPage() {
   );
   return (
     <AppShell header={header}>
-      <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
-        <div>
-          <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Settings</h1>
-          <p className="text-muted-foreground">API keys, your GPU server and your own models, for both Explainer and Animations.</p>
-          <nav className="mt-3 flex flex-wrap gap-2 text-sm">
+      <div className="w-full max-w-6xl space-y-6 px-4 py-6 md:px-8">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <p className="text-[13.5px] text-muted-foreground">API keys, your GPU server and your own models, for Explainer and Animations</p>
+          <nav className="flex flex-wrap gap-4 text-[13px]" aria-label="On this page">
             {[["keys", "API keys"], ["gpu", "GPU server"], ["models", "Models"]].map(([a, l]) => (
-              <a key={a} href={`#${a}`} className="rounded-xl border border-border px-3 py-1.5 text-muted-foreground hover:border-amber-500/40 hover:text-foreground">{l}</a>
+              <a key={a} href={`#${a}`} className="text-muted-foreground transition-colors hover:text-foreground">{l}</a>
             ))}
-            <Link href="/gpu" className="rounded-xl border border-border px-3 py-1.5 text-muted-foreground hover:border-amber-500/40 hover:text-foreground">GPU workers →</Link>
           </nav>
         </div>
         {q.isLoading && <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Loading…</p>}

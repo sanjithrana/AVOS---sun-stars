@@ -61,11 +61,11 @@ export function SkillGrid({ items, value, onChange, loading }: {
           <input
             value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search skills, looks, what they are good for"
             aria-label="Search skills"
-            className="w-full border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[rgba(200,255,58,0.6)]"
+            className="w-full border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-signal/60"
           />
         </div>
         <p className="text-xs text-muted-foreground">{shown.length} of {items.length}</p>
-        <Link href="/stickman" className="border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-[rgba(200,255,58,0.5)] hover:text-foreground">
+        <Link href="/stickman" className="border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-signal/50 hover:text-foreground">
           Stickman looks
         </Link>
       </div>
@@ -87,7 +87,7 @@ export function SkillGrid({ items, value, onChange, loading }: {
             return (
               <button
                 key={s.id} type="button" onClick={() => onChange(s.id)} aria-pressed={on} title={s.made_for}
-                className={`group overflow-hidden border text-left transition ${ on ?"border-[rgba(200,255,58,0.85)] ring-1 ring-[rgba(200,255,58,0.45)]" :"border-border hover:border-[rgba(200,255,58,0.5)]" }`}
+                className={`group overflow-hidden border text-left transition ${ on ?"border-signal/85 ring-1 ring-signal/45" :"border-border hover:border-signal/50" }`}
               >
                 <div className="relative aspect-video overflow-hidden bg-muted">
                   {missing[s.id] ? (
@@ -100,7 +100,7 @@ export function SkillGrid({ items, value, onChange, loading }: {
                     <img
                       src={`/skills/${s.id}.jpg`} alt="" loading="lazy" decoding="async"
                       onError={() => setMissing((m) => ({ ...m, [s.id]: true }))}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                      className="h-full w-full object-cover transition duration-300"
                     />
                   )}
                 </div>

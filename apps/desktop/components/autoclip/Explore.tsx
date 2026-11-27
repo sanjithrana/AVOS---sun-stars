@@ -68,7 +68,7 @@ export function Explore({ onPick }: { onPick: (url: string) => void }) {
         {d?.items.slice(0, shown).map((v) => (
           <article key={v.id} className="group space-y-2">
             <div className="relative overflow-hidden rounded-2xl bg-black">
-              <img src={v.thumb} alt="" loading="lazy" className="aspect-video w-full object-cover transition group-hover:scale-[1.02]" />
+              <img src={v.thumb} alt="" loading="lazy" className="aspect-video w-full object-cover transition" />
               <button type="button" onClick={() => onPick(v.url)} className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-medium text-black shadow hover:bg-white/90"><Scissors className="h-4 w-4" />Get clips</button>
               <span className={`absolute bottom-3 right-3 rounded-md px-2 py-0.5 text-xs font-semibold ${v.live ? "bg-red-600 text-white" : "bg-black/80 text-white"}`}>{v.live ? "● LIVE" : len(v.seconds)}</span>
             </div>

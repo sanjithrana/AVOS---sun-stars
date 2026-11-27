@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/bricolage-grotesque/opsz.css";
+import "@fontsource-variable/instrument-sans/wdth.css";
 import "./globals.css";
 import { Providers } from "./providers";
 import { ThemeProvider, THEME_BOOTSTRAP_SCRIPT } from "./theme-provider";
 
 export const metadata: Metadata = {
-  title: "AVOS - AI Video Operating System",
+  title: "AVOS Studio",
   description: "Vertically integrated AI Video Operating System",
 };
 

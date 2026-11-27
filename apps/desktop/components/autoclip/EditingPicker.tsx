@@ -88,7 +88,7 @@ export function EditingPicker({ o, set, ov }: { o: EditOpts; set: <K extends key
       </div>
       <div role="radiogroup" aria-label="Edit style" className="flex flex-wrap gap-2">
         {[["off", "No effects"], ...Object.entries(styles)].map(([k, v]) => (
-          <button key={k} type="button" role="radio" aria-checked={o.edit === k} onClick={() => set("edit", k)} className={`border px-3 py-2 text-left text-sm transition ${o.edit === k ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground hover:text-foreground"}`}>{v}</button>
+          <button key={k} type="button" role="radio" aria-checked={o.edit === k} onClick={() => set("edit", k)} className={`border px-3 py-2 text-left text-sm transition ${o.edit === k ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground hover:text-foreground"}`}>{v}</button>
         ))}
       </div>
       {!off && (

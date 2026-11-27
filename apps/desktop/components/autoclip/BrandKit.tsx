@@ -21,7 +21,7 @@ export function BrandKit({ v, set }: { v: BrandOpts; set: (b: BrandOpts) => void
   const kind = wm?.kind ?? "none";
   const setWm = (p: Partial<NonNullable<BrandOpts["wm"]>>) => set({ ...v, wm: { kind: "text", pos: "br", size: 100, opacity: 75, ...(wm ?? {}), ...p } as NonNullable<BrandOpts["wm"]> });
   const on = !!(wm || v.end?.on || v.lower?.on);
-  const pill = (x: boolean) => `border px-3 py-1.5 text-sm ${x ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground hover:text-foreground"}`;
+  const pill = (x: boolean) => `border px-3 py-1.5 text-sm ${x ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground hover:text-foreground"}`;
   return (
     <div className="border border-border">
       <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium">
@@ -51,7 +51,7 @@ export function BrandKit({ v, set }: { v: BrandOpts; set: (b: BrandOpts) => void
               <div className="grid gap-4 sm:grid-cols-[auto_1fr_1fr]">
                 <div className="grid w-28 grid-cols-3 gap-1">
                   {POS.map((p) => <button key={p} type="button" title={POS_NAME[p]} aria-label={POS_NAME[p]} aria-pressed={(wm.pos ?? "br") === p} onClick={() => setWm({ pos: p })}
-                    className={`h-8 border ${(wm.pos ?? "br") === p ? "border-primary bg-[rgba(200,255,58,0.25)]" : "border-border hover:bg-muted"}`} />)}
+                    className={`h-8 border ${(wm.pos ?? "br") === p ? "border-primary bg-signal/25" : "border-border hover:bg-muted"}`} />)}
                 </div>
                 <Label text={`Size: ${wm.size ?? (kind === "logo" ? 18 : 100)}%`} hint={kind === "logo" ? "Share of the clip's width." : "100% is small and readable."}>
                   <input type="range" min={kind === "logo" ? 6 : 50} max={kind === "logo" ? 45 : 250} value={wm.size ?? (kind === "logo" ? 18 : 100)} onChange={(e) => setWm({ size: +e.target.value })} className="w-full" />

@@ -16,6 +16,8 @@ function localIPv4Addresses(): string[] {
 }
 
 const nextConfig: NextConfig = {
+  // The dev badge sat on top of Settings at the bottom of the rail.
+  devIndicators: { position: "bottom-right" },
   allowedDevOrigins: ["localhost", "127.0.0.1", ...localIPv4Addresses()],
   // A stray lockfile one level up (e.g. D:\star\package-lock.json) makes
   // Turbopack auto-detect the wrong workspace root, which breaks route
@@ -36,6 +38,8 @@ const nextConfig: NextConfig = {
       { source: "/facts", destination: "/explainer", permanent: false },
       { source: "/project/:path*", destination: "/explainer", permanent: false },
       { source: "/studio/:path*", destination: "/explainer", permanent: false },
+      // The Models tab never had a page: the models live in Settings.
+      { source: "/models", destination: "/settings#models", permanent: false },
     ];
   },
   async rewrites() {

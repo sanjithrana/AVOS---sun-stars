@@ -50,7 +50,7 @@ export function FilmPage({ id }: { id: string }) {
       <div>
         <BackLink direct href="/animations/films" className="text-xs text-muted-foreground hover:underline">← Films</BackLink>
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
+          <h1 className="text-2xl font-semibold text-foreground md:text-3xl">{s.title}</h1>
           <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{snap.language.name}</span>
           <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{s.format.aspect}</span>
           {bd?.duration ? <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{bd.duration.toFixed(1)} s · {bd.shots?.length} shots</span> : null}
@@ -62,7 +62,7 @@ export function FilmPage({ id }: { id: string }) {
         {stages.map((x, i) => (
           <li key={x.key}>
             <a href={`#stage-${x.key}`} className="flex items-center gap-2 rounded-xl border border-border bg-card/40 p-2 text-xs hover:border-amber-500" data-testid={`stage-${x.key}`} data-state={x.state}>
-              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${DOT[x.state]}`}>{x.state === "done" ? "✓" : i + 1}</span>
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${DOT[x.state]}`}>{x.state === "done" ? "✓" : i + 1}</span>
               <span className="min-w-0"><b className="block truncate text-foreground">{x.label}</b>
                 <span className="text-[10px] text-muted-foreground">{x.state === "yours" ? "waiting for you" : x.state === "working" ? "working…" : x.state === "done" ? "done" : "later"}</span></span>
             </a>
@@ -149,7 +149,7 @@ export function FilmPage({ id }: { id: string }) {
           {(part.status === "rendering" || part.status === "queued") && (
             <div className="space-y-2">
               <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin text-amber-500" />{snap.series.work.step ?? "Animating"}{snap.series.work.total ? ` · ${snap.series.work.done}/${snap.series.work.total}` : ""}</p>
-              {!!snap.series.work.total && <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-all" style={{ width: `${Math.round((100 * (snap.series.work.done ?? 0)) / snap.series.work.total)}%` }} /></div>}
+              {!!snap.series.work.total && <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-amber-500 transition-colors" style={{ width: `${Math.round((100 * (snap.series.work.done ?? 0)) / snap.series.work.total)}%` }} /></div>}
             </div>
           )}
           {animated && ep && <PartReview sid={id} snap={snap} ep={ep} p={part} act={act} pending={pending} />}
@@ -190,7 +190,7 @@ function Stage({ n, id, title, state, children }: { n: number; id: string; title
   return (
     <section id={`stage-${id}`} className={`scroll-mt-20 rounded-xl border p-4 md:p-5 ${state === "yours" ? "border-amber-500/60" : "border-border"} bg-card/20`} data-testid={`film-stage-${id}`}>
       <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-foreground">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-black">{n}</span>{title}
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-black">{n}</span>{title}
       </h2>
       {children}
     </section>

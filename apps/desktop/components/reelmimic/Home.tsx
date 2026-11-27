@@ -43,7 +43,7 @@ export function Home() {
   ];
   return (
     <main className="mx-auto max-w-7xl space-y-8 p-4 md:p-8" data-testid="animations-home">
-      <PageHero eyebrow={say("動畫", "Animations")} title={<>{say("借用風格，", "Steal the style. ")}<Lit>{say("做出你的故事。", "Make it yours.")}</Lit></>}
+      <PageHero eyebrow={say("動畫", "Animations")} title={<>{say("借用風格，", "Steal the style, ")}<Lit>{say("做出你的故事。", "make it yours")}</Lit></>}
         blurb={say("丟一支喜歡的影片，做出同樣風格的新動畫：拆解風格、企劃、你核准後才製作，每一段都檢查過才交件。",
           "Give it a video you love and get a new animation in the same style: it studies the style, plans with you, renders only after you approve, and checks every part before delivering.")}
         steps={[{ icon: Palette, t: say("拆解風格", "Study the style"), d: say("看懂參考影片", "Learns the look of your reference.") }, { icon: ListChecks, t: say("企劃並核准", "Plan and approve"), d: say("你核准後才製作", "Nothing renders until you say so.") }, { icon: ShieldCheck, t: say("製作並檢查", "Render and check"), d: say("每一段都檢查", "Every part is checked before delivery.") }]} />
@@ -71,8 +71,8 @@ export function Home() {
       <section className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
         {stats.map(([ico, label, value, color]) => (
           <div key={ico} className="rounded-xl border border-border bg-card/50 p-4 md:p-6">
-            <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-[var(--signal)] md:h-12 md:w-12`}><I n={ico} s={2} style={{ fontSize: 20 }} /></div>
-            <p className="mb-1 text-2xl font-bold text-foreground md:text-3xl">{list.isLoading ? "–" : value}</p>
+            <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-signal md:h-12 md:w-12`}><I n={ico} s={2} style={{ fontSize: 20 }} /></div>
+            <p className="mb-1 text-2xl font-semibold text-foreground md:text-3xl">{list.isLoading ? "–" : value}</p>
             <p className="text-xs text-muted-foreground md:text-sm">{label}</p>
           </div>
         ))}
@@ -101,13 +101,13 @@ export function Home() {
         {items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-12 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 text-amber-500"><I n="film" style={{ fontSize: 30 }} /></div>
-            <h3 className="text-xl font-bold text-foreground">{say("還沒有專案", "No animations yet")}</h3>
+            <h3 className="text-xl font-semibold text-foreground">{say("還沒有專案", "No animations yet")}</h3>
             <p className="text-muted-foreground">{say("在上面放一支參考影片並寫下你想做什麼。", "Add a reference video above and describe what you want.")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">{items.map((p) => (
             <Link key={p.id} data-testid="animation-card" data-stage={p.stage} href={`/animations/${p.id}`}
-              className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card/50 transition-all duration-300 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10"
+              className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card/50 transition-colors duration-300 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10"
               onMouseEnter={(e) => { const v = e.currentTarget.querySelector("video"); if (v) { v.currentTime = 3; v.play().catch(() => {}); } }}
               onMouseLeave={(e) => e.currentTarget.querySelector("video")?.pause()}>
               <div className="relative aspect-video bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 bg-cover bg-center" style={{ backgroundImage: p.thumb ? `url("${api.file(p.id, p.thumb)}")` : undefined }}>

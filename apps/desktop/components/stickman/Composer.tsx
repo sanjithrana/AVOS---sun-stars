@@ -9,7 +9,7 @@ import { ModelPicker, NO_CHOICE, choiceBody, type ModelChoice } from "@/componen
 
 const LENGTHS = { director: [30, 60, 90, 120], autopilot: [60, 120, 180, 300] } as const;
 const label = (s: number) => (s < 60 ? `${s} s` : `${s / 60} min`);
-const chip = (on: boolean) => `rounded-full border px-4 py-2 text-sm transition-colors ${on ? "border-[rgba(200,255,58,0.7)] bg-[rgba(200,255,58,0.18)] text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
+const chip = (on: boolean) => `rounded-full border px-4 py-2 text-sm transition-colors ${on ? "border-signal/70 bg-signal/18 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`;
 
 /** The brief, the way Stickman Video Director takes it: a topic, a pasted copy or script, or a description of what you need,
  *  plus the requirements (look, shape, length, narrator). The director's treatment comes first, for your approval. */
@@ -39,7 +39,7 @@ export function Composer({ style }: { style: StyleInfo | null }) {
       </p>
 
       {style?.native_audio && (
-        <p className="mt-4 rounded-2xl border border-[rgba(200,255,58,0.35)] p-3 text-xs leading-relaxed text-muted-foreground" data-testid="native-note">
+        <p className="mt-4 rounded-2xl border border-signal/35 p-3 text-xs leading-relaxed text-muted-foreground" data-testid="native-note">
           This skill works like SJinn&apos;s Amber Noir: a director&apos;s proposal and continuity bible first, then an identity sheet, a location reference and an opening image per clip,
           each checked. Clips are made by Seedance 2.0 from those references with its own narration, music and sound, and joined with no titles or subtitles.
           Needs a fal.ai key with credit (Settings); without it the clips fall back to pictures with camera moves and a separate voice.

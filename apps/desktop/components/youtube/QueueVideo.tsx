@@ -36,12 +36,12 @@ export function QueueVideo({ url, title, className = "", full = false }: { url: 
               <span className="flex flex-wrap gap-2">
                 {chans.map((c) => (
                   <button key={c.id} type="button" aria-pressed={sel.has(c.id)} onClick={() => { const x = new Set(sel); x.has(c.id) ? x.delete(c.id) : x.add(c.id); setSel(x); }}
-                    className={`border px-3 py-1.5 ${sel.has(c.id) ? "border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)]" : "border-border text-muted-foreground"}`}>
+                    className={`border px-3 py-1.5 ${sel.has(c.id) ? "border-signal/85 bg-signal/12" : "border-border text-muted-foreground"}`}>
                     {c.title}<span className="ml-1.5 text-[10px] uppercase opacity-70">{c.platform || "youtube"}</span>
                   </button>
                 ))}
               </span>
-              <button type="button" disabled={sel.size === 0 || go.isPending} onClick={() => go.mutate()} className="h-9 border border-[rgba(200,255,58,0.85)] bg-[rgba(200,255,58,0.12)] px-3 disabled:opacity-50">
+              <button type="button" disabled={sel.size === 0 || go.isPending} onClick={() => go.mutate()} className="h-9 border border-signal/85 bg-signal/12 px-3 disabled:opacity-50">
                 {go.isPending ? "Adding…" : `Add to ${sel.size || ""} queue${sel.size === 1 ? "" : "s"}`}
               </button>
             </>
