@@ -162,9 +162,21 @@ async def llamacpp_models() -> list[str] | None:
         return None
 
 
+AUTO_ORDER = ("groq", "gemini", "openrouter", "openai", "anthropic")   # free tiers first, then paid
+
+
+def auto_agent() -> str:
+    """The writer to use when you never picked one: the first text AI you have a key for (free tiers first), else Ollama
+    on this computer. Paste one key in Settings and new jobs use it, with nothing else to set."""
+    for kind in AUTO_ORDER:
+        if os.environ.get(SPEC[kind]["key"]):
+            return kind
+    return "ollama"
+
+
 def default_agent() -> str:
-    a = os.environ.get("STUDIO_DEFAULT_AGENT") or "ollama"
-    return a if a in agent_kinds() else "ollama"
+    a = os.environ.get("STUDIO_DEFAULT_AGENT") or ""
+    return a if a in agent_kinds() else auto_agent()
 
 
 def _cli(kind: str) -> str | None:

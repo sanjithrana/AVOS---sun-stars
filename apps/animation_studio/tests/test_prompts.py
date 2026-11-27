@@ -103,7 +103,7 @@ def test_ai_writer_improvement_is_validated(monkeypatch):
     monkeypatch.setattr(writers, "uses_ai", lambda s: True)
     monkeypatch.setattr(writers, "ask", lambda *a, **k: {"text": cur + " Keep the face symmetrical and fully visible in every view.", "why": "faces were off-model"})
     _use(key, 1, ["flag"] * 4 + ["ok"] * 2, "flat")
-    assert prompts.learn({"id": "x"}) and prompts.library()["items"][-2]["candidate"]["text"].startswith(cur)
+    assert prompts.learn({"id": "x"}) and next(i for i in prompts.library()["items"] if i["key"] == key)["candidate"]["text"].startswith(cur)
     monkeypatch.setattr(writers, "ask", lambda *a, **k: {"text": "Draw a character sheet.", "why": "short"})          # drops {name}/{look}/{style}
     out = prompts._ai_improve({"id": "x"}, key, cur, prompts._load()["keys"][key]["versions"][0], None)
     assert out is None

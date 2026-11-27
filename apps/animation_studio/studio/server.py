@@ -101,6 +101,13 @@ async def health() -> dict:
     return {"ok": True, "repo": str(config.REPO), "repoPresent": config.REPO.is_dir(), "styles": str(config.STYLES), "projects": str(PROJECTS)}
 
 
+@app.get("/api/setup")
+def setup_plan() -> dict:
+    """Home: which provider does writing, pictures, video and voice with the keys you saved, and what to add next."""
+    from . import setup
+    return setup.plan()
+
+
 @app.get("/api/agents")
 async def agents() -> dict:
     return await agent_status()

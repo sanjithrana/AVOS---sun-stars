@@ -22,7 +22,7 @@ INFO = {
              "portrait transformation clip with mechanical ASMR. With media on, it draws both pictures and makes the clip from them.",
     "input": "Name a subject, e.g. a seven-headed hydra, a snow leopard, a vintage locomotive, a samurai crab",
     "outputs": ["Compact device image", "Fully transformed image", "Transformation video"],
-    "aspect": "9:16", "seconds": [8, 10, 12, 15], "default_seconds": 15, "native_audio": True,
+    "aspect": "9:16", "aspects": ["9:16"], "seconds": [8, 10, 12, 15], "default_seconds": 15, "native_audio": True,
     "examples": ["a seven-headed hydra", "a snow leopard", "a vintage steam locomotive", "a phoenix", "a hermit crab", "a Viking longship"],
     "credit": "Workflow modelled on SJinn's mechanical-toy skill.",
 }

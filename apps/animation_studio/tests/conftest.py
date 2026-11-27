@@ -19,8 +19,12 @@ os.environ["COMFYUI_WORKFLOW_DIR"] = str(_TMP / "comfyui_workflows")
 os.environ["AVOS_SETTINGS_FILE"] = str(_TMP / "avos_settings.json")
 for k in ("OLLAMA_URL", "STUDIO_OLLAMA_MODEL", "STUDIO_OLLAMA_VISION_MODEL", "STUDIO_DEFAULT_AGENT", "GROQ_API_KEY",
           "FAL_KEY", "COMFYUI_URL", "MODEL_BACKEND", "STUDIO_IMAGE_MODEL", "STUDIO_IMAGES",
-          "CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "IMAGE_SERVICE_URL"):
+          "CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "IMAGE_SERVICE_URL",
+          "GEMINI_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"):
     os.environ.pop(k, None)
+# The writer is picked automatically from saved keys (llm.auto_agent); a test that saves a Groq key must not turn every
+# later test into a call to Groq, so the suite pins the old default. test_setup.py unsets it to test the automatic pick.
+os.environ["STUDIO_DEFAULT_AGENT"] = "ollama"
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 needs_ffmpeg = pytest.mark.skipif(not shutil.which("ffmpeg"), reason="FFmpeg is not installed")

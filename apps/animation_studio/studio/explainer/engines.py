@@ -163,7 +163,7 @@ def animation_prompt(p: dict, shot: dict) -> str:
     who = ", ".join(c["name"] for c in p["plan"]["characters"] if c["id"] in shot["characters"])
     things = ", ".join(x["name"] for x in p["plan"]["props"] if x["id"] in shot["props"])
     moving = shot["action"].rstrip(".")
-    move = cinema.MOVES.get(shot["camera"].get("movement"), "steady camera").split(",")[0]
+    move = cinema.MOVES.get((shot.get("camera") or {}).get("movement"), "steady camera").split(",")[0]
     bits = [f"{move[0].upper() + move[1:]} as {moving}."]
     if shot.get("cam_note"):
         bits.append(f"Camera: {shot['cam_note']}.")

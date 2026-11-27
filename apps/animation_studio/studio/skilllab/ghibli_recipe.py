@@ -33,7 +33,7 @@ INFO = {
              "timed to the length you pick. Prompt only, or it draws a key frame and makes the clip too.",
     "input": "Paste a recipe link (or the recipe itself), e.g. https://example.com/paneer-butter-masala",
     "outputs": ["The prompt", "The cooking scene"],
-    "aspect": "16:9", "seconds": [10, 15], "default_seconds": 15, "native_audio": True,
+    "aspect": "16:9", "aspects": ["16:9"], "seconds": [10, 15], "default_seconds": 15, "native_audio": True,
     "examples": ["https://example.com/recipes/tomato-soup", "Masala chai: ginger, cardamom, tea, milk, jaggery", "Pancakes: flour, egg, milk, butter, maple syrup"],
     "credit": "Prompt brief from an anime cooking-video prompt template.",
 }

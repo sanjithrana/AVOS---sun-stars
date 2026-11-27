@@ -545,6 +545,7 @@ class StyleSkill:
     RUN = RUN
     last_stage = staticmethod(last_stage)
     reset = staticmethod(reset)
+    outputs_of = staticmethod(outputs_of)
 
     def __init__(self, slug: str, st: dict) -> None:
         self.slug, self.style = slug, st

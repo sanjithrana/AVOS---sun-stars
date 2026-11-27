@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Clapperboard, Landmark, Scissors, Sparkles, type LucideIcon } from "lucide-react";
 import { PromptBar } from "@/components/home/PromptBar";
+import { SetupCard } from "@/components/home/SetupCard";
 import { AppShell } from "@/components/layout/AppShell";
 import { EMPTY_ACTIVITY, ago, fetchActivity, type ActivityItem } from "@/lib/activity";
 import { explainer } from "@/lib/explainer";
@@ -133,6 +134,9 @@ export default function Home() {
             </>
           )}
         </section>
+
+        {/* which key does what, and the one to add next */}
+        <SetupCard />
 
         {/* the rooms */}
         {STUDIOS.map((s) => (

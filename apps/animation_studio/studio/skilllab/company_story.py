@@ -925,6 +925,17 @@ def do_finish(pid: str) -> None:
     base.step(pid, "finish", status="done", note="" if mpath else "no music model ready: narration only")
 
 
+def outputs_of(p: dict) -> list[dict]:
+    """One card per scene (its clip once animated, its picture until then), then the finished film."""
+    scenes = (p.get("script") or {}).get("scenes") or []
+    out = [{"key": f"scene{sc['n']}", "step": "animate" if sc.get("video") else "scenes",
+            "title": f"{sc['n']}. {(sc.get('purpose') or sc.get('place') or 'Scene').strip()[:40]}",
+            "kind": "video" if sc.get("video") else "image", "file": sc.get("video") or sc.get("picture"),
+            "prompt": None} for sc in scenes]
+    out.append({"key": "final", "step": "finish", "title": "The film", "kind": "video", "file": p.get("video"), "prompt": None})
+    return out
+
+
 RUN = {"research": do_research, "script": do_script, "cast": do_cast, "scenes": do_scenes, "animate": do_animate, "voice": do_voice, "finish": do_finish}
 
 

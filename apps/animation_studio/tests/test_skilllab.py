@@ -50,7 +50,7 @@ def test_run_draws_transformed_from_compact_then_clip(monkeypatch):
     def png(color):
         b = io.BytesIO(); Image.new("RGB", (72, 128), color).save(b, "PNG"); return b.getvalue()
 
-    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None):
+    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None, **kw):
         calls.append((tag, len(refs)))
         return png("grey" if "compact" in tag else "black"), {"model": "stand-in"}
 
@@ -288,7 +288,7 @@ def test_company_story_run_makes_the_video(monkeypatch):
     monkeypatch.setattr(CS, "_seedance", lambda s: False)
     pics = []
 
-    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None):
+    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None, **kw):
         pics.append((tag, len(refs)))
         assert refs == [] and negative == CS.NEGATIVE and "NO people" in prompt               # backdrops only: the character is placed in code
         return _scene_png(w // 8, h // 8, len(pics)), {"model": "stand-in"}
@@ -326,7 +326,7 @@ def test_review_pause_plan_changes_and_activity_feed(monkeypatch):
     _patch(monkeypatch)
     monkeypatch.setattr(CS, "_seedance", lambda s: False)
 
-    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None):
+    def fake_picture(prompt, refs, w, h, seed, tag, priority=5, s=None, negative=None, **kw):
         return _scene_png(w // 8, h // 8, 1), {"model": "stand-in"}
 
     monkeypatch.setattr(media, "picture", fake_picture)
@@ -479,9 +479,9 @@ def test_asmr_cooking_locks_the_look_and_the_sound():
     assert (AC.shots_for(30), AC.shots_for(180)) == (7, 40) and 3.0 <= AC.seconds_each(45, AC.shots_for(45)) <= 6.0
     r = AC.norm_recipe(AC_RECIPE, "cheese corn nuggets", 3)
     assert [s["n"] for s in r["shots"]] == [1, 2, 3] and r["title"] == "Cheese Corn Nuggets"
-    for sh in r["shots"]:                                    # the look is in every picture prompt, word for word
+    for sh in r["shots"]:                                    # the hands and the never-list survive the 900-character cap
         q = AC.image_prompt(r, sh)
-        assert AC.HANDS in q and AC.SURFACE in q and AC.LIGHT in q and AC.NEVER in q
+        assert AC.HANDS in q and AC.NEVER in q and q.endswith(AC.NEVER)
         assert sh["state"] in q and sh["subject"] in q       # continuity and what is in frame are named
         assert len(q) < 1500                                 # the free picture models cut long prompts
     m = AC.motion_prompt(r["shots"][2], 4)
@@ -510,7 +510,7 @@ def test_asmr_cooking_run_makes_the_video_without_any_paid_model(monkeypatch):
     monkeypatch.setattr(writers, "ask", ask)
     monkeypatch.setattr(writers, "uses_ai", lambda s: True)
     monkeypatch.setattr(AC, "shots_for", lambda total: 3)
-    def fake_picture(prompt, refs, w, h, seed, tag, s=None, negative=None, priority=5):
+    def fake_picture(prompt, refs, w, h, seed, tag, s=None, negative=None, priority=5, **kw):
         assert AC.HANDS in prompt
         return _scene_png(w, h, seed), {"model": "test"}
     monkeypatch.setattr(M, "picture", fake_picture)

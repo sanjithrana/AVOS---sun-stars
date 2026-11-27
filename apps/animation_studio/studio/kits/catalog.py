@@ -21,7 +21,7 @@ ANIM = {
     "anime-watercolor": ("Anime Watercolor", "Hand-painted anime sky, cumulus clouds, watercolour washes", "calm stories, travel, poems"),
     "ascii-art": ("ASCII Art", "The whole picture typed in characters on a dark terminal", "tech, hacking, code, retro"),
     "paper-cutout": ("Paper Cut-out", "A pop-up book of coloured paper with real shadows", "history, fairy tales, kids"),
-    "kurzgesagt": ("Kurzgesagt style", "Bold flat vector, gradients and glow, deep space colours", "science, space, biology"),
+    "kurzgesagt": ("Flat space vector", "Bold flat vector, gradients and glow, deep space colours", "science, space, biology"),
     "ink-wash": ("Ink Wash", "Sumi-e brush painting: black ink, mist, one red seal", "philosophy, nature, Asia"),
     "voxel-art": ("Voxel Art", "A world of cubes with tiny textures, raised camera", "games, building, maps"),
     "1930s-cartoon": ("1930s Cartoon", "Rubber-hose animation on old film with grain and flicker", "comedy, nostalgia, music"),

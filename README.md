@@ -56,6 +56,7 @@ fal.ai, Replicate, Stability or your own ComfyUI GPU server.
 - **Human in the loop.** Durable workflows (Temporal) pause for your approval and resume exactly where they stopped, even after a restart.
 - **Free first.** Ollama for text, Pollinations and Cloudflare for pictures, faster-whisper for captions and free Edge voices for narration. Paid providers are optional.
 - **Bring your own GPU.** Point Settings at a ComfyUI server and the studio routes image and video jobs to it; drop in your own workflow JSON.
+- **One key is enough to start.** Paste a text key (Groq, Gemini...) and it writes every job; paste a fal.ai key and it draws pictures and makes Seedance, Kling or Wan video. Home shows *Your setup*: which provider does writing, pictures, video and voice, and the one key that would help most.
 - **Provider fallback.** When a free daily quota runs out, the job moves to the next provider you have set up instead of failing.
 - **Skills you can edit.** Writers, directors and checkers are plain `SKILL.md` files in [`apps/skills`](apps/skills). Change the text and the next run follows it.
 - **Live progress.** Every stage streams to the app as it happens; the top bar shows what is working and what needs you.
