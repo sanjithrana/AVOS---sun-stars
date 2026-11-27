@@ -93,7 +93,9 @@ def test_skills_are_loaded_from_the_skills_folder():
                      "avos-scene-director", "avos-sound-designer", "avos-shot-qa", "avos-continuity", "avos-prompt-compiler"}
     body = K.load("avos-scene-director")
     assert body.startswith("# Scene director") and "---" not in body.splitlines()[0]
-    assert all(k["description"] and k["used_by"] for k in K.catalog())
+    assert all(k["description"] for k in K.catalog())               # every skill says what it is for
+    crew = {"avos-series-bible", "avos-design-dna", "avos-head-writer", "avos-scriptwriter", "avos-scene-director"}
+    assert all(k["used_by"] for k in K.catalog() if k["name"] in crew)  # and the crew's own skills say who runs them
     assert K.load("no-such-skill", "fallback") == "fallback"
 
 

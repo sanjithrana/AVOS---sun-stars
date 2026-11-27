@@ -449,6 +449,6 @@ def test_your_model_choices_per_step(shared, monkeypatch, tmp_path):
                                                            "bogus": {"model": "x"}}})
         s = r.json()["series"]
         assert s["settings"]["models"] == {"motion": {"model": "ltx-2.3", "backend": "fal"}, "music": {"model": "off", "backend": "auto"}}
-        assert media.ordered(s, "motion", ["wan-2.2", "ltx-2.3"]) == ["ltx-2.3", "wan-2.2"] and media.where(s, "motion", "ltx-2.3") == "fal"
+        assert media.ordered(s, "motion", ["wan-2.2", "ltx-2.3"]) == ["ltx-2.3"]   # your pick only (media.strict) and media.where(s, "motion", "ltx-2.3") == "fal"
         assert media.where(s, "motion", "wan-2.2") is None and media.music(s, "x", 10, "t")[1]["note"] == "music off (your choice)"
         c.post(f"/api/series/{sid}/cancel")

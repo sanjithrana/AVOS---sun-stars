@@ -41,7 +41,10 @@ def _parse(text: str) -> tuple[dict[str, str], str]:
         for line in m.group(1).splitlines():
             if ":" in line:
                 k, v = line.split(":", 1)
-                meta[k.strip()] = v.strip()
+                v = v.strip()
+                if len(v) > 1 and v[0] == v[-1] and v[0] in "\"'":     # a quoted value, as some SKILL.md files write it
+                    v = v[1:-1].strip()
+                meta[k.strip()] = v
         text = text[m.end():]
     return meta, text.strip()
 
@@ -58,10 +61,28 @@ def load(name: str, default: str = "") -> str:
 
 
 def catalog() -> list[dict[str, Any]]:
+    """Every SKILL.md under apps/skills, one or two folders deep.
+
+    Nested because vendored collections keep their skills in folders of their own
+    (skills/animation-skills/skills/graph/SKILL.md), and those are instruction files like any other -- leaving them out
+    of the list only makes them invisible, not absent. Three folders deep is the limit, and the folders a package
+    manager fills are skipped, so one stray node_modules cannot turn the list into thousands of rows.
+    """
     d = skills_dir()
-    out = []
-    for p in sorted(d.glob("*/SKILL.md")) if d else []:
-        meta, body = _parse(p.read_text("utf-8"))
+    out, seen = [], set()
+    skip = {"node_modules", "vendor", ".git", "__pycache__", ".next", "dist", "build"}
+    found = [p for p in d.rglob("SKILL.md")
+             if len(p.parent.relative_to(d).parts) <= 3 and not (skip & set(p.relative_to(d).parts))] if d else []
+    for p in sorted(found):
+        if p in seen:
+            continue
+        seen.add(p)
+        try:
+            meta, body = _parse(p.read_text("utf-8"))
+        except OSError:
+            continue
+        rel = p.parent.relative_to(d)
         out.append({"name": meta.get("name") or p.parent.name, "description": meta.get("description", ""),
-                    "used_by": meta.get("used_by", ""), "path": str(p), "chars": len(body)})
+                    "used_by": meta.get("used_by", ""), "path": str(p), "chars": len(body),
+                    "folder": str(rel).replace("\\", "/")})
     return out

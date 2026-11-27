@@ -34,7 +34,7 @@ def test_local_only_refuses_cloud(monkeypatch):
     monkeypatch.setattr(models, "available", lambda mid: {"gpu": "No GPU worker is online", "fal": None, "cloudflare": None})
     with pytest.raises(models.ModelUnavailable) as e:
         media.where(S(motion="ltx-2.3", local=True), "motion", "ltx-2.3")
-    assert "NOT tried" in str(e.value) and "GPU worker" in str(e.value)
+    assert "Nothing was sent anywhere" in str(e.value) and "GPU worker" in str(e.value)
     monkeypatch.setattr(models, "available", lambda mid: {"gpu": None, "fal": None})
     assert media.where(S(motion="ltx-2.3", local=True), "motion", "ltx-2.3") == "gpu"
 

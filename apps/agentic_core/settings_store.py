@@ -29,6 +29,7 @@ KNOWN_KEYS: list[dict[str, str]] = [
     {"name": "GEMINI_API_KEY", "label": "Google Gemini (free tier)", "group": "Text AI", "uses": "Animations", "url": "https://aistudio.google.com/apikey"},
     {"name": "OPENROUTER_API_KEY", "label": "OpenRouter", "group": "Text AI", "uses": "Animations", "url": "https://openrouter.ai/keys"},
     {"name": "ANTHROPIC_API_KEY", "label": "Anthropic", "group": "Text AI", "uses": "Animations", "url": "https://console.anthropic.com/"},
+    {"name": "PEXELS_API_KEY", "label": "Pexels (free stock footage)", "group": "Images & video", "uses": "Skills, Stickman", "url": "https://www.pexels.com/api/"},
     {"name": "FAL_KEY", "label": "fal.ai (open image/video models)", "group": "Images & video", "uses": "Facts, Animations", "url": "https://fal.ai/dashboard/keys"},
     {"name": "REPLICATE_API_TOKEN", "label": "Replicate", "group": "Images & video", "uses": "Facts", "url": "https://replicate.com/account/api-tokens"},
     {"name": "STABILITY_API_KEY", "label": "Stability AI", "group": "Images & video", "uses": "Facts", "url": "https://platform.stability.ai/account/keys"},

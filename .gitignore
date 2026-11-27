@@ -73,3 +73,6 @@ yt-test.txt
 avos-all-updates/
 avos-architecture-updated*/
 
+
+# runtime state written by the studio (provider health, caches)
+.avos/

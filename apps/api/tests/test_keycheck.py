@@ -64,7 +64,7 @@ def test_route(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
     from src.routes.settings import router
     app = FastAPI()
-    app.include_router(router, prefix="/api/v1")
+    app.include_router(router)
     monkeypatch.setenv("AVOS_SETTINGS_FILE", str(tmp_path / "s.json"))
     monkeypatch.delenv("STABILITY_API_KEY", raising=False)
     with TestClient(app) as c:
