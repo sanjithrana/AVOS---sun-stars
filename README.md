@@ -4,7 +4,7 @@
 
 <p><b>One idea in, a finished video out.</b><br>
 A local studio for faceless shorts: explainers, stickman stories, animated series and auto-clipped highlights,<br>
-written, drawn, voiced, cut and posted from one desktop app.</p>
+written, drawn, voiced, cut and posted from one desktop app. developed by sanjuuuu...</p>
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
@@ -142,3 +142,5 @@ youtube-transcript-api and OpenCV. The interface follows the *unslop* design rul
 ([@heydamir](https://x.com/heydamir)), CC BY 4.0.
 
 All product names, logos and brands mentioned here belong to their owners and are used only to identify compatible services.
+
+with all my friends support.
